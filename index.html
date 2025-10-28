@@ -225,8 +225,6 @@
                         <ul class="docs-nav">
                             <li><a href="#" class="docs-link active" data-subpage="about"><i class="fas fa-info-circle"></i> About Us</a></li>
                             <li><a href="#" class="docs-link" data-subpage="technology"><i class="fas fa-microchip"></i> Technology</a></li>
-                            <li><a href="#" class="docs-link" data-subpage="features"><i class="fas fa-star"></i> Features</a></li>
-                            <li><a href="#" class="docs-link" data-subpage="contact"><i class="fas fa-envelope"></i> Contact</a></li>
                         </ul>
                     </aside>
                     <article class="docs-content" id="docsContent"></article>
@@ -281,9 +279,7 @@
         function loadDocsContent(subpage) {
             const content = {
                 'about': `<h2>About CyberStream</h2><p>CyberStream is a next-generation video streaming platform designed for the modern digital era. Our mission is to deliver high-quality video content with an immersive, cyberpunk-inspired user experience.</p><h3>Our Vision</h3><p>We believe that streaming technology should be both powerful and beautiful. CyberStream combines cutting-edge video delivery with a visually striking interface that enhances your viewing experience.</p><h3>What We Offer</h3><ul><li><strong>High-Quality Streaming:</strong> Adaptive bitrate streaming for the best possible quality based on your connection</li><li><strong>Advanced Player:</strong> Custom video player with precision controls and intuitive interface</li><li><strong>Privacy Focused:</strong> We respect your privacy and don't track your viewing habits</li><li><strong>Future-Ready:</strong> Built with the latest web technologies for optimal performance</li></ul>`,
-                'technology': `<h2>Our Technology</h2><p>CyberStream is built on a modern technology stack designed for performance, reliability, and scalability.</p><h3>Video Delivery</h3><p>We use adaptive bitrate streaming to ensure smooth playback regardless of your connection speed. Our content delivery network ensures low latency and fast loading times worldwide.</p><h3>Player Technology</h3><p>Our custom video player is built with HTML5 and enhanced with JavaScript for advanced functionality while maintaining compatibility across all modern browsers.</p>`,
-                'features': `<h2>Platform Features</h2><p>Complete feature documentation coming soon.</p>`,
-                'contact': `<h2>Contact Us</h2><p>Contact information coming soon.</p>`
+                'technology': `<h2>Our Technology</h2><p>CyberStream is built on a modern technology stack designed for performance, reliability, and scalability.</p><h3>Video Delivery</h3><p>We use adaptive bitrate streaming to ensure smooth playback regardless of your connection speed. Our content delivery network ensures low latency and fast loading times worldwide.</p><h3>Player Technology</h3><p>Our custom video player is built with HTML5 and enhanced with JavaScript for advanced functionality while maintaining compatibility across all modern browsers.</p>`
             };
 
             document.getElementById('docsContent').innerHTML = content[subpage] || content['about'];
