@@ -25,7 +25,7 @@
         .navbar { display: flex; justify-content: center; align-items: center; }
         .nav-brand { display: flex; align-items: center; gap: 12px; font-size: 1.4rem; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin-right: 2rem; padding: 4px 8px; }
         .nav-brand i { font-size: 1.6rem; color: #cccccc; }
-        .nav-menu { display: flex; list-style: none; gap: 2.5rem; border: 1px solid hsl(0deg 0% 100% / 12%); border-radius: 6px; }
+        .nav-menu { display: flex; list-style: none; gap: 1.5rem; border: 1px solid hsl(0deg 0% 100% / 12%); border-radius: 6px; padding: 8px 16px; }
         .nav-menu a { color: #aaaaaa; text-decoration: none; padding: 0.6rem 1.2rem; border: 1px solid transparent; transition: all 0.3s ease; font-size: 1rem; display: flex; align-items: center; gap: 8px; border-radius: 4px; }
         .nav-menu a:hover, .nav-menu a.active { color: #ffffff; border: 1px solid #ffffff; }
         
@@ -49,7 +49,6 @@
         .hero { text-align: center; padding: 10rem 0; margin-bottom: 4rem; }
         .hero-video { text-align: center; padding: 1rem 0; margin-bottom: 4rem; }
         .hero-docs { text-align: center; padding: 4rem 0; margin-bottom: 4rem; }
-        .hero-dashboard { text-align: center; padding: 5rem 0; margin-bottom: 4rem; }
         .hero h1 { font-size: 3.5rem; margin-bottom: 1.2rem; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 2px; }
         .tagline { color: #888888; font-size: 1.3rem; margin-bottom: 2.5rem; }
         
@@ -75,23 +74,6 @@
         .feature-card i { font-size: 3rem; color: #cccccc; margin-bottom: 1rem; }
         .feature-card h3 { margin-bottom: 1.2rem; font-size: 1.3rem; color: #ffffff; }
         .feature-card p { color: #888888; font-size: 1rem; }
-        
-        .dashboard-preview { background: #111111; border: 1px solid #333333; border-radius: 8px; padding: 2.5rem; text-align: center; }
-        
-        .roadmap { display: flex; flex-direction: column; gap: 2rem; }
-        .roadmap-item { background: #111111; border: 1px solid #333333; padding: 1.5rem; border-radius: 8px; display: flex; align-items: center; gap: 1.5rem; transition: all 0.3s ease; }
-        .roadmap-item:hover { border-color: #555555; transform: translateX(5px); }
-        .roadmap-item i { font-size: 2rem; color: #cccccc; min-width: 40px; }
-        .roadmap-item h3 { font-size: 1.2rem; color: #ffffff; margin-bottom: 0.5rem; }
-        .roadmap-item p { color: #888888; margin: 0; }
-        
-        .download-section { background: #000000ff; border: 1px solid #000000ff; border-radius: 8px; padding: 2.5rem; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        .download-card { display: flex; flex-direction: column; align-items: center; background: #000000ff; border-radius: 8px; padding: 2.5rem 2rem 2rem 2rem; box-shadow: 0 2px 16px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
-        .download-card i { font-size: 3rem; color: #cccccc; margin-bottom: 1rem; }
-        .download-card h3 { margin-bottom: 1.2rem; font-size: 1.3rem; color: #ffffff; }
-        .download-card p { color: #888888; font-size: 1rem; margin-bottom: 1.5rem; text-align: center; }
-        .file-list { margin-bottom: 2rem; width: 100%; }
-        .file-item { color: #aaa; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
         
         .docs-layout { background: #111111; border: 1px solid #333333; border-radius: 8px; padding: 2.5rem; display: flex; gap: 2.5rem; }
         .docs-sidebar { min-width: 220px; }
@@ -130,7 +112,8 @@
             .typewriter { font-size: 2.5rem; }
             .docs-layout { flex-direction: column; gap: 1.5rem; }
             .docs-sidebar { min-width: 0; }
-            .nav-menu { gap: 1rem; }
+            .nav-menu { gap: 0.8rem; padding: 6px 12px; }
+            .nav-brand { margin-right: 1rem; }
         }
     </style>
 </head>
@@ -155,7 +138,6 @@
                 <li><a href="#" class="nav-link active" data-page="home"><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="#" class="nav-link" data-page="video"><i class="fas fa-play-circle"></i> Watch Video</a></li>
                 <li><a href="#" class="nav-link" data-page="docs"><i class="fas fa-book"></i> About</a></li>
-                <li><a href="#" class="nav-link" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             </ul>
         </div>
     </header>
@@ -199,33 +181,6 @@
                         </div>
                     </div>
                 </section>
-
-                <section class="section">
-                    <h2>Platform Roadmap</h2>
-                    <div class="roadmap">
-                        <div class="roadmap-item">
-                            <i class="fas fa-check"></i>
-                            <div>
-                                <h3>Q4 2025: Beta Launch</h3>
-                                <p>Initial release with core streaming functionality and basic player.</p>
-                            </div>
-                        </div>
-                        <div class="roadmap-item">
-                            <i class="fas fa-hourglass-half"></i>
-                            <div>
-                                <h3>Q1 2026: Advanced Features</h3>
-                                <p>Add playlists, user accounts, and social sharing capabilities.</p>
-                            </div>
-                        </div>
-                        <div class="roadmap-item">
-                            <i class="fas fa-hourglass-start"></i>
-                            <div>
-                                <h3>Q2 2026: Multi-Platform</h3>
-                                <p>Launch mobile apps and expand to additional streaming formats.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
             </div>
 
             <div class="page-content" id="videoPage">
@@ -245,17 +200,16 @@
                         </div>
                     </div>
                     <div class="video-info">
-                        <h2 class="video-title">Cyberpunk Cityscape - 4K Visual Experience</h2>
+                        <h2 class="video-title">Dead Poets Society</h2>
                         <div class="video-meta">
-                            <span><i class="fas fa-eye"></i> 12.4K views</span>
-                            <span><i class="fas fa-calendar"></i> Uploaded: Oct 9, 2025</span>
-                            <span><i class="fas fa-clock"></i> Duration: 1:45</span>
+                            <span><i class="fas fa-calendar"></i> Uploaded: October 28, 2025</span>
+                            <span><i class="fas fa-clock"></i> Duration: 2:08:48</span>
                         </div>
                         <p class="video-description">
-                            Immerse yourself in this stunning cyberpunk cityscape visualization. 
-                            Experience the neon-lit streets, futuristic architecture, and atmospheric 
-                            details that bring this digital world to life. Perfect for background 
-                            visuals, creative inspiration, or simply enjoying the aesthetic.
+                            A timeless classic that explores the power of literature and the importance of seizing the day. 
+                            Follow an English teacher who inspires his students through his teaching of poetry, encouraging 
+                            them to break free from the constraints of conformity and pursue their individual passions. 
+                            A moving story about mentorship, friendship, and the transformative power of education.
                         </p>
                     </div>
                 </section>
@@ -272,29 +226,11 @@
                             <li><a href="#" class="docs-link active" data-subpage="about"><i class="fas fa-info-circle"></i> About Us</a></li>
                             <li><a href="#" class="docs-link" data-subpage="technology"><i class="fas fa-microchip"></i> Technology</a></li>
                             <li><a href="#" class="docs-link" data-subpage="features"><i class="fas fa-star"></i> Features</a></li>
-                            <li><a href="#" class="docs-link" data-subpage="roadmap"><i class="fas fa-road"></i> Roadmap</a></li>
                             <li><a href="#" class="docs-link" data-subpage="contact"><i class="fas fa-envelope"></i> Contact</a></li>
                         </ul>
                     </aside>
                     <article class="docs-content" id="docsContent"></article>
                 </div>
-            </div>
-
-            <div class="page-content" id="dashboardPage">
-                <section class="hero-dashboard">
-                    <h1>User Dashboard</h1>
-                    <p class="tagline">Manage your viewing experience (Coming Soon)</p>
-                </section>
-                <section class="section">
-                    <div class="dashboard-preview">
-                        <i class="fas fa-chart-line" style="font-size: 5rem; color: #666; margin: 2rem 0;"></i>
-                        <h3>Dashboard Coming Soon</h3>
-                        <p style="color: #888; max-width: 600px; margin: 0 auto;">
-                            The dashboard will provide personalized recommendations, viewing history, 
-                            playlist management, and account settings. Stay tuned for updates!
-                        </p>
-                    </div>
-                </section>
             </div>
         </div>
     </main>
@@ -347,7 +283,6 @@
                 'about': `<h2>About CyberStream</h2><p>CyberStream is a next-generation video streaming platform designed for the modern digital era. Our mission is to deliver high-quality video content with an immersive, cyberpunk-inspired user experience.</p><h3>Our Vision</h3><p>We believe that streaming technology should be both powerful and beautiful. CyberStream combines cutting-edge video delivery with a visually striking interface that enhances your viewing experience.</p><h3>What We Offer</h3><ul><li><strong>High-Quality Streaming:</strong> Adaptive bitrate streaming for the best possible quality based on your connection</li><li><strong>Advanced Player:</strong> Custom video player with precision controls and intuitive interface</li><li><strong>Privacy Focused:</strong> We respect your privacy and don't track your viewing habits</li><li><strong>Future-Ready:</strong> Built with the latest web technologies for optimal performance</li></ul>`,
                 'technology': `<h2>Our Technology</h2><p>CyberStream is built on a modern technology stack designed for performance, reliability, and scalability.</p><h3>Video Delivery</h3><p>We use adaptive bitrate streaming to ensure smooth playback regardless of your connection speed. Our content delivery network ensures low latency and fast loading times worldwide.</p><h3>Player Technology</h3><p>Our custom video player is built with HTML5 and enhanced with JavaScript for advanced functionality while maintaining compatibility across all modern browsers.</p>`,
                 'features': `<h2>Platform Features</h2><p>Complete feature documentation coming soon.</p>`,
-                'roadmap': `<h2>Development Roadmap</h2><p>Detailed roadmap information coming soon.</p>`,
                 'contact': `<h2>Contact Us</h2><p>Contact information coming soon.</p>`
             };
 
