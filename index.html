@@ -582,6 +582,156 @@
         .page-content.active { 
             display: block; 
         }
+
+        /* Custom Video Player Styles */
+        .custom-video-player {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .video-element {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .custom-video-player:hover .video-controls {
+            opacity: 1;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #00ff88;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        .time-display {
+            color: white;
+            font-size: 0.9rem;
+            min-width: 100px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .volume-level {
+            height: 100%;
+            background: #00ff88;
+            border-radius: 2px;
+            width: 100%;
+        }
+
+        .subtitle-btn {
+            position: relative;
+        }
+
+        .subtitle-menu {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px;
+            min-width: 150px;
+            display: none;
+        }
+
+        .subtitle-btn:hover .subtitle-menu {
+            display: block;
+        }
+
+        .subtitle-option {
+            color: white;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .subtitle-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .subtitle-option.active {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .fullscreen-btn {
+            margin-left: auto;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00ff88;
+            font-size: 3rem;
+            display: none;
+        }
+
+        .video-element.loading + .loading-spinner {
+            display: block;
+        }
         
         /* Responsive */
         @media (max-width: 768px) {
@@ -591,6 +741,18 @@
             .docs-layout { flex-direction: column; gap: 1.5rem; }
             .docs-sidebar { min-width: 0; }
             .nav-menu { gap: 1rem; }
+            .video-controls {
+                padding: 10px;
+                gap: 10px;
+            }
+            .control-btn {
+                font-size: 1rem;
+                padding: 6px;
+            }
+            .time-display {
+                min-width: 80px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -698,23 +860,70 @@
             <div class="page-content" id="backupPage">
                 <section class="hero-video">
                     <h1>Backup Video with Subtitles</h1>
-                    <p class="tagline">Alternative streaming with integrated Turkish subtitles</p>
+                    <p class="tagline">Custom player with Turkish subtitles support</p>
                 </section>
                 <section class="section">
                     <div class="video-container">
-                        <div class="video-wrapper">
-                            <!-- Backup Video with Google Drive Embed -->
-                            <iframe 
-                                class="video-frame" 
-                                src="https://drive.google.com/file/d/1IU27cu1gzn_quSOUB6_qHwov_H6I_GLV/preview" 
-                                allow="autoplay; encrypted-media" 
-                                allowfullscreen
-                                title="Dead Poets Society with Turkish Subtitles">
-                            </iframe>
+                        <div class="custom-video-player">
+                            <!-- Custom Video Player -->
+                            <video class="video-element" id="customVideo" poster="https://image.tmdb.org/t/p/w1280/aiVg6CL2MRQqQuNxY6eZaBqP4UV.jpg">
+                                <source src="https://drive.google.com/uc?export=download&id=1IU27cu1gzn_quSOUB6_qHwov_H6I_GLV" type="video/mp4">
+                                
+                                <!-- Turkish Subtitles -->
+                                <track 
+                                    kind="subtitles" 
+                                    src="https://raw.githubusercontent.com/itsthecloudyy/cdn/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.vtt"
+                                    srclang="tr"
+                                    label="Türkçe"
+                                    default>
+                                
+                                Your browser does not support the video tag.
+                            </video>
+                            
+                            <div class="loading-spinner">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            
+                            <div class="video-controls">
+                                <button class="control-btn play-pause-btn">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                
+                                <div class="progress-container">
+                                    <div class="progress-bar"></div>
+                                </div>
+                                
+                                <div class="time-display">
+                                    <span class="current-time">0:00</span> / <span class="duration">0:00</span>
+                                </div>
+                                
+                                <div class="volume-control">
+                                    <button class="control-btn volume-btn">
+                                        <i class="fas fa-volume-up"></i>
+                                    </button>
+                                    <div class="volume-slider">
+                                        <div class="volume-level" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="subtitle-btn">
+                                    <button class="control-btn">
+                                        <i class="fas fa-closed-captioning"></i>
+                                    </button>
+                                    <div class="subtitle-menu">
+                                        <button class="subtitle-option" data-subtitle="none">Subtitles Off</button>
+                                        <button class="subtitle-option active" data-subtitle="tr">Türkçe</button>
+                                    </div>
+                                </div>
+                                
+                                <button class="control-btn fullscreen-btn">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="video-info">
-                        <h2 class="video-title">Dead Poets Society (Backup with Subtitles)</h2>
+                        <h2 class="video-title">Dead Poets Society (Custom Player)</h2>
                         <div class="video-meta">
                             <span><i class="fas fa-calendar"></i> Uploaded: October 28, 2025</span>
                             <span><i class="fas fa-clock"></i> Duration: 2:08:48</span>
@@ -722,7 +931,7 @@
                         </div>
                         <p class="video-description">
                             A timeless classic that explores the power of literature and the importance of seizing the day. 
-                            This version includes integrated Turkish subtitles for the best viewing experience.
+                            This version uses our custom video player with full Turkish subtitle support.
                             Follow an English teacher who inspires his students through his teaching of poetry, encouraging 
                             them to break free from the constraints of conformity and pursue their individual passions. 
                             A moving story about mentorship, friendship, and the transformative power of education.
@@ -756,9 +965,146 @@
     </footer>
 
     <script>
+        // Custom Video Player Functionality
+        class CustomVideoPlayer {
+            constructor() {
+                this.video = document.getElementById('customVideo');
+                this.playPauseBtn = document.querySelector('.play-pause-btn');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.progressContainer = document.querySelector('.progress-container');
+                this.currentTimeEl = document.querySelector('.current-time');
+                this.durationEl = document.querySelector('.duration');
+                this.volumeBtn = document.querySelector('.volume-btn');
+                this.volumeSlider = document.querySelector('.volume-slider');
+                this.volumeLevel = document.querySelector('.volume-level');
+                this.fullscreenBtn = document.querySelector('.fullscreen-btn');
+                this.subtitleOptions = document.querySelectorAll('.subtitle-option');
+                
+                this.init();
+            }
+            
+            init() {
+                // Event listeners
+                this.video.addEventListener('loadedmetadata', () => {
+                    this.durationEl.textContent = this.formatTime(this.video.duration);
+                });
+                
+                this.video.addEventListener('timeupdate', () => {
+                    this.updateProgress();
+                    this.currentTimeEl.textContent = this.formatTime(this.video.currentTime);
+                });
+                
+                this.video.addEventListener('waiting', () => {
+                    this.video.classList.add('loading');
+                });
+                
+                this.video.addEventListener('canplay', () => {
+                    this.video.classList.remove('loading');
+                });
+                
+                this.playPauseBtn.addEventListener('click', () => {
+                    this.togglePlay();
+                });
+                
+                this.progressContainer.addEventListener('click', (e) => {
+                    this.seek(e);
+                });
+                
+                this.volumeBtn.addEventListener('click', () => {
+                    this.toggleMute();
+                });
+                
+                this.volumeSlider.addEventListener('click', (e) => {
+                    this.setVolume(e);
+                });
+                
+                this.fullscreenBtn.addEventListener('click', () => {
+                    this.toggleFullscreen();
+                });
+                
+                this.subtitleOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        this.setSubtitle(e.target.dataset.subtitle);
+                    });
+                });
+                
+                // Auto-play when page loads
+                setTimeout(() => {
+                    this.video.play().catch(e => {
+                        console.log('Autoplay prevented, waiting for user interaction');
+                    });
+                }, 1000);
+            }
+            
+            togglePlay() {
+                if (this.video.paused) {
+                    this.video.play();
+                    this.playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    this.video.pause();
+                    this.playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            }
+            
+            updateProgress() {
+                const percent = (this.video.currentTime / this.video.duration) * 100;
+                this.progressBar.style.width = `${percent}%`;
+            }
+            
+            seek(e) {
+                const rect = this.progressContainer.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                this.video.currentTime = percent * this.video.duration;
+            }
+            
+            toggleMute() {
+                this.video.muted = !this.video.muted;
+                this.volumeBtn.innerHTML = this.video.muted ? 
+                    '<i class="fas fa-volume-mute"></i>' : 
+                    '<i class="fas fa-volume-up"></i>';
+            }
+            
+            setVolume(e) {
+                const rect = this.volumeSlider.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                this.video.volume = Math.max(0, Math.min(1, percent));
+                this.volumeLevel.style.width = `${this.video.volume * 100}%`;
+            }
+            
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                    this.fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                } else {
+                    document.exitFullscreen();
+                    this.fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            }
+            
+            setSubtitle(lang) {
+                const tracks = this.video.textTracks;
+                for (let i = 0; i < tracks.length; i++) {
+                    tracks[i].mode = tracks[i].language === lang ? 'showing' : 'hidden';
+                }
+                
+                // Update active subtitle option
+                this.subtitleOptions.forEach(option => {
+                    option.classList.toggle('active', option.dataset.subtitle === lang);
+                });
+            }
+            
+            formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // Initialize custom video player when backup page loads
         document.addEventListener('DOMContentLoaded', function() {
             const navLinks = document.querySelectorAll('.nav-link');
             const pageContents = document.querySelectorAll('.page-content');
+            let customPlayer = null;
             
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -770,6 +1116,13 @@
                     
                     pageContents.forEach(page => page.classList.remove('active'));
                     document.getElementById(targetPage + 'Page').classList.add('active');
+                    
+                    // Initialize custom player when backup page is loaded
+                    if (targetPage === 'backup' && !customPlayer) {
+                        setTimeout(() => {
+                            customPlayer = new CustomVideoPlayer();
+                        }, 100);
+                    }
                     
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
