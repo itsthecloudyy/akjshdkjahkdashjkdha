@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scope Executor</title>
+    <title>CyberStream - Video Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -53,8 +53,8 @@
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(-10px); } 60% { transform: translateX(-50%) translateY(-5px); } }
         
         /* Hero Sections */
-        .hero { text-align: center; padding: 20rem 0; margin-bottom: 4rem; }
-        .hero-download { text-align: center; padding: 1rem 0; margin-bottom: 4rem; }
+        .hero { text-align: center; padding: 10rem 0; margin-bottom: 4rem; }
+        .hero-video { text-align: center; padding: 1rem 0; margin-bottom: 4rem; }
         .hero-docs { text-align: center; padding: 4rem 0; margin-bottom: 4rem; }
         .hero-dashboard { text-align: center; padding: 5rem 0; margin-bottom: 4rem; }
         .hero h1 { font-size: 3.5rem; margin-bottom: 1.2rem; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 2px; }
@@ -68,6 +68,24 @@
         /* Sections */
         .section { margin-bottom: 6rem; }
         .section h2 { font-size: 2.5rem; margin-bottom: 2rem; text-align: center; color: #ffffff; }
+        
+        /* Video Player */
+        .video-container { position: relative; width: 100%; max-width: 1000px; margin: 0 auto; }
+        .video-player { width: 100%; border-radius: 8px; background: #000; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+        
+        /* Video Controls */
+        .video-controls { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+        .control-btn { background: transparent; border: 1px solid #555; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .control-btn:hover { background: #333; }
+        .progress-container { flex: 1; height: 8px; background: #333; border-radius: 4px; position: relative; cursor: pointer; }
+        .progress-bar { height: 100%; background: #ffffff; border-radius: 4px; width: 0%; transition: width 0.1s ease; }
+        .time-display { color: #aaa; font-size: 0.9rem; min-width: 100px; text-align: center; }
+        
+        /* Video Info */
+        .video-info { margin-top: 2rem; padding: 1.5rem; background: #111; border-radius: 8px; border: 1px solid #333; }
+        .video-title { font-size: 1.8rem; margin-bottom: 1rem; color: #fff; }
+        .video-meta { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; color: #aaa; }
+        .video-description { color: #ccc; line-height: 1.6; }
         
         /* Features Grid */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
@@ -135,22 +153,23 @@
         
         /* Responsive */
         @media (max-width: 768px) {
-            .hero { padding: 15rem 0; }
+            .hero { padding: 8rem 0; }
             .hero h1 { font-size: 2.5rem; }
             .typewriter { font-size: 2.5rem; }
             .docs-layout { flex-direction: column; gap: 1.5rem; }
             .docs-sidebar { min-width: 0; }
             .nav-menu { gap: 1rem; }
+            .video-controls { flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
     <!-- Intro Screen -->
     <div class="intro" id="introScreen">
-        <div class="typewriter">Scope Executor</div>
+        <div class="typewriter">CyberStream</div>
         <div class="status-container" id="statusContainer">
-            <i class="fas fa-crosshairs status-icon"></i>
-            <span class="status-text">Coming Soon (Not Released)</span>
+            <i class="fas fa-play-circle status-icon"></i>
+            <span class="status-text">Streaming Platform</span>
         </div>
     </div>
 
@@ -161,13 +180,13 @@
     <header class="header" id="mainHeader">
         <div class="navbar">
             <div class="nav-brand">
-                <i class="fas fa-crosshairs"></i>
-                <span>Scope</span>
+                <i class="fas fa-play-circle"></i>
+                <span>CyberStream</span>
             </div>
             <ul class="nav-menu">
                 <li><a href="#" class="nav-link active" data-page="home"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="#" class="nav-link" data-page="download"><i class="fas fa-download"></i> Download</a></li>
-                <li><a href="#" class="nav-link" data-page="docs"><i class="fas fa-book"></i> Docs</a></li>
+                <li><a href="#" class="nav-link" data-page="video"><i class="fas fa-play-circle"></i> Watch Video</a></li>
+                <li><a href="#" class="nav-link" data-page="docs"><i class="fas fa-book"></i> About</a></li>
                 <li><a href="#" class="nav-link" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             </ul>
         </div>
@@ -182,103 +201,121 @@
             <!-- Home Page -->
             <div class="page-content active" id="homePage">
                 <section class="hero section">
-                    <h1>Improve Your Scripting</h1>
-                    <p class="tagline">Basic Roblox luau external executor.</p>
+                    <h1>Next-Gen Video Streaming</h1>
+                    <p class="tagline">Experience high-quality streaming with our cyberpunk-inspired platform.</p>
                     <div class="btn-group">
-                        <a href="#" class="btn nav-link" data-page="download"><i class="fas fa-download"></i> Get Early Access</a>
-                        <a href="#" class="btn nav-link" data-page="docs"><i class="fas fa-book"></i> Learn More</a>
+                        <a href="#" class="btn nav-link" data-page="video"><i class="fas fa-play-circle"></i> Watch Now</a>
+                        <a href="#" class="btn nav-link" data-page="docs"><i class="fas fa-info-circle"></i> Learn More</a>
                     </div>
                 </section>
                 
                 <section class="section">
-                    <h2>Why Choose Scope?</h2>
+                    <h2>Why Choose CyberStream?</h2>
                     <div class="features-grid">
                         <div class="feature-card">
-                            <i class="fas fa-shield-alt"></i>
-                            <h3>Secure Execution</h3>
-                            <p>Run scripts externally with advanced protection and memory isolation.</p>
+                            <i class="fas fa-hd-video"></i>
+                            <h3>High Definition</h3>
+                            <p>Stream videos in crystal clear HD quality with adaptive bitrate streaming.</p>
                         </div>
                         <div class="feature-card">
                             <i class="fas fa-bolt"></i>
-                            <h3>High Performance</h3>
-                            <p>Optimized Luau runtime for fast execution and low latency.</p>
+                            <h3>Fast Streaming</h3>
+                            <p>Optimized streaming technology for minimal buffering and instant playback.</p>
                         </div>
                         <div class="feature-card">
-                            <i class="fas fa-tools"></i>
-                            <h3>Developer Tools</h3>
-                            <p>Comprehensive documentation for our API.</p>
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>Secure Platform</h3>
+                            <p>Your privacy is our priority with end-to-end encryption for all streams.</p>
                         </div>
                         <div class="feature-card">
-                            <i class="fas fa-plug"></i>
-                            <h3>Extensible API</h3>
-                            <p>Build custom integrations with our comprehensive SDK.</p>
+                            <i class="fas fa-crosshairs"></i>
+                            <h3>Precision Controls</h3>
+                            <p>Advanced video controls for the perfect viewing experience.</p>
                         </div>
                     </div>
                 </section>
 
                 <section class="section">
-                    <h2>Roadmap</h2>
+                    <h2>Platform Roadmap</h2>
                     <div class="roadmap">
                         <div class="roadmap-item">
                             <i class="fas fa-check"></i>
                             <div>
-                                <h3>Q4 2025: Beta Release</h3>
-                                <p>Launch of the UI and the API with core functionality.</p>
+                                <h3>Q4 2025: Beta Launch</h3>
+                                <p>Initial release with core streaming functionality and basic player.</p>
                             </div>
                         </div>
                         <div class="roadmap-item">
                             <i class="fas fa-hourglass-half"></i>
                             <div>
-                                <h3>Q1 2026: Advanced Debugging</h3>
-                                <p>Add breakpoint support and variable inspection tools.</p>
+                                <h3>Q1 2026: Advanced Features</h3>
+                                <p>Add playlists, user accounts, and social sharing capabilities.</p>
                             </div>
                         </div>
                         <div class="roadmap-item">
                             <i class="fas fa-hourglass-start"></i>
                             <div>
-                                <h3>Q2 2026: Multi-Process Support</h3>
-                                <p>Simultaneous attachment to multiple target processes.</p>
+                                <h3>Q2 2026: Multi-Platform</h3>
+                                <p>Launch mobile apps and expand to additional streaming formats.</p>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
 
-            <!-- Download Page -->
-            <div class="page-content" id="downloadPage">
-                <section class="hero-download">
-                    <h1>Early Access Downloads</h1>
-                    <p class="tagline">Join the beta program (coming soon)</p>
+            <!-- Video Page -->
+            <div class="page-content" id="videoPage">
+                <section class="hero-video">
+                    <h1>Featured Content</h1>
+                    <p class="tagline">Experience our high-quality streaming technology</p>
                 </section>
-                <div class="download-section section">
-                    <div class="download-card">
-                        <i class="fas fa-file-code"></i>
-                        <h3>Scope Executor Beta</h3>
-                        <p>Full installer with editor and runtime.</p>
-                        <div class="file-list">
-                            <div class="file-item"><i class="fas fa-file"></i> scope.exe (~30 MB)</div>
-                            <div class="file-item"><i class="fas fa-tag"></i> Beta v0.1</div>
-                            <div class="file-item"><i class="fas fa-desktop"></i> Windows x64</div>
+                <section class="section">
+                    <div class="video-container">
+                        <video class="video-player" id="mainVideo" controls>
+                            <source src="https://ia601006.us.archive.org/22/items/1_20251009_20251009_1605/1.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="video-controls">
+                            <button class="control-btn" id="playPauseBtn"><i class="fas fa-play"></i></button>
+                            <button class="control-btn" id="muteBtn"><i class="fas fa-volume-up"></i></button>
+                            <div class="progress-container" id="progressContainer">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                            <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+                            <button class="control-btn" id="fullscreenBtn"><i class="fas fa-expand"></i></button>
                         </div>
-                        <a href="#" class="btn" onclick="alert('Not released yet'); return false;"><i class="fas fa-download"></i> Download (Soon)</a>
                     </div>
-                </div>
+                    <div class="video-info">
+                        <h2 class="video-title">Cyberpunk Cityscape - 4K Visual Experience</h2>
+                        <div class="video-meta">
+                            <span><i class="fas fa-eye"></i> 12.4K views</span>
+                            <span><i class="fas fa-calendar"></i> Uploaded: Oct 9, 2025</span>
+                            <span><i class="fas fa-clock"></i> Duration: 1:45</span>
+                        </div>
+                        <p class="video-description">
+                            Immerse yourself in this stunning cyberpunk cityscape visualization. 
+                            Experience the neon-lit streets, futuristic architecture, and atmospheric 
+                            details that bring this digital world to life. Perfect for background 
+                            visuals, creative inspiration, or simply enjoying the aesthetic.
+                        </p>
+                    </div>
+                </section>
             </div>
 
             <!-- Docs Page -->
             <div class="page-content" id="docsPage">
                 <section class="hero-docs">
-                    <h1>Comprehensive Documentation</h1>
-                    <p class="tagline">Everything you need to master Scope Executor</p>
+                    <h1>About CyberStream</h1>
+                    <p class="tagline">Learn more about our platform and vision</p>
                 </section>
                 <div class="docs-layout">
                     <aside class="docs-sidebar">
                         <ul class="docs-nav">
-                            <li><a href="#" class="docs-link active" data-subpage="getting-started"><i class="fas fa-rocket"></i> Getting Started</a></li>
-                            <li><a href="#" class="docs-link" data-subpage="interface"><i class="fas fa-desktop"></i> User Interface</a></li>
-                            <li><a href="#" class="docs-link" data-subpage="luau"><i class="fas fa-code"></i> Luau Language</a></li>
-                            <li><a href="#" class="docs-link" data-subpage="api"><i class="fas fa-plug"></i> API Reference</a></li>
-                            <li><a href="#" class="docs-link" data-subpage="advanced"><i class="fas fa-cog"></i> Advanced Topics</a></li>
+                            <li><a href="#" class="docs-link active" data-subpage="about"><i class="fas fa-info-circle"></i> About Us</a></li>
+                            <li><a href="#" class="docs-link" data-subpage="technology"><i class="fas fa-microchip"></i> Technology</a></li>
+                            <li><a href="#" class="docs-link" data-subpage="features"><i class="fas fa-star"></i> Features</a></li>
+                            <li><a href="#" class="docs-link" data-subpage="roadmap"><i class="fas fa-road"></i> Roadmap</a></li>
+                            <li><a href="#" class="docs-link" data-subpage="contact"><i class="fas fa-envelope"></i> Contact</a></li>
                         </ul>
                     </aside>
                     <article class="docs-content" id="docsContent">
@@ -290,16 +327,16 @@
             <!-- Dashboard Page -->
             <div class="page-content" id="dashboardPage">
                 <section class="hero-dashboard">
-                    <h1>Dashboard Preview</h1>
-                    <p class="tagline">Manage your scripts and executions (Coming Soon)</p>
+                    <h1>User Dashboard</h1>
+                    <p class="tagline">Manage your viewing experience (Coming Soon)</p>
                 </section>
                 <section class="section">
                     <div class="dashboard-preview">
                         <i class="fas fa-chart-line" style="font-size: 5rem; color: #666; margin: 2rem 0;"></i>
                         <h3>Dashboard Coming Soon</h3>
                         <p style="color: #888; max-width: 600px; margin: 0 auto;">
-                            The dashboard will provide real-time analytics, script management, execution history, 
-                            and performance metrics. Stay tuned for updates!
+                            The dashboard will provide personalized recommendations, viewing history, 
+                            playlist management, and account settings. Stay tuned for updates!
                         </p>
                     </div>
                 </section>
@@ -309,7 +346,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>Scope Executor &mdash; Next-Gen External Executor &copy; 2025</p>
+            <p>CyberStream &mdash; Next-Gen Video Platform &copy; 2025</p>
         </div>
     </footer>
 
@@ -335,6 +372,11 @@
                     
                     // Scroll to top
                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // If navigating to video page, setup video controls
+                    if (targetPage === 'video') {
+                        setupVideoControls();
+                    }
                 });
             });
 
@@ -356,59 +398,116 @@
             });
 
             // Load initial docs content
-            loadDocsContent('getting-started');
+            loadDocsContent('about');
+            
+            // Setup video controls if on video page initially
+            if (document.getElementById('videoPage').classList.contains('active')) {
+                setupVideoControls();
+            }
         });
 
         // Docs Content Loader
         function loadDocsContent(subpage) {
             const content = {
-                'getting-started': `
-                    <h2>Getting Started</h2>
-                    <p>Welcome to Scope Executor! This guide will help you get up and running with your first script execution.</p>
+                'about': `
+                    <h2>About CyberStream</h2>
+                    <p>CyberStream is a next-generation video streaming platform designed for the modern digital era. Our mission is to deliver high-quality video content with an immersive, cyberpunk-inspired user experience.</p>
                     
-                    <h3>Prerequisites</h3>
+                    <h3>Our Vision</h3>
+                    <p>We believe that streaming technology should be both powerful and beautiful. CyberStream combines cutting-edge video delivery with a visually striking interface that enhances your viewing experience.</p>
+
+                    <h3>What We Offer</h3>
                     <ul>
-                        <li><strong>Operating System:</strong> Windows 10 or later (64-bit)</li>
-                        <li><strong>Target Process:</strong> Roblox Player (RobloxPlayerBeta.exe)</li>
-                        <li><strong>Permissions:</strong> Administrator rights may be required</li>
-                        <li><strong>Antivirus:</strong> You may need to whitelist Scope Executor</li>
+                        <li><strong>High-Quality Streaming:</strong> Adaptive bitrate streaming for the best possible quality based on your connection</li>
+                        <li><strong>Advanced Player:</strong> Custom video player with precision controls and intuitive interface</li>
+                        <li><strong>Privacy Focused:</strong> We respect your privacy and don't track your viewing habits</li>
+                        <li><strong>Future-Ready:</strong> Built with the latest web technologies for optimal performance</li>
                     </ul>
-
-                    <h3>Installation Steps</h3>
-                    <p>Once the beta is released, follow these steps to install Scope Executor:</p>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <pre><code>1. Download scope.exe from the Downloads page
-2. Run the installer as Administrator
-3. Follow the installation wizard
-4. Launch Scope Executor from the desktop shortcut</code></pre>
-                    </div>
-
-                    <div class="note">
-                        <p><strong>Note:</strong> The first time you run Scope, Windows Defender may flag it. This is normal for external executors. Add it to your exclusions list.</p>
-                    </div>
                 `,
-                'interface': `
-                    <h2>User Interface</h2>
-                    <p>The Scope Executor interface is designed for efficiency and ease of use.</p>
-                    <h3>Main Window Components</h3>
-                    <h4>1. Script Editor</h4>
-                    <p>The central editing area features syntax highlighting and auto-completion.</p>
+                'technology': `
+                    <h2>Our Technology</h2>
+                    <p>CyberStream is built on a modern technology stack designed for performance, reliability, and scalability.</p>
+                    
+                    <h3>Video Delivery</h3>
+                    <p>We use adaptive bitrate streaming to ensure smooth playback regardless of your connection speed. Our content delivery network ensures low latency and fast loading times worldwide.</p>
+
+                    <h3>Player Technology</h3>
+                    <p>Our custom video player is built with HTML5 and enhanced with JavaScript for advanced functionality while maintaining compatibility across all modern browsers.</p>
                 `,
-                'luau': `<h2>Luau Language Documentation</h2><p>Complete Luau language reference coming soon.</p>`,
-                'api': `<h2>API Reference</h2><p>Complete API documentation coming soon.</p>`,
-                'advanced': `<h2>Advanced Topics</h2><p>Advanced usage guide coming soon.</p>`
+                'features': `<h2>Platform Features</h2><p>Complete feature documentation coming soon.</p>`,
+                'roadmap': `<h2>Development Roadmap</h2><p>Detailed roadmap information coming soon.</p>`,
+                'contact': `<h2>Contact Us</h2><p>Contact information coming soon.</p>`
             };
 
-            document.getElementById('docsContent').innerHTML = content[subpage] || content['getting-started'];
+            document.getElementById('docsContent').innerHTML = content[subpage] || content['about'];
         }
 
-        // Copy Code Function
-        function copyCode(btn) {
-            const code = btn.nextElementSibling.textContent;
-            navigator.clipboard.writeText(code);
-            btn.textContent = 'Copied!';
-            setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+        // Video Controls
+        function setupVideoControls() {
+            const video = document.getElementById('mainVideo');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const muteBtn = document.getElementById('muteBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressContainer = document.getElementById('progressContainer');
+            const timeDisplay = document.getElementById('timeDisplay');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            
+            // Play/Pause functionality
+            playPauseBtn.addEventListener('click', function() {
+                if (video.paused) {
+                    video.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    video.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+            
+            // Mute functionality
+            muteBtn.addEventListener('click', function() {
+                video.muted = !video.muted;
+                muteBtn.innerHTML = video.muted ? 
+                    '<i class="fas fa-volume-mute"></i>' : 
+                    '<i class="fas fa-volume-up"></i>';
+            });
+            
+            // Progress bar functionality
+            video.addEventListener('timeupdate', function() {
+                const progress = (video.currentTime / video.duration) * 100;
+                progressBar.style.width = `${progress}%`;
+                
+                // Update time display
+                const currentTime = formatTime(video.currentTime);
+                const duration = formatTime(video.duration);
+                timeDisplay.textContent = `${currentTime} / ${duration}`;
+            });
+            
+            // Click on progress bar to seek
+            progressContainer.addEventListener('click', function(e) {
+                const rect = progressContainer.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                video.currentTime = pos * video.duration;
+            });
+            
+            // Fullscreen functionality
+            fullscreenBtn.addEventListener('click', function() {
+                if (video.requestFullscreen) {
+                    video.requestFullscreen();
+                } else if (video.mozRequestFullScreen) {
+                    video.mozRequestFullScreen();
+                } else if (video.webkitRequestFullscreen) {
+                    video.webkitRequestFullscreen();
+                } else if (video.msRequestFullscreen) {
+                    video.msRequestFullscreen();
+                }
+            });
+            
+            // Format time helper function
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
         }
 
         // Network Background Animation
