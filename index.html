@@ -703,27 +703,14 @@
                 <section class="section">
                     <div class="video-container">
                         <div class="video-wrapper">
-                            <!-- Backup Video with Subtitles -->
-                            <video 
+                            <!-- Backup Video with Google Drive Embed -->
+                            <iframe 
                                 class="video-frame" 
-                                id="backupVideo"
-                                controls
-                                crossorigin="anonymous"
-                                poster="https://image.tmdb.org/t/p/w1280/aiVg6CL2MRQqQuNxY6eZaBqP4UV.jpg">
-                                
-                                <!-- Your YIFY Google Drive Video -->
-                                <source src="https://drive.google.com/uc?export=download&id=1IU27cu1gzn_quSOUB6_qHwov_H6I_GLV" type="video/mp4">
-                                
-                                <!-- Turkish Subtitles -->
-                                <track 
-                                    kind="subtitles" 
-                                    src="https://raw.githubusercontent.com/itsthecloudyy/cdn/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.vtt"
-                                    srclang="tr"
-                                    label="Türkçe"
-                                    default>
-                                
-                                Your browser does not support the video tag.
-                            </video>
+                                src="https://drive.google.com/file/d/1IU27cu1gzn_quSOUB6_qHwov_H6I_GLV/preview" 
+                                allow="autoplay; encrypted-media" 
+                                allowfullscreen
+                                title="Dead Poets Society with Turkish Subtitles">
+                            </iframe>
                         </div>
                     </div>
                     <div class="video-info">
@@ -783,18 +770,6 @@
                     
                     pageContents.forEach(page => page.classList.remove('active'));
                     document.getElementById(targetPage + 'Page').classList.add('active');
-                    
-                    // Auto-start backup video when navigating to backup page
-                    if (targetPage === 'backup') {
-                        setTimeout(() => {
-                            const backupVideo = document.getElementById('backupVideo');
-                            if (backupVideo) {
-                                backupVideo.play().catch(e => {
-                                    console.log('Autoplay prevented:', e);
-                                });
-                            }
-                        }, 1000);
-                    }
                     
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
