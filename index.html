@@ -583,7 +583,6 @@
             display: block; 
         }
         
-        /* Responsive */
         @media (max-width: 768px) {
             .hero { padding: 8rem 0; }
             .hero h1 { font-size: 2.5rem; }
@@ -668,14 +667,21 @@
                 <section class="section">
                     <div class="video-container">
                         <div class="video-wrapper">
-                            <!-- Google Drive Video Embed -->
-                            <iframe 
+                            <video 
                                 class="video-frame" 
-                                src="https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview" 
-                                allow="autoplay; encrypted-media" 
-                                allowfullscreen
-                                title="Dead Poets Society">
-                            </iframe>
+                                id="mainVideo"
+                                controls
+                                crossorigin="anonymous"
+                                poster="https://image.tmdb.org/t/p/w1280/aiVg6CL2MRQqQuNxY6eZaBqP4UV.jpg">
+                                <source src="https://drive.google.com/uc?export=download&id=YOUR_NEW_FILE_ID" type="video/mp4">
+                                <track 
+                                    kind="subtitles" 
+                                    src="https://raw.githubusercontent.com/itsthecloudyy/cdn/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.vtt"
+                                    srclang="tr"
+                                    label="Türkçe"
+                                    default>
+                                Your browser does not support the video tag.
+                            </video>
                         </div>
                     </div>
                     <div class="video-info">
