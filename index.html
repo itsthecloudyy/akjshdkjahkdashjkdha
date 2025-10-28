@@ -732,6 +732,20 @@
         .video-element.loading + .loading-spinner {
             display: block;
         }
+
+        .video-error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #ff4444;
+            display: none;
+        }
+
+        .video-element.error + .video-error {
+            display: block;
+        }
         
         /* Responsive */
         @media (max-width: 768px) {
@@ -865,8 +879,9 @@
                 <section class="section">
                     <div class="video-container">
                         <div class="custom-video-player">
-                            <!-- Custom Video Player -->
-                            <video class="video-element" id="customVideo" poster="https://image.tmdb.org/t/p/w1280/aiVg6CL2MRQqQuNxY6eZaBqP4UV.jpg">
+                            <!-- Custom Video Player with Google Drive Video -->
+                            <video class="video-element" id="customVideo" poster="https://image.tmdb.org/t/p/w1280/aiVg6CL2MRQqQuNxY6eZaBqP4UV.jpg" crossorigin="anonymous">
+                                <!-- Google Drive Video - Using direct download link -->
                                 <source src="https://drive.google.com/uc?export=download&id=1IU27cu1gzn_quSOUB6_qHwov_H6I_GLV" type="video/mp4">
                                 
                                 <!-- Turkish Subtitles -->
@@ -882,6 +897,20 @@
                             
                             <div class="loading-spinner">
                                 <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            
+                            <div class="video-error">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h3>Video Loading Issue</h3>
+                                <p>If the video doesn't load, please check:</p>
+                                <ul style="text-align: left; margin: 1rem 0;">
+                                    <li>Google Drive file permissions</li>
+                                    <li>Internet connection</li>
+                                    <li>Try refreshing the page</li>
+                                </ul>
+                                <button class="btn" onclick="location.reload()" style="margin-top: 1rem;">
+                                    <i class="fas fa-redo"></i> Reload Page
+                                </button>
                             </div>
                             
                             <div class="video-controls">
@@ -965,6 +994,63 @@
     </footer>
 
     <script>
+        // Google Drive Video Loader
+        function loadGoogleDriveVideo() {
+            const video = document.getElementById('customVideo');
+            const fileId = '1IU27cu1gzn_quSOUB6_qHwov_H6I_GLV';
+            
+            // Show loading state
+            video.classList.add('loading');
+            
+            // Try multiple Google Drive URL formats
+            const videoSources = [
+                `https://drive.google.com/uc?export=download&id=${fileId}`,
+                `https://drive.google.com/file/d/${fileId}/preview`,
+                `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+                `https://docs.google.com/uc?id=${fileId}`
+            ];
+            
+            let currentSourceIndex = 0;
+            
+            function tryNextSource() {
+                if (currentSourceIndex >= videoSources.length) {
+                    // All sources failed
+                    video.classList.remove('loading');
+                    video.classList.add('error');
+                    return;
+                }
+                
+                const source = videoSources[currentSourceIndex];
+                console.log('Trying video source:', source);
+                
+                video.src = source;
+                video.load();
+                
+                currentSourceIndex++;
+            }
+            
+            video.addEventListener('error', function() {
+                console.log('Video source failed, trying next...');
+                setTimeout(tryNextSource, 1000);
+            });
+            
+            video.addEventListener('loadeddata', function() {
+                console.log('Video loaded successfully!');
+                video.classList.remove('loading');
+                video.classList.remove('error');
+                
+                // Auto-play the video
+                setTimeout(() => {
+                    video.play().catch(e => {
+                        console.log('Autoplay prevented:', e);
+                    });
+                }, 500);
+            });
+            
+            // Start with first source
+            tryNextSource();
+        }
+
         // Custom Video Player Functionality
         class CustomVideoPlayer {
             constructor() {
@@ -1002,6 +1088,10 @@
                     this.video.classList.remove('loading');
                 });
                 
+                this.video.addEventListener('error', () => {
+                    this.video.classList.add('error');
+                });
+                
                 this.playPauseBtn.addEventListener('click', () => {
                     this.togglePlay();
                 });
@@ -1028,12 +1118,13 @@
                     });
                 });
                 
-                // Auto-play when page loads
-                setTimeout(() => {
-                    this.video.play().catch(e => {
-                        console.log('Autoplay prevented, waiting for user interaction');
-                    });
-                }, 1000);
+                // Keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.togglePlay();
+                    }
+                });
             }
             
             togglePlay() {
@@ -1073,7 +1164,7 @@
             
             toggleFullscreen() {
                 if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
+                    this.video.parentElement.requestFullscreen();
                     this.fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
                 } else {
                     document.exitFullscreen();
@@ -1120,6 +1211,7 @@
                     // Initialize custom player when backup page is loaded
                     if (targetPage === 'backup' && !customPlayer) {
                         setTimeout(() => {
+                            loadGoogleDriveVideo();
                             customPlayer = new CustomVideoPlayer();
                         }, 100);
                     }
