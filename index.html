@@ -347,6 +347,7 @@
             padding: 0 10px;
         }
         
+        /* Improved Video Player for Mobile */
         .video-container { 
             position: relative; 
             width: 100%; 
@@ -355,12 +356,15 @@
             border-radius: 8px; 
             overflow: hidden; 
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
+            -webkit-overflow-scrolling: touch;
         }
         
         .video-wrapper { 
             position: relative; 
             width: 100%; 
             padding-top: 56.25%; 
+            height: 0;
+            overflow: hidden;
         }
         
         .video-frame { 
@@ -371,6 +375,8 @@
             height: 100%; 
             border: none; 
             background: #000; 
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
         
         .video-info { 
@@ -705,6 +711,19 @@
             .docs-nav a {
                 justify-content: center;
             }
+            
+            /* Mobile video player improvements */
+            .video-container {
+                border-radius: 6px;
+            }
+            
+            .video-wrapper {
+                padding-top: 56.25%;
+            }
+            
+            .video-frame {
+                -webkit-overflow-scrolling: touch;
+            }
         }
         
         @media (max-width: 480px) {
@@ -734,6 +753,15 @@
                 max-width: 250px;
                 justify-content: center;
             }
+            
+            /* Extra small screen video improvements */
+            .video-info {
+                padding: 1rem;
+            }
+            
+            .video-title {
+                font-size: 1.2rem;
+            }
         }
         
         /* Landscape orientation fixes */
@@ -754,6 +782,18 @@
             
             .hero {
                 padding: 2rem 0;
+            }
+            
+            /* Landscape video player */
+            .video-wrapper {
+                padding-top: 75%; /* Adjust aspect ratio for landscape */
+            }
+        }
+        
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            .video-frame {
+                -webkit-transform: translateZ(0);
             }
         }
     </style>
@@ -835,11 +875,13 @@
                 <section class="section">
                     <div class="video-container">
                         <div class="video-wrapper">
+                            <!-- Mobile-optimized video iframe -->
                             <iframe 
                                 class="video-frame" 
-                                src="https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview" 
-                                allow="autoplay; encrypted-media" 
-                                allowfullscreen>
+                                src="https://www.youtube.com/embed/yeIEM2F2-Io" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                title="Dead Poets Society Trailer">
                             </iframe>
                         </div>
                     </div>
@@ -1080,6 +1122,9 @@
             lines.length = 0;
             createNetwork();
         });
+        
+        // Fix for mobile video playback
+        document.addEventListener('touchstart', function() {}, {passive: true});
     </script>
 </body>
 </html>
