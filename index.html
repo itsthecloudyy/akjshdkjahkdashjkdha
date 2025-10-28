@@ -583,34 +583,6 @@
             display: block; 
         }
         
-        .drive-converter { 
-            background: #111; 
-            padding: 2rem; 
-            border-radius: 8px; 
-            border: 1px solid #333; 
-            margin-bottom: 2rem; 
-        }
-        
-        .drive-converter input { 
-            width: 100%; 
-            padding: 12px; 
-            background: #222; 
-            border: 1px solid #444; 
-            border-radius: 4px; 
-            color: white; 
-            margin-bottom: 1rem; 
-        }
-        
-        .drive-converter button { 
-            background: #00ff88; 
-            color: #000; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-weight: bold; 
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
             .hero { padding: 8rem 0; }
@@ -697,7 +669,7 @@
                 <section class="section">
                     <div class="video-container">
                         <div class="video-wrapper">
-                            <!-- Google Drive Video Embed -->
+                            <!-- Main Video Embed -->
                             <iframe 
                                 class="video-frame" 
                                 src="https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview" 
@@ -729,13 +701,6 @@
                     <p class="tagline">Alternative streaming with integrated Turkish subtitles</p>
                 </section>
                 <section class="section">
-                    <div class="drive-converter">
-                        <h3>Google Drive Link Converter</h3>
-                        <p>Paste your Google Drive video link below to generate an embed:</p>
-                        <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/1ABC123.../view">
-                        <button onclick="convertDriveLink()">Convert to Embed</button>
-                    </div>
-                    
                     <div class="video-container">
                         <div class="video-wrapper">
                             <!-- Backup Video with Subtitles -->
@@ -746,8 +711,8 @@
                                 crossorigin="anonymous"
                                 poster="https://image.tmdb.org/t/p/w1280/aiVg6CL2MRQqQuNxY6eZaBqP4UV.jpg">
                                 
-                                <!-- Video source will be dynamically added -->
-                                <source src="" type="video/mp4" id="videoSource">
+                                <!-- Your YIFY Google Drive Video -->
+                                <source src="https://drive.google.com/uc?export=download&id=1IU27cu1gzn_quSOUB6_qHwov_H6I_GLV" type="video/mp4">
                                 
                                 <!-- Turkish Subtitles -->
                                 <track 
@@ -804,41 +769,6 @@
     </footer>
 
     <script>
-        // Google Drive Link Converter
-        function convertDriveLink() {
-            const driveLink = document.getElementById('driveLink').value;
-            const videoSource = document.getElementById('videoSource');
-            const videoElement = document.getElementById('backupVideo');
-            
-            // Extract file ID from Google Drive link
-            let fileId = '';
-            
-            // Handle different Google Drive link formats
-            if (driveLink.includes('/file/d/')) {
-                fileId = driveLink.split('/file/d/')[1].split('/')[0];
-            } else if (driveLink.includes('id=')) {
-                fileId = driveLink.split('id=')[1].split('&')[0];
-            } else if (driveLink.includes('/uc?')) {
-                fileId = driveLink.split('id=')[1].split('&')[0];
-            }
-            
-            if (fileId) {
-                // Create embed URL
-                const embedUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-                
-                // Update video source
-                videoSource.src = embedUrl;
-                
-                // Reload video with new source
-                videoElement.load();
-                
-                alert('Video source updated successfully! Click play to start streaming.');
-            } else {
-                alert('Please enter a valid Google Drive link.');
-            }
-        }
-
-        // Navigation
         document.addEventListener('DOMContentLoaded', function() {
             const navLinks = document.querySelectorAll('.nav-link');
             const pageContents = document.querySelectorAll('.page-content');
@@ -853,6 +783,18 @@
                     
                     pageContents.forEach(page => page.classList.remove('active'));
                     document.getElementById(targetPage + 'Page').classList.add('active');
+                    
+                    // Auto-start backup video when navigating to backup page
+                    if (targetPage === 'backup') {
+                        setTimeout(() => {
+                            const backupVideo = document.getElementById('backupVideo');
+                            if (backupVideo) {
+                                backupVideo.play().catch(e => {
+                                    console.log('Autoplay prevented:', e);
+                                });
+                            }
+                        }, 1000);
+                    }
                     
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
@@ -884,7 +826,6 @@
             document.getElementById('docsContent').innerHTML = content[subpage] || content['about'];
         }
 
-        // Network Animation
         const nodes = [];
         const lines = [];
         
@@ -968,7 +909,6 @@
             requestAnimationFrame(animateNetwork);
         }
 
-        // Intro Animation
         const intro = document.getElementById('introScreen');
         const statusContainer = document.getElementById('statusContainer');
         const header = document.getElementById('mainHeader');
