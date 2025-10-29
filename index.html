@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberStream - Video Platform</title>
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { 
             margin: 0; 
@@ -52,8 +53,14 @@
         }
         
         @keyframes pulse { 
-            0%, 100% { transform: scale(1); opacity: 1; } 
-            50% { transform: scale(1.5); opacity: 0.6; } 
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 1; 
+            } 
+            50% { 
+                transform: scale(1.5); 
+                opacity: 0.6; 
+            } 
         }
         
         .line { 
@@ -62,6 +69,7 @@
             background: linear-gradient(90deg, transparent, #aaaaaa, transparent); 
             opacity: 0.3; 
             transform-origin: left center; 
+            transition: opacity 0.3s ease; 
         }
         
         .container { 
@@ -72,12 +80,13 @@
         
         .header { 
             border: 1px solid hsl(0deg 0% 100% / 12%); 
-            border-radius: 50px; 
+            border-radius: 6px; 
             position: fixed; 
             top: 20px; 
             left: 50%; 
             transform: translateX(-50%); 
             background: rgba(0, 0, 0, 0.8); 
+            border-radius: 50px; 
             padding: 10px 20px; 
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); 
             z-index: 100; 
@@ -363,7 +372,6 @@
             gap: 1.5rem; 
             margin-bottom: 1.5rem; 
             color: #aaa; 
-            flex-wrap: wrap; 
         }
         
         .video-description { 
@@ -655,10 +663,6 @@
             .player-options {
                 grid-template-columns: 1fr;
             }
-            .video-meta {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
         }
     </style>
 </head>
@@ -737,13 +741,13 @@
                 <section class="section">
                     <div class="video-container">
                         <div class="video-wrapper">
-                            <!-- YouTube Video Embed -->
+                            <!-- Main Video Embed -->
                             <iframe 
-                                class="video-frame active" 
-                                src="https://www.youtube.com/embed/3j3_iOa8jVA" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                class="video-frame" 
+                                src="https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview" 
+                                allow="autoplay; encrypted-media" 
                                 allowfullscreen
-                                title="Dead Poets Society Trailer">
+                                title="Dead Poets Society">
                             </iframe>
                         </div>
                     </div>
@@ -844,13 +848,16 @@
                                     title="Dead Poets Society - FileMoon">
                                 </iframe>
 
-                                <!-- MixDrop -->
+                                <!-- MixDrop (Using iframe for better compatibility) -->
                                 <iframe 
                                     class="video-frame" 
                                     id="mixdropPlayer"
-                                    src="https://mxdrop.to/e/vkqqjd1qs0433p" 
-                                    allow="autoplay; encrypted-media" 
-                                    allowfullscreen
+                                    src="//mxdrop.to/e/vkqqjd1qs0433p" 
+                                    width="640" 
+                                    height="480" 
+                                    scrolling="no" 
+                                    frameborder="0" 
+                                    allowfullscreen="true"
                                     title="Dead Poets Society - MixDrop">
                                 </iframe>
 
@@ -922,7 +929,7 @@
     </footer>
 
     <script>
-        // Optimized Multi-Player Selector
+        // Multi-Player Selector
         class MultiPlayerSelector {
             constructor() {
                 this.playerOptions = document.querySelectorAll('.player-option');
@@ -933,8 +940,10 @@
             }
             
             init() {
+                // Set initial active player
                 this.setActivePlayer('doodstream');
                 
+                // Add event listeners to player options
                 this.playerOptions.forEach(option => {
                     option.addEventListener('click', () => {
                         const player = option.dataset.player;
@@ -944,10 +953,12 @@
             }
             
             setActivePlayer(playerId) {
+                // Update player options
                 this.playerOptions.forEach(option => {
                     option.classList.toggle('active', option.dataset.player === playerId);
                 });
                 
+                // Update video frames - hide all, then show active
                 this.videoFrames.forEach(frame => {
                     frame.classList.remove('active');
                 });
@@ -957,6 +968,7 @@
                     activeFrame.classList.add('active');
                 }
                 
+                // Update status message
                 this.updatePlayerStatus(playerId);
             }
             
@@ -976,35 +988,34 @@
             }
         }
 
-        // Optimized initialization
+        // Initialize multi-player selector when backup page loads
         document.addEventListener('DOMContentLoaded', function() {
             const navLinks = document.querySelectorAll('.nav-link');
             const pageContents = document.querySelectorAll('.page-content');
             let multiPlayer = null;
             
-            // Navigation handler
-            function handleNavigation(e) {
-                e.preventDefault();
-                const targetPage = this.getAttribute('data-page');
-                
-                navLinks.forEach(nav => nav.classList.remove('active'));
-                this.classList.add('active');
-                
-                pageContents.forEach(page => page.classList.remove('active'));
-                document.getElementById(targetPage + 'Page').classList.add('active');
-                
-                if (targetPage === 'backup' && !multiPlayer) {
-                    multiPlayer = new MultiPlayerSelector();
-                }
-                
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-            
             navLinks.forEach(link => {
-                link.addEventListener('click', handleNavigation);
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    pageContents.forEach(page => page.classList.remove('active'));
+                    document.getElementById(targetPage + 'Page').classList.add('active');
+                    
+                    // Initialize multi-player when backup page is loaded
+                    if (targetPage === 'backup' && !multiPlayer) {
+                        setTimeout(() => {
+                            multiPlayer = new MultiPlayerSelector();
+                        }, 100);
+                    }
+                    
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
             });
 
-            // Docs navigation
             const docsLinks = document.querySelectorAll('.docs-link');
             
             docsLinks.forEach(link => {
@@ -1031,14 +1042,12 @@
             document.getElementById('docsContent').innerHTML = content[subpage] || content['about'];
         }
 
-        // Optimized network animation
         const nodes = [];
         const lines = [];
-        let animationId = null;
         
         function createNetwork() {
             const background = document.getElementById('networkBackground');
-            const nodeCount = 15; // Reduced for performance
+            const nodeCount = 20;
             
             for (let i = 0; i < nodeCount; i++) {
                 const node = document.createElement('div');
@@ -1057,16 +1066,15 @@
                     element: node, 
                     x: x, 
                     y: y,
-                    vx: (Math.random() - 0.5) * 0.2, // Slower for performance
-                    vy: (Math.random() - 0.5) * 0.2
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3
                 });
             }
             
-            // Create fewer connections for better performance
             for (let i = 0; i < nodeCount; i++) {
-                for (let j = i + 1; j < Math.min(i + 3, nodeCount); j++) {
+                for (let j = i + 1; j < nodeCount; j++) {
                     const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-                    if (dist < 200) {
+                    if (dist < 180) {
                         const line = document.createElement('div');
                         line.classList.add('line');
                         background.appendChild(line);
@@ -1078,12 +1086,15 @@
         }
 
         function animateNetwork() {
-            nodes.forEach(function(node) {
+            nodes.forEach(function(node, i) {
                 node.x += node.vx;
                 node.y += node.vy;
                 
                 if (node.x < 0 || node.x > window.innerWidth) node.vx *= -1;
                 if (node.y < 0 || node.y > window.innerHeight) node.vy *= -1;
+                
+                node.x = Math.max(0, Math.min(window.innerWidth, node.x));
+                node.y = Math.max(0, Math.min(window.innerHeight, node.y));
                 
                 node.element.style.left = node.x + 'px';
                 node.element.style.top = node.y + 'px';
@@ -1093,22 +1104,27 @@
                 const from = nodes[line.from];
                 const to = nodes[line.to];
                 
-                const dist = Math.hypot(to.x - from.x, to.y - from.y);
+                const x1 = from.x + 2;
+                const y1 = from.y + 2;
+                const x2 = to.x + 2;
+                const y2 = to.y + 2;
+                
+                const dist = Math.hypot(x2 - x1, y2 - y1);
                 const length = dist;
-                const angle = Math.atan2(to.y - from.y, to.x - from.x) * (180 / Math.PI);
+                const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+                
                 const opacity = Math.max(0, 1 - dist / 200) * 0.4;
                 
                 line.element.style.width = length + 'px';
                 line.element.style.transform = 'rotate(' + angle + 'deg)';
-                line.element.style.left = from.x + 'px';
-                line.element.style.top = from.y + 'px';
+                line.element.style.left = x1 + 'px';
+                line.element.style.top = y1 + 'px';
                 line.element.style.opacity = opacity;
             });
             
-            animationId = requestAnimationFrame(animateNetwork);
+            requestAnimationFrame(animateNetwork);
         }
 
-        // Optimized page initialization
         const intro = document.getElementById('introScreen');
         const statusContainer = document.getElementById('statusContainer');
         const header = document.getElementById('mainHeader');
@@ -1141,13 +1157,6 @@
 
         scrollArrow.addEventListener('click', function() {
             window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-        });
-
-        // Clean up animation on page unload
-        window.addEventListener('beforeunload', function() {
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-            }
         });
     </script>
 </body>
