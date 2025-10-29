@@ -128,113 +128,95 @@
                 </section>
             </div>
 
-            <div class="page-content" id="backupPage">
-                <section class="hero-video">
-                    <h1>Backup Video with Subtitles</h1>
-                    <p class="tagline">Multiple player options with Turkish subtitles</p>
-                </section>
-                <section class="section">
-                    <div class="player-selector">
-                        <h3>Select Video Player</h3>
-                        <p>Choose your preferred streaming service:</p>
-                        
-                        <div class="player-options">
-                            <div class="player-option active" data-player="doodstream">
-                                <i class="fas fa-bolt"></i>
-                                <h4>DoodStream</h4>
-                                <p>Fast & Reliable</p>
-                            </div>
-                            <div class="player-option" data-player="filemoon">
-                                <i class="fas fa-moon"></i>
-                                <h4>FileMoon</h4>
-                                <p>Modern Player</p>
-                            </div>
-                            <div class="player-option" data-player="mixdrop">
-                                <i class="fas fa-cloud"></i>
-                                <h4>MixDrop</h4>
-                                <p>Clean Interface</p>
-                            </div>
-                        </div>
-
-                        <div class="player-status">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Current: DoodStream - Fast streaming with Turkish subtitles</span>
-                        </div>
-
-                        <!-- MixDrop Warning -->
-                        <div class="player-warning" id="mixdropWarning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span><strong>MixDrop Player:</strong> To see subtitles, you need to manually load the subtitle file. Please download the subtitle file from the Download page.</span>
-                        </div>
-                    </div>
-
-                    <div class="video-container">
-                        <div class="video-wrapper">
-                            <!-- Dynamic Video Player -->
-                            <div id="videoPlayerContainer">
-                                <!-- DoodStream (Default) -->
-                                <iframe 
-                                    class="video-frame active" 
-                                    id="doodstreamPlayer"
-                                    src="https://dsvplay.com/e/t2gc0n61c3iv" 
-                                    allow="autoplay; encrypted-media" 
-                                    allowfullscreen
-                                    title="Dead Poets Society - DoodStream">
-                                </iframe>
-
-                                <!-- FileMoon -->
-                                <iframe 
-                                    class="video-frame" 
-                                    id="filemoonPlayer"
-                                    src="https://filemoon.to/e/ra1uugjc5f0v" 
-                                    allow="autoplay; encrypted-media" 
-                                    allowfullscreen
-                                    title="Dead Poets Society - FileMoon">
-                                </iframe>
-
-                                <!-- MixDrop (Using iframe for better compatibility) -->
-                                <iframe 
-                                    class="video-frame" 
-                                    id="mixdropPlayer"
-                                    src="//mxdrop.to/e/vkqqjd1qs0433p" 
-                                    width="640" 
-                                    height="480" 
-                                    scrolling="no" 
-                                    frameborder="0" 
-                                    allowfullscreen="true"
-                                    title="Dead Poets Society - MixDrop">
-                                </iframe>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <h2 class="video-title">Dead Poets Society (Multi-Player)</h2>
-                        <div class="video-meta">
-                            <span><i class="fas fa-calendar"></i> Uploaded: October 29, 2025</span>
-                            <span><i class="fas fa-clock"></i> Duration: 2:10:08</span>
-                            <span><i class="fas fa-closed-captioning"></i> Turkish Subtitles Available</span>
-                            <span><i class="fas fa-sync-alt"></i> 3 Player Options</span>
-                        </div>
-                        <p class="video-description">
-                            A timeless classic that explores the power of literature and the importance of seizing the day. 
-                            This version offers multiple streaming options with full Turkish subtitle support on all players.
-                            Follow an English teacher who inspires his students through his teaching of poetry, encouraging 
-                            them to break free from the constraints of conformity and pursue their individual passions. 
-                            A moving story about mentorship, friendship, and the transformative power of education.
-                        </p>
-                        
-                        <div style="margin-top: 1.5rem; padding: 1rem; background: #1a1a1a; border-radius: 6px;">
-                            <h4 style="color: #00ff88; margin-bottom: 0.5rem;">
-                                <i class="fas fa-info-circle"></i> Player Information
-                            </h4>
-                            <p style="color: #aaa; margin: 0;">
-                                All players include Turkish subtitles. If one player doesn't work, try another option above.
-                                DoodStream is recommended for the best performance.
-                            </p>
-                        </div>
-                    </div>
-                </section>
+<div class="page-content" id="backupPage">
+    <section class="hero-video">
+        <h1>Backup Video with Subtitles</h1>
+        <p class="tagline">Multiple player options with Turkish subtitles</p>
+    </section>
+    <section class="section">
+        <div class="player-selector">
+            <h3>Select Video Player</h3>
+            <p>Choose your preferred streaming service:</p>
+            
+            <div class="player-options">
+                <div class="player-option active" data-player="doodstream">
+                    <i class="fas fa-bolt"></i>
+                    <h4>DoodStream</h4>
+                    <p>Fast & Reliable</p>
+                </div>
+                <div class="player-option" data-player="filemoon">
+                    <i class="fas fa-moon"></i>
+                    <h4>FileMoon</h4>
+                    <p>Modern Player</p>
+                </div>
+                <div class="player-option" data-player="mixdrop">
+                    <i class="fas fa-cloud"></i>
+                    <h4>MixDrop</h4>
+                    <p>Clean Interface</p>
+                </div>
             </div>
+
+            <div class="player-status">
+                <i class="fas fa-info-circle"></i>
+                <span>Current: DoodStream - Fast streaming with Turkish subtitles</span>
+            </div>
+
+            <!-- MixDrop Warning -->
+            <div class="player-warning" id="mixdropWarning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span><strong>MixDrop Player:</strong> To see subtitles, you need to manually load the subtitle file. Please download the subtitle file from the Download page.</span>
+            </div>
+        </div>
+
+        <!-- DoodStream Container (Initially loaded) -->
+        <div class="video-container" id="doodstreamContainer" style="display: block;">
+            <div class="video-wrapper">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- FileMoon Container (Hidden until needed) -->
+        <div class="video-container" id="filemoonContainer" style="display: none;">
+            <div class="video-wrapper">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- MixDrop Container (Hidden until needed) -->
+        <div class="video-container" id="mixdropContainer" style="display: none;">
+            <div class="video-wrapper">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+
+        <div class="video-info">
+            <h2 class="video-title">Dead Poets Society (Multi-Player)</h2>
+            <div class="video-meta">
+                <span><i class="fas fa-calendar"></i> Uploaded: October 29, 2025</span>
+                <span><i class="fas fa-clock"></i> Duration: 2:10:08</span>
+                <span><i class="fas fa-closed-captioning"></i> Turkish Subtitles Available</span>
+                <span><i class="fas fa-sync-alt"></i> 3 Player Options</span>
+            </div>
+            <p class="video-description">
+                A timeless classic that explores the power of literature and the importance of seizing the day. 
+                This version offers multiple streaming options with full Turkish subtitle support on all players.
+                Follow an English teacher who inspires his students through his teaching of poetry, encouraging 
+                them to break free from the constraints of conformity and pursue their individual passions. 
+                A moving story about mentorship, friendship, and the transformative power of education.
+            </p>
+            
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #1a1a1a; border-radius: 6px;">
+                <h4 style="color: #00ff88; margin-bottom: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> Player Information
+                </h4>
+                <p style="color: #aaa; margin: 0;">
+                    All players include Turkish subtitles. If one player doesn't work, try another option above.
+                    DoodStream is recommended for the best performance.
+                </p>
+            </div>
+        </div>
+    </section>
+</div>
 
             <div class="page-content" id="downloadPage">
                 <section class="hero-video">
