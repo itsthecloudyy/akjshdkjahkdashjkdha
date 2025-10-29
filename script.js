@@ -32,14 +32,14 @@ function initializeApp() {
     initIntroAnimation();
 }
 
-// Multi-Player Selector
+// Multi-Player Selector with Lazy Loading
 class MultiPlayerSelector {
     constructor() {
         this.playerOptions = document.querySelectorAll('.player-option');
-        this.videoFrames = document.querySelectorAll('.video-frame');
         this.playerStatus = document.querySelector('.player-status');
         this.mixdropWarning = document.getElementById('mixdropWarning');
         this.currentPlayer = 'doodstream';
+        this.loadedPlayers = new Set(['doodstream']); // Track loaded players
         
         this.init();
     }
@@ -69,14 +69,21 @@ class MultiPlayerSelector {
             option.classList.toggle('active', option.dataset.player === playerId);
         });
         
-        // Update video frames - hide all, then show active
-        this.videoFrames.forEach(frame => {
-            frame.classList.remove('active');
+        // Hide all video containers first
+        document.querySelectorAll('.video-container').forEach(container => {
+            container.style.display = 'none';
         });
         
-        const activeFrame = document.getElementById(playerId + 'Player');
-        if (activeFrame) {
-            activeFrame.classList.add('active');
+        // Show active video container
+        const activeContainer = document.getElementById(playerId + 'Container');
+        if (activeContainer) {
+            activeContainer.style.display = 'block';
+            
+            // Lazy load the player if not already loaded
+            if (!this.loadedPlayers.has(playerId)) {
+                this.lazyLoadPlayer(playerId);
+                this.loadedPlayers.add(playerId);
+            }
         }
         
         // Show/hide MixDrop warning
@@ -90,13 +97,48 @@ class MultiPlayerSelector {
         this.updatePlayerStatus(playerId);
     }
     
+    lazyLoadPlayer(playerId) {
+        const container = document.getElementById(playerId + 'Container');
+        if (!container) return;
+        
+        // Create and append the iframe only when needed
+        const iframe = document.createElement('iframe');
+        iframe.className = 'video-frame active';
+        iframe.allow = 'autoplay; encrypted-media';
+        iframe.allowFullscreen = true;
+        
+        switch(playerId) {
+            case 'doodstream':
+                iframe.src = 'https://dsvplay.com/e/t2gc0n61c3iv';
+                iframe.title = 'Dead Poets Society - DoodStream';
+                break;
+            case 'filemoon':
+                iframe.src = 'https://filemoon.to/e/ra1uugjc5f0v';
+                iframe.title = 'Dead Poets Society - FileMoon';
+                break;
+            case 'mixdrop':
+                iframe.src = '//mxdrop.to/e/vkqqjd1qs0433p';
+                iframe.width = '640';
+                iframe.height = '480';
+                iframe.scrolling = 'no';
+                iframe.frameBorder = '0';
+                iframe.allowFullscreen = true;
+                iframe.title = 'Dead Poets Society - MixDrop';
+                break;
+        }
+        
+        container.querySelector('.video-wrapper').appendChild(iframe);
+    }
+    
     stopCurrentPlayer() {
-        const currentFrame = document.getElementById(this.currentPlayer + 'Player');
+        const currentFrame = document.querySelector(`#${this.currentPlayer}Container iframe`);
         if (currentFrame) {
             // For iframes, we need to reload them to stop playback
             const src = currentFrame.src;
             currentFrame.src = '';
-            currentFrame.src = src;
+            setTimeout(() => {
+                currentFrame.src = src;
+            }, 100);
         }
     }
     
@@ -114,7 +156,7 @@ class MultiPlayerSelector {
     }
 }
 
-// Navigation system
+// Navigation system with page management
 function initNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     const pageContents = document.querySelectorAll('.page-content');
@@ -136,15 +178,28 @@ function initNavigation() {
         }
     }
     
+    // Function to manage page resources
+    function managePageResources(targetPage) {
+        // Stop videos and animations when leaving pages
+        if (currentPage === 'backup' || currentPage === 'video') {
+            stopAllVideos();
+        }
+        
+        // Pause network animation on content pages to save resources
+        if (targetPage !== 'home') {
+            document.getElementById('networkBackground').style.opacity = '0.2';
+        } else {
+            document.getElementById('networkBackground').style.opacity = '0.4';
+        }
+    }
+    
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             const targetPage = this.getAttribute('data-page');
             
-            // Stop videos if leaving backup or video page
-            if (currentPage === 'backup' || currentPage === 'video') {
-                stopAllVideos();
-            }
+            // Manage resources before page change
+            managePageResources(targetPage);
             
             // Update current page
             currentPage = targetPage;
@@ -153,9 +208,15 @@ function initNavigation() {
             navLinks.forEach(nav => nav.classList.remove('active'));
             this.classList.add('active');
             
-            // Show target page
-            pageContents.forEach(page => page.classList.remove('active'));
-            document.getElementById(targetPage + 'Page').classList.add('active');
+            // Show target page, hide others
+            pageContents.forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+            });
+            
+            const targetPageElement = document.getElementById(targetPage + 'Page');
+            targetPageElement.classList.add('active');
+            targetPageElement.style.display = 'block';
             
             // Initialize multi-player when backup page is loaded
             if (targetPage === 'backup' && !multiPlayer) {
@@ -164,10 +225,33 @@ function initNavigation() {
                 }, 100);
             }
             
+            // Lazy load main video only when video page is accessed
+            if (targetPage === 'video') {
+                lazyLoadMainVideo();
+            }
+            
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
+}
+
+// Lazy load main video
+function lazyLoadMainVideo() {
+    const videoWrapper = document.querySelector('#videoPage .video-wrapper');
+    const existingFrame = videoWrapper.querySelector('.video-frame');
+    
+    // Only load if not already loaded
+    if (!existingFrame || !existingFrame.src) {
+        const iframe = document.createElement('iframe');
+        iframe.className = 'video-frame active';
+        iframe.src = 'https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview';
+        iframe.allow = 'autoplay; encrypted-media';
+        iframe.allowFullscreen = true;
+        iframe.title = 'Dead Poets Society';
+        
+        videoWrapper.appendChild(iframe);
+    }
 }
 
 // Documentation system
@@ -285,23 +369,18 @@ function initIntroAnimation() {
     }
 }
 
-// Optimize network animation for better performance
-function optimizeNetworkAnimation() {
-    // Reduce animation intensity when videos are playing
-    const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-            if (entry.entryType === 'navigation') {
-                // Adjust network animation based on device performance
-                if (entry.domContentLoadedEventEnd > 3000) {
-                    // Slow device, reduce animation
-                    document.documentElement.style.setProperty('--node-count', '15');
-                    document.documentElement.style.setProperty('--animation-speed', '0.2s');
-                }
-            }
-        });
+// Performance monitoring
+function monitorPerformance() {
+    // Reduce network animation when page is not visible
+    document.addEventListener('visibilitychange', function() {
+        const background = document.getElementById('networkBackground');
+        if (document.hidden) {
+            background.style.opacity = '0.1';
+        } else {
+            background.style.opacity = '0.4';
+        }
     });
-    observer.observe({entryTypes: ['navigation']});
 }
 
-// Initialize performance optimizations
-document.addEventListener('DOMContentLoaded', optimizeNetworkAnimation);
+// Initialize performance monitoring
+document.addEventListener('DOMContentLoaded', monitorPerformance);
