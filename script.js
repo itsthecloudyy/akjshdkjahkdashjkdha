@@ -39,6 +39,7 @@ class MultiPlayerSelector {
         this.videoFrames = document.querySelectorAll('.video-frame');
         this.playerStatus = document.querySelector('.player-status');
         this.mixdropWarning = document.getElementById('mixdropWarning');
+        this.currentPlayer = 'doodstream';
         
         this.init();
     }
@@ -57,6 +58,12 @@ class MultiPlayerSelector {
     }
     
     setActivePlayer(playerId) {
+        // Stop current player first
+        this.stopCurrentPlayer();
+        
+        // Update current player
+        this.currentPlayer = playerId;
+        
         // Update player options
         this.playerOptions.forEach(option => {
             option.classList.toggle('active', option.dataset.player === playerId);
@@ -83,6 +90,16 @@ class MultiPlayerSelector {
         this.updatePlayerStatus(playerId);
     }
     
+    stopCurrentPlayer() {
+        const currentFrame = document.getElementById(this.currentPlayer + 'Player');
+        if (currentFrame) {
+            // For iframes, we need to reload them to stop playback
+            const src = currentFrame.src;
+            currentFrame.src = '';
+            currentFrame.src = src;
+        }
+    }
+    
     updatePlayerStatus(playerId) {
         const statusMessages = {
             'doodstream': 'DoodStream - Fast streaming with Turkish subtitles',
@@ -102,11 +119,35 @@ function initNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     const pageContents = document.querySelectorAll('.page-content');
     let multiPlayer = null;
+    let currentPage = 'home';
+    
+    // Function to stop all videos when leaving backup page
+    function stopAllVideos() {
+        if (multiPlayer) {
+            multiPlayer.stopCurrentPlayer();
+        }
+        
+        // Also stop the main video on video page
+        const mainVideo = document.querySelector('#videoPage .video-frame');
+        if (mainVideo && mainVideo.src) {
+            const src = mainVideo.src;
+            mainVideo.src = '';
+            mainVideo.src = src;
+        }
+    }
     
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             const targetPage = this.getAttribute('data-page');
+            
+            // Stop videos if leaving backup or video page
+            if (currentPage === 'backup' || currentPage === 'video') {
+                stopAllVideos();
+            }
+            
+            // Update current page
+            currentPage = targetPage;
             
             // Update active nav link
             navLinks.forEach(nav => nav.classList.remove('active'));
@@ -243,3 +284,24 @@ function initIntroAnimation() {
         background.classList.add('active');
     }
 }
+
+// Optimize network animation for better performance
+function optimizeNetworkAnimation() {
+    // Reduce animation intensity when videos are playing
+    const observer = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+            if (entry.entryType === 'navigation') {
+                // Adjust network animation based on device performance
+                if (entry.domContentLoadedEventEnd > 3000) {
+                    // Slow device, reduce animation
+                    document.documentElement.style.setProperty('--node-count', '15');
+                    document.documentElement.style.setProperty('--animation-speed', '0.2s');
+                }
+            }
+        });
+    });
+    observer.observe({entryTypes: ['navigation']});
+}
+
+// Initialize performance optimizations
+document.addEventListener('DOMContentLoaded', optimizeNetworkAnimation);
