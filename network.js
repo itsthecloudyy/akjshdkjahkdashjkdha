@@ -91,5 +91,13 @@ function animateNetwork(nodes, lines) {
 
 // Initialize network background when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initNetworkBackground();
+    if (!isMobileDevice()) {
+        initNetworkBackground();
+    }
 });
+
+// Device detection function for network.js
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           (window.innerWidth <= 768 && window.innerHeight <= 1024);
+}
