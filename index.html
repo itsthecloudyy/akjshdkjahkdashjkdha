@@ -184,12 +184,12 @@
             overflow: hidden; 
             border-right: 3px solid #ffffff; 
             width: 0; 
-            animation: typing 2s steps(12) forwards, blink 0.75s step-end infinite; 
+            animation: typing 2s steps(11, end) forwards, blink 0.75s step-end infinite; 
         }
         
         @keyframes typing { 
             from { width: 0; } 
-            to { width: 12ch; } 
+            to { width: 11ch; } 
         }
         
         @keyframes blink { 
@@ -1036,20 +1036,6 @@
                                 <li><i class="fas fa-check-circle"></i> Quality: High-quality translation</li>
                             </ul>
                         </div>
-                    </div>
-                    
-                    <div class="download-info" style="max-width: 600px; margin: 2rem auto;">
-                        <h4><i class="fas fa-question-circle"></i> How to Use</h4>
-                        <p style="color: #aaa; line-height: 1.6;">
-                            After downloading the subtitle file, you can use it with most video players:
-                        </p>
-                        <ul>
-                            <li><i class="fas fa-play-circle"></i> <strong>VLC Media Player:</strong> Drag and drop the subtitle file onto the video</li>
-                            <li><i class="fas fa-play-circle"></i> <strong>MPV/MPC-HC:</strong> Place the subtitle file in the same folder as the video with the same name</li>
-                            <li><i class="fas fa-play-circle"></i> <strong>Online Players:</strong> Use the subtitle upload feature if available</li>
-                            <li><i class="fas fa-play-circle"></i> <strong>Plex/Jellyfin:</strong> Add to your media server's subtitle folder</li>
-                            <li><i class="fas fa-exclamation-triangle"></i> <strong>MixDrop:</strong> Does not have manual subtitle loading feature</li>
-                        </ul>
                     </div>
                 </section>
             </div>
