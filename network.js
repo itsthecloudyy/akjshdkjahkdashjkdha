@@ -225,36 +225,6 @@ window.addEventListener('resize', function() {
     }, 250);
 });
 
-// Reduce animation intensity when videos are playing
-function reduceAnimationIntensity() {
-    const background = document.getElementById('networkBackground');
-    if (background) {
-        background.style.opacity = '0.2';
-        
-        // Slow down animation
-        nodes.forEach(node => {
-            node.vx *= 0.5;
-            node.vy *= 0.5;
-        });
-    }
-}
-
-function restoreAnimationIntensity() {
-    const background = document.getElementById('networkBackground');
-    if (background) {
-        background.style.opacity = '0.4';
-        
-        // Restore animation speed
-        const isSlowDevice = window.innerWidth < 768;
-        const animationSpeed = isSlowDevice ? 0.15 : 0.25;
-        
-        nodes.forEach(node => {
-            node.vx = (Math.random() - 0.5) * animationSpeed;
-            node.vy = (Math.random() - 0.5) * animationSpeed;
-        });
-    }
-}
-
 // Device detection function
 function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
@@ -263,8 +233,6 @@ function isMobileDevice() {
 
 // Export functions for use in other scripts
 window.NetworkAnimation = {
-    reduceIntensity: reduceAnimationIntensity,
-    restoreIntensity: restoreAnimationIntensity,
     pause: pauseNetworkAnimation,
     resume: resumeNetworkAnimation
 };
