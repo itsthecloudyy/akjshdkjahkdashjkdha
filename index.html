@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberStream - Video Platform</title>
+    <meta name="description" content="Next-gen video streaming platform with cyberpunk-inspired design">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -652,6 +653,21 @@
             border-left-color: #ff4444;
         }
 
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero { padding: 8rem 0; }
@@ -662,6 +678,38 @@
             .nav-menu { gap: 1rem; }
             .player-options {
                 grid-template-columns: 1fr;
+            }
+            .nav-brand {
+                margin-right: 1rem;
+                font-size: 1.2rem;
+            }
+            .video-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                width: 95%;
+                padding: 8px 16px;
+            }
+            .nav-menu {
+                gap: 0.5rem;
+            }
+            .nav-menu a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .nav-brand {
+                font-size: 1rem;
+                margin-right: 0.5rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .tagline {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -684,15 +732,15 @@
                 <span>CyberStream</span>
             </div>
             <ul class="nav-menu">
-                <li><a href="#" class="nav-link active" data-page="home"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="#" class="nav-link" data-page="video"><i class="fas fa-play-circle"></i> Watch Video</a></li>
-                <li><a href="#" class="nav-link" data-page="backup"><i class="fas fa-backup"></i> Backup Video</a></li>
-                <li><a href="#" class="nav-link" data-page="docs"><i class="fas fa-book"></i> About</a></li>
+                <li><a href="#" class="nav-link active" data-page="home" aria-label="Home page"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" class="nav-link" data-page="video" aria-label="Watch video"><i class="fas fa-play-circle"></i> Watch Video</a></li>
+                <li><a href="#" class="nav-link" data-page="backup" aria-label="Backup video options"><i class="fas fa-backup"></i> Backup Video</a></li>
+                <li><a href="#" class="nav-link" data-page="docs" aria-label="About CyberStream"><i class="fas fa-book"></i> About</a></li>
             </ul>
         </div>
     </header>
 
-    <i class="fas fa-arrow-down scroll-arrow" id="scrollArrow"></i>
+    <i class="fas fa-arrow-down scroll-arrow" id="scrollArrow" aria-label="Scroll down"></i>
 
     <main class="main-content">
         <div class="container">
@@ -743,7 +791,7 @@
                         <div class="video-wrapper">
                             <!-- Main Video Embed -->
                             <iframe 
-                                class="video-frame" 
+                                class="video-frame active" 
                                 src="https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview" 
                                 allow="autoplay; encrypted-media" 
                                 allowfullscreen
@@ -988,8 +1036,23 @@
             }
         }
 
-        // Initialize multi-player selector when backup page loads
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize navigation
+            initNavigation();
+            
+            // Initialize documentation system
+            initDocumentation();
+            
+            // Initialize intro animation
+            initIntroAnimation();
+            
+            // Initialize network background
+            initNetworkBackground();
+        });
+
+        // Navigation system
+        function initNavigation() {
             const navLinks = document.querySelectorAll('.nav-link');
             const pageContents = document.querySelectorAll('.page-content');
             let multiPlayer = null;
@@ -999,9 +1062,11 @@
                     e.preventDefault();
                     const targetPage = this.getAttribute('data-page');
                     
+                    // Update active nav link
                     navLinks.forEach(nav => nav.classList.remove('active'));
                     this.classList.add('active');
                     
+                    // Show target page
                     pageContents.forEach(page => page.classList.remove('active'));
                     document.getElementById(targetPage + 'Page').classList.add('active');
                     
@@ -1012,10 +1077,14 @@
                         }, 100);
                     }
                     
+                    // Scroll to top
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
             });
+        }
 
+        // Documentation system
+        function initDocumentation() {
             const docsLinks = document.querySelectorAll('.docs-link');
             
             docsLinks.forEach(link => {
@@ -1031,7 +1100,7 @@
             });
 
             loadDocsContent('about');
-        });
+        }
 
         function loadDocsContent(subpage) {
             const content = {
@@ -1042,13 +1111,49 @@
             document.getElementById('docsContent').innerHTML = content[subpage] || content['about'];
         }
 
-        const nodes = [];
-        const lines = [];
-        
-        function createNetwork() {
+        // Intro animation system
+        function initIntroAnimation() {
+            const intro = document.getElementById('introScreen');
+            const statusContainer = document.getElementById('statusContainer');
+            const header = document.getElementById('mainHeader');
+            const background = document.getElementById('networkBackground');
+            const scrollArrow = document.getElementById('scrollArrow');
+
+            background.classList.add('active');
+
+            const hasSeenIntro = sessionStorage.getItem('introPlayed') === 'true';
+
+            if (!hasSeenIntro) {
+                setTimeout(() => {
+                    statusContainer.classList.add('visible');
+                    setTimeout(() => {
+                        intro.classList.add('hidden');
+                        header.classList.add('active');
+                        background.classList.add('active'); 
+                        scrollArrow.classList.add('visible');
+                        sessionStorage.setItem('introPlayed', 'true');
+                    }, 1000);
+                }, 2000);
+            } else {
+                intro.classList.add('hidden');
+                header.classList.add('active');
+                background.classList.add('active');
+                scrollArrow.classList.add('visible');
+            }
+
+            scrollArrow.addEventListener('click', function() {
+                window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+            });
+        }
+
+        // Network background animation
+        function initNetworkBackground() {
+            const nodes = [];
+            const lines = [];
             const background = document.getElementById('networkBackground');
             const nodeCount = 20;
             
+            // Create nodes
             for (let i = 0; i < nodeCount; i++) {
                 const node = document.createElement('div');
                 node.classList.add('node');
@@ -1071,6 +1176,7 @@
                 });
             }
             
+            // Create lines between nearby nodes
             for (let i = 0; i < nodeCount; i++) {
                 for (let j = i + 1; j < nodeCount; j++) {
                     const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
@@ -1082,24 +1188,30 @@
                     }
                 }
             }
-            animateNetwork();
+            
+            // Start animation
+            animateNetwork(nodes, lines);
         }
 
-        function animateNetwork() {
-            nodes.forEach(function(node, i) {
+        function animateNetwork(nodes, lines) {
+            nodes.forEach(function(node) {
                 node.x += node.vx;
                 node.y += node.vy;
                 
+                // Bounce off edges
                 if (node.x < 0 || node.x > window.innerWidth) node.vx *= -1;
                 if (node.y < 0 || node.y > window.innerHeight) node.vy *= -1;
                 
+                // Keep within bounds
                 node.x = Math.max(0, Math.min(window.innerWidth, node.x));
                 node.y = Math.max(0, Math.min(window.innerHeight, node.y));
                 
+                // Update position
                 node.element.style.left = node.x + 'px';
                 node.element.style.top = node.y + 'px';
             });
             
+            // Update lines
             lines.forEach(function(line) {
                 const from = nodes[line.from];
                 const to = nodes[line.to];
@@ -1122,42 +1234,8 @@
                 line.element.style.opacity = opacity;
             });
             
-            requestAnimationFrame(animateNetwork);
+            requestAnimationFrame(() => animateNetwork(nodes, lines));
         }
-
-        const intro = document.getElementById('introScreen');
-        const statusContainer = document.getElementById('statusContainer');
-        const header = document.getElementById('mainHeader');
-        const background = document.getElementById('networkBackground');
-        const scrollArrow = document.getElementById('scrollArrow');
-
-        background.classList.add('active');
-
-        const hasSeenIntro = sessionStorage.getItem('introPlayed') === 'true';
-
-        if (!hasSeenIntro) {
-            setTimeout(() => {
-                statusContainer.classList.add('visible');
-                setTimeout(() => {
-                    intro.classList.add('hidden');
-                    header.classList.add('active');
-                    background.classList.add('active'); 
-                    scrollArrow.classList.add('visible');
-                    createNetwork();
-                    sessionStorage.setItem('introPlayed', 'true');
-                }, 1000);
-            }, 2000);
-        } else {
-            intro.classList.add('hidden');
-            header.classList.add('active');
-            background.classList.add('active');
-            scrollArrow.classList.add('visible');
-            createNetwork();
-        }
-
-        scrollArrow.addEventListener('click', function() {
-            window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-        });
     </script>
 </body>
 </html>
