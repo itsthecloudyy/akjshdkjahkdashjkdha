@@ -1,3 +1,37 @@
+// Device detection
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           (window.innerWidth <= 768 && window.innerHeight <= 1024);
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if mobile device
+    if (isMobileDevice()) {
+        const mobileWarning = document.getElementById('mobileWarning');
+        mobileWarning.classList.add('active');
+        
+        // Proceed anyway button
+        document.getElementById('proceedAnyway').addEventListener('click', function() {
+            mobileWarning.classList.remove('active');
+            initializeApp();
+        });
+    } else {
+        initializeApp();
+    }
+});
+
+function initializeApp() {
+    // Initialize navigation
+    initNavigation();
+    
+    // Initialize documentation system
+    initDocumentation();
+    
+    // Initialize intro animation
+    initIntroAnimation();
+}
+
 // Multi-Player Selector
 class MultiPlayerSelector {
     constructor() {
@@ -62,18 +96,6 @@ class MultiPlayerSelector {
         `;
     }
 }
-
-// Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize navigation
-    initNavigation();
-    
-    // Initialize documentation system
-    initDocumentation();
-    
-    // Initialize intro animation
-    initIntroAnimation();
-});
 
 // Navigation system
 function initNavigation() {
