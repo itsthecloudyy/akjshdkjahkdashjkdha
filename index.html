@@ -346,6 +346,11 @@
             height: 100%; 
             border: none; 
             background: #000; 
+            display: none; 
+        }
+        
+        .video-frame.active { 
+            display: block; 
         }
         
         .video-info { 
@@ -953,10 +958,15 @@
                     option.classList.toggle('active', option.dataset.player === playerId);
                 });
                 
-                // Update video frames
+                // Update video frames - hide all, then show active
                 this.videoFrames.forEach(frame => {
-                    frame.classList.toggle('active', frame.id === playerId + 'Player');
+                    frame.classList.remove('active');
                 });
+                
+                const activeFrame = document.getElementById(playerId + 'Player');
+                if (activeFrame) {
+                    activeFrame.classList.add('active');
+                }
                 
                 // Update status message
                 this.updatePlayerStatus(playerId);
