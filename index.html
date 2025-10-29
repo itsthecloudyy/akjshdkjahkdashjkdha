@@ -943,7 +943,6 @@
                                 <h4>DoodStream</h4>
                                 <p>Fast & Reliable</p>
                             </div>
-                            </div>
                             <div class="player-option" data-player="filemoon">
                                 <i class="fas fa-moon"></i>
                                 <h4>FileMoon</h4>
@@ -953,11 +952,6 @@
                                 <i class="fas fa-cloud"></i>
                                 <h4>MixDrop</h4>
                                 <p>Clean Interface</p>
-                            </div>
-                            <div class="player-option" data-player="streamtape">
-                                <i class="fas fa-tape"></i>
-                                <h4>StreamTape</h4>
-                                <p>Stable Streaming</p>
                             </div>
                         </div>
 
@@ -1009,18 +1003,6 @@
                                     allowfullscreen="true"
                                     title="Dead Poets Society - MixDrop">
                                 </iframe>
-
-                                <!-- StreamTape -->
-                                <iframe 
-                                    class="video-frame" 
-                                    id="streamtapePlayer"
-                                    src="https://streamtape.com/e/AAO8aKary3SX8KQ/" 
-                                    allow="autoplay" 
-                                    allowtransparency 
-                                    scrolling="no" 
-                                    frameborder="0"
-                                    title="Dead Poets Society - StreamTape">
-                                </iframe>
                             </div>
                         </div>
                     </div>
@@ -1030,7 +1012,7 @@
                             <span><i class="fas fa-calendar"></i> Uploaded: October 29, 2025</span>
                             <span><i class="fas fa-clock"></i> Duration: 2:10:08</span>
                             <span><i class="fas fa-closed-captioning"></i> English Subtitles Available</span>
-                            <span><i class="fas fa-sync-alt"></i> 5 Player Options</span>
+                            <span><i class="fas fa-sync-alt"></i> 3 Player Options</span>
                         </div>
                         <p class="video-description">
                             A timeless classic that explores the power of literature and the importance of seizing the day. 
@@ -1178,10 +1160,9 @@
             
             updatePlayerStatus(playerId) {
                 const statusMessages = {
-                    'doodstream': 'DoodStream - Fast streaming with Turkish subtitles',
-                    'filemoon': 'FileMoon - Modern player with Turkish subtitles',
-                    'mixdrop': 'MixDrop - Clean interface (manual subtitle upload required)',
-                    'streamtape': 'StreamTape - Stable streaming with Turkish subtitles'
+                    'doodstream': 'DoodStream - Fast streaming with English subtitles',
+                    'filemoon': 'FileMoon - Modern player with English subtitles',
+                    'mixdrop': 'MixDrop - Clean interface (manual subtitle upload required)'
                 };
                 
                 this.playerStatus.innerHTML = `
