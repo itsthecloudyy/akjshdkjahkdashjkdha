@@ -741,6 +741,25 @@
             transform: translateY(-2px);
         }
 
+        /* Player Warning Styles */
+        .player-warning {
+            background: #2e1a1a;
+            border-left: 4px solid #ff4444;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .player-warning.active {
+            display: block;
+        }
+
+        .player-warning i {
+            color: #ff4444;
+            margin-right: 10px;
+        }
+
         /* Loading Spinner */
         .loading {
             display: inline-block;
@@ -852,7 +871,7 @@
                     <div class="features-grid">
                         <div class="feature-card">
                             <i class="fas fa-hd-video"></i>
-                            <h3>High Definition 🚀</h3>
+                            <h3>High Definition</h3>
                             <p>Stream videos in crystal clear HD quality with adaptive bitrate streaming.</p>
                         </div>
                         <div class="feature-card">
@@ -949,6 +968,12 @@
                         <div class="player-status">
                             <i class="fas fa-info-circle"></i>
                             <span>Current: DoodStream - Fast streaming with Turkish subtitles</span>
+                        </div>
+
+                        <!-- MixDrop Warning -->
+                        <div class="player-warning" id="mixdropWarning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span><strong>MixDrop Player:</strong> Altyazıları görmek için altyazı dosyasını manuel olarak yüklemeniz gerekmektedir. Lütfen Download sayfasından altyazı dosyasını indirin.</span>
                         </div>
                     </div>
 
@@ -1056,9 +1081,11 @@
                         <h3>Dead Poets Society Turkish Subtitles</h3>
                         <p>Download the VTT subtitle file to use with any video player. This file contains Turkish translations synchronized with the movie timeline.</p>
                         
-                        <button class="download-btn" id="downloadSubtitleBtn">
+                        <a href="https://drive.usercontent.google.com/download?id=1g1bj_kuSi8knL9IkUAgMa1RTt-zi0WuD&export=download&authuser=0" 
+                           class="download-btn" 
+                           download="Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE-YIFY-Turkish.vtt">
                             <i class="fas fa-download"></i> Download Subtitle File
-                        </button>
+                        </a>
                         
                         <div class="download-info">
                             <h4><i class="fas fa-info-circle"></i> File Information</h4>
@@ -1082,6 +1109,7 @@
                             <li><i class="fas fa-play-circle"></i> <strong>MPV/MPC-HC:</strong> Place the subtitle file in the same folder as the video with the same name</li>
                             <li><i class="fas fa-play-circle"></i> <strong>Online Players:</strong> Use the subtitle upload feature if available</li>
                             <li><i class="fas fa-play-circle"></i> <strong>Plex/Jellyfin:</strong> Add to your media server's subtitle folder</li>
+                            <li><i class="fas fa-exclamation-triangle"></i> <strong>MixDrop:</strong> Manuel olarak altyazı yükleme özelliği yoktur</li>
                         </ul>
                     </div>
                 </section>
@@ -1118,6 +1146,7 @@
                 this.playerOptions = document.querySelectorAll('.player-option');
                 this.videoFrames = document.querySelectorAll('.video-frame');
                 this.playerStatus = document.querySelector('.player-status');
+                this.mixdropWarning = document.getElementById('mixdropWarning');
                 
                 this.init();
             }
@@ -1151,6 +1180,13 @@
                     activeFrame.classList.add('active');
                 }
                 
+                // Show/hide MixDrop warning
+                if (playerId === 'mixdrop') {
+                    this.mixdropWarning.classList.add('active');
+                } else {
+                    this.mixdropWarning.classList.remove('active');
+                }
+                
                 // Update status message
                 this.updatePlayerStatus(playerId);
             }
@@ -1160,7 +1196,7 @@
                     'doodstream': 'DoodStream - Fast streaming with Turkish subtitles',
                     'vidoza': 'Vidoza - HD quality with Turkish subtitles', 
                     'filemoon': 'FileMoon - Modern player with Turkish subtitles',
-                    'mixdrop': 'MixDrop - Clean interface with Turkish subtitles',
+                    'mixdrop': 'MixDrop - Clean interface (manual subtitle upload required)',
                     'streamtape': 'StreamTape - Stable streaming with Turkish subtitles'
                 };
                 
@@ -1169,36 +1205,6 @@
                     <span>Current: ${statusMessages[playerId]}</span>
                 `;
             }
-        }
-
-        // Download functionality
-        function downloadSubtitle() {
-            const subtitleUrl = 'https://raw.githubusercontent.com/itsthecloudyy/cdn/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.vtt';
-            const fileName = 'Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE-YIFY-Turkish.vtt';
-            
-            // Create a temporary anchor element
-            const link = document.createElement('a');
-            link.href = subtitleUrl;
-            link.download = fileName;
-            
-            // Append to the document, click, and remove
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Show download confirmation
-            const downloadBtn = document.getElementById('downloadSubtitleBtn');
-            const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<i class="fas fa-check"></i> Download Started!';
-            downloadBtn.style.background = '#00cc6a';
-            downloadBtn.style.borderColor = '#00cc6a';
-            
-            // Reset button after 2 seconds
-            setTimeout(() => {
-                downloadBtn.innerHTML = originalText;
-                downloadBtn.style.background = '#00ff88';
-                downloadBtn.style.borderColor = '#00ff88';
-            }, 2000);
         }
 
         // Initialize the application
@@ -1214,12 +1220,6 @@
             
             // Initialize network background
             initNetworkBackground();
-            
-            // Initialize download button
-            const downloadBtn = document.getElementById('downloadSubtitleBtn');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', downloadSubtitle);
-            }
         });
 
         // Navigation system
