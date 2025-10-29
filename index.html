@@ -184,12 +184,12 @@
             overflow: hidden; 
             border-right: 3px solid #ffffff; 
             width: 0; 
-            animation: typing 2s steps(14) forwards, blink 0.75s step-end infinite; 
+            animation: typing 2s steps(12) forwards, blink 0.75s step-end infinite; 
         }
         
         @keyframes typing { 
             from { width: 0; } 
-            to { width: 14ch; } 
+            to { width: 12ch; } 
         }
         
         @keyframes blink { 
@@ -223,30 +223,6 @@
         .status-text { 
             font-size: 1.2rem; 
             color: #aaaaaa; 
-        }
-        
-        .scroll-arrow { 
-            position: fixed; 
-            bottom: 40px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            font-size: 2rem; 
-            color: #ffffff; 
-            animation: bounce 2s infinite; 
-            opacity: 0; 
-            transition: opacity 0.5s ease; 
-            z-index: 10; 
-            cursor: pointer; 
-        }
-        
-        .scroll-arrow.visible { 
-            opacity: 1; 
-        }
-        
-        @keyframes bounce { 
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); } 
-            40% { transform: translateX(-50%) translateY(-10px); } 
-            60% { transform: translateX(-50%) translateY(-5px); } 
         }
         
         .hero { 
@@ -852,8 +828,6 @@
         </div>
     </header>
 
-    <i class="fas fa-arrow-down scroll-arrow" id="scrollArrow" aria-label="Scroll down"></i>
-
     <main class="main-content">
         <div class="container">
             <div class="page-content active" id="homePage">
@@ -1312,7 +1286,6 @@
             const statusContainer = document.getElementById('statusContainer');
             const header = document.getElementById('mainHeader');
             const background = document.getElementById('networkBackground');
-            const scrollArrow = document.getElementById('scrollArrow');
 
             background.classList.add('active');
 
@@ -1325,7 +1298,6 @@
                         intro.classList.add('hidden');
                         header.classList.add('active');
                         background.classList.add('active'); 
-                        scrollArrow.classList.add('visible');
                         sessionStorage.setItem('introPlayed', 'true');
                     }, 1000);
                 }, 2000);
@@ -1333,12 +1305,7 @@
                 intro.classList.add('hidden');
                 header.classList.add('active');
                 background.classList.add('active');
-                scrollArrow.classList.add('visible');
             }
-
-            scrollArrow.addEventListener('click', function() {
-                window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-            });
         }
 
         // Network background animation
