@@ -943,10 +943,6 @@
                                 <h4>DoodStream</h4>
                                 <p>Fast & Reliable</p>
                             </div>
-                            <div class="player-option" data-player="vidoza">
-                                <i class="fas fa-play-circle"></i>
-                                <h4>Vidoza</h4>
-                                <p>HD Quality</p>
                             </div>
                             <div class="player-option" data-player="filemoon">
                                 <i class="fas fa-moon"></i>
@@ -989,19 +985,6 @@
                                     allow="autoplay; encrypted-media" 
                                     allowfullscreen
                                     title="Dead Poets Society - DoodStream">
-                                </iframe>
-
-                                <!-- Vidoza -->
-                                <iframe 
-                                    class="video-frame" 
-                                    id="vidozaPlayer"
-                                    src="https://vidoza.net/embed-2cjrg3b9nl9f.html" 
-                                    frameborder="0" 
-                                    marginwidth="0" 
-                                    marginheight="0" 
-                                    scrolling="no" 
-                                    allowfullscreen
-                                    title="Dead Poets Society - Vidoza">
                                 </iframe>
 
                                 <!-- FileMoon -->
@@ -1195,11 +1178,10 @@
             
             updatePlayerStatus(playerId) {
                 const statusMessages = {
-                    'doodstream': 'DoodStream - Fast streaming with English subtitles',
-                    'vidoza': 'Vidoza - HD quality with English subtitles', 
-                    'filemoon': 'FileMoon - Modern player with English subtitles',
+                    'doodstream': 'DoodStream - Fast streaming with Turkish subtitles',
+                    'filemoon': 'FileMoon - Modern player with Turkish subtitles',
                     'mixdrop': 'MixDrop - Clean interface (manual subtitle upload required)',
-                    'streamtape': 'StreamTape - Stable streaming with English subtitles'
+                    'streamtape': 'StreamTape - Stable streaming with Turkish subtitles'
                 };
                 
                 this.playerStatus.innerHTML = `
