@@ -653,6 +653,71 @@
             border-left-color: #ff4444;
         }
 
+        /* Download Page Styles */
+        .download-section {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .download-card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 2.5rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .download-card i {
+            font-size: 4rem;
+            color: #00ff88;
+            margin-bottom: 1.5rem;
+        }
+
+        .download-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .download-card p {
+            color: #aaa;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .download-info {
+            background: #1a1a1a;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+
+        .download-info h4 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+        }
+
+        .download-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .download-info li {
+            color: #aaa;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-info li i {
+            font-size: 1rem;
+            color: #00ff88;
+        }
+
         /* Loading Spinner */
         .loading {
             display: inline-block;
@@ -686,6 +751,10 @@
             .video-meta {
                 flex-direction: column;
                 gap: 0.5rem;
+            }
+            .download-card {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
             }
         }
 
@@ -735,6 +804,7 @@
                 <li><a href="#" class="nav-link active" data-page="home" aria-label="Home page"><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="#" class="nav-link" data-page="video" aria-label="Watch video"><i class="fas fa-play-circle"></i> Watch Video</a></li>
                 <li><a href="#" class="nav-link" data-page="backup" aria-label="Backup video options"><i class="fas fa-backup"></i> Backup Video</a></li>
+                <li><a href="#" class="nav-link" data-page="download" aria-label="Download subtitle file"><i class="fas fa-download"></i> Download</a></li>
                 <li><a href="#" class="nav-link" data-page="docs" aria-label="About CyberStream"><i class="fas fa-book"></i> About</a></li>
             </ul>
         </div>
@@ -948,6 +1018,51 @@
                                 DoodStream is recommended for the best performance.
                             </p>
                         </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="page-content" id="downloadPage">
+                <section class="hero-video">
+                    <h1>Download Subtitle File</h1>
+                    <p class="tagline">Get the Turkish subtitle file for Dead Poets Society</p>
+                </section>
+                <section class="section download-section">
+                    <div class="download-card">
+                        <i class="fas fa-file-download"></i>
+                        <h3>Dead Poets Society Turkish Subtitles</h3>
+                        <p>Download the VTT subtitle file to use with any video player. This file contains Turkish translations synchronized with the movie timeline.</p>
+                        
+                        <a href="https://raw.githubusercontent.com/itsthecloudyy/cdn/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.vtt" 
+                           download="Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE-YIFY-Turkish.vtt" 
+                           class="btn" 
+                           style="background: #00ff88; color: #000; border-color: #00ff88;">
+                            <i class="fas fa-download"></i> Download Subtitle File
+                        </a>
+                        
+                        <div class="download-info">
+                            <h4><i class="fas fa-info-circle"></i> File Information</h4>
+                            <ul>
+                                <li><i class="fas fa-file-alt"></i> Format: VTT (Web Video Text Tracks)</li>
+                                <li><i class="fas fa-language"></i> Language: Turkish</li>
+                                <li><i class="fas fa-film"></i> Movie: Dead Poets Society (1989)</li>
+                                <li><i class="fas fa-hdd"></i> File Size: ~50KB</li>
+                                <li><i class="fas fa-check-circle"></i> Quality: High-quality translation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="download-info" style="max-width: 600px; margin: 2rem auto;">
+                        <h4><i class="fas fa-question-circle"></i> How to Use</h4>
+                        <p style="color: #aaa; line-height: 1.6;">
+                            After downloading the subtitle file, you can use it with most video players:
+                        </p>
+                        <ul>
+                            <li><i class="fas fa-play-circle"></i> <strong>VLC Media Player:</strong> Drag and drop the subtitle file onto the video</li>
+                            <li><i class="fas fa-play-circle"></i> <strong>MPV/MPC-HC:</strong> Place the subtitle file in the same folder as the video with the same name</li>
+                            <li><i class="fas fa-play-circle"></i> <strong>Online Players:</strong> Use the subtitle upload feature if available</li>
+                            <li><i class="fas fa-play-circle"></i> <strong>Plex/Jellyfin:</strong> Add to your media server's subtitle folder</li>
+                        </ul>
                     </div>
                 </section>
             </div>
