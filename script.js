@@ -4,8 +4,86 @@ function isMobileDevice() {
            (window.innerWidth <= 768 && window.innerHeight <= 1024);
 }
 
+// Loading screen management
+class LoadingScreen {
+    constructor() {
+        this.loadingBar = document.getElementById('loadingBar');
+        this.loadingText = document.getElementById('loadingText');
+        this.loadingStatus = document.getElementById('loadingStatus');
+        this.progress = 0;
+        this.steps = [
+            { text: 'Initializing platform...', duration: 800 },
+            { text: 'Loading core modules...', duration: 600 },
+            { text: 'Setting up video players...', duration: 700 },
+            { text: 'Preparing user interface...', duration: 500 },
+            { text: 'Almost ready...', duration: 400 }
+        ];
+    }
+
+    start() {
+        return new Promise((resolve) => {
+            this.animateLoading(resolve);
+        });
+    }
+
+    animateLoading(resolve) {
+        let currentStep = 0;
+        const totalSteps = this.steps.length;
+        const stepProgress = 100 / totalSteps;
+
+        const executeStep = () => {
+            if (currentStep < totalSteps) {
+                const step = this.steps[currentStep];
+                this.loadingText.textContent = step.text;
+                
+                // Animate progress bar
+                const targetProgress = (currentStep + 1) * stepProgress;
+                this.animateProgressBar(this.progress, targetProgress, step.duration, () => {
+                    currentStep++;
+                    executeStep();
+                });
+            } else {
+                // Complete loading
+                this.animateProgressBar(this.progress, 100, 500, () => {
+                    setTimeout(() => {
+                        this.hide();
+                        resolve();
+                    }, 500);
+                });
+            }
+        };
+
+        executeStep();
+    }
+
+    animateProgressBar(from, to, duration, callback) {
+        const startTime = performance.now();
+        
+        const updateProgress = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            this.progress = from + (to - from) * progress;
+            this.loadingBar.style.width = this.progress + '%';
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateProgress);
+            } else {
+                callback();
+            }
+        };
+        
+        requestAnimationFrame(updateProgress);
+    }
+
+    hide() {
+        const intro = document.getElementById('introScreen');
+        intro.classList.add('hidden');
+    }
+}
+
 // Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Check if mobile device
     if (isMobileDevice()) {
         const mobileWarning = document.getElementById('mobileWarning');
@@ -17,6 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
         });
     } else {
+        // Start loading screen
+        const loadingScreen = new LoadingScreen();
+        await loadingScreen.start();
         initializeApp();
     }
 });
@@ -28,8 +109,12 @@ function initializeApp() {
     // Initialize documentation system
     initDocumentation();
     
-    // Initialize intro animation
-    initIntroAnimation();
+    // Initialize network background
+    setTimeout(() => {
+        if (typeof initNetworkBackground === 'function') {
+            initNetworkBackground();
+        }
+    }, 100);
 }
 
 // Multi-Player Selector with Lazy Loading
@@ -339,34 +424,6 @@ function loadDocsContent(subpage) {
     };
 
     document.getElementById('docsContent').innerHTML = content[subpage] || content['about'];
-}
-
-// Intro animation system
-function initIntroAnimation() {
-    const intro = document.getElementById('introScreen');
-    const statusContainer = document.getElementById('statusContainer');
-    const header = document.getElementById('mainHeader');
-    const background = document.getElementById('networkBackground');
-
-    background.classList.add('active');
-
-    const hasSeenIntro = sessionStorage.getItem('introPlayed') === 'true';
-
-    if (!hasSeenIntro) {
-        setTimeout(() => {
-            statusContainer.classList.add('visible');
-            setTimeout(() => {
-                intro.classList.add('hidden');
-                header.classList.add('active');
-                background.classList.add('active'); 
-                sessionStorage.setItem('introPlayed', 'true');
-            }, 1000);
-        }, 2000);
-    } else {
-        intro.classList.add('hidden');
-        header.classList.add('active');
-        background.classList.add('active');
-    }
 }
 
 // Performance monitoring
