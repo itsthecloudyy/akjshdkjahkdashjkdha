@@ -652,6 +652,155 @@
             border-left-color: #ff4444;
         }
 
+        /* Custom Video Player Styles */
+        .custom-video-player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+        }
+
+        .custom-video-player.active {
+            display: block;
+        }
+
+        .custom-video-player video {
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+
+        .player-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .custom-video-player:hover .player-controls {
+            opacity: 1;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .control-btn:hover {
+            color: #00ff88;
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 5px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #00ff88;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        .time-display {
+            color: #fff;
+            font-size: 0.9rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .volume-level {
+            height: 100%;
+            background: #00ff88;
+            border-radius: 2px;
+            width: 100%;
+        }
+
+        .subtitle-toggle {
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .subtitle-toggle.active {
+            color: #00ff88;
+        }
+
+        .subtitle-toggle:hover {
+            color: #00ff88;
+        }
+
+        .subtitle-display {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #fff;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .subtitle-display.active {
+            display: block;
+        }
+
+        .fullscreen-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .fullscreen-btn:hover {
+            color: #00ff88;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero { padding: 8rem 0; }
@@ -662,6 +811,16 @@
             .nav-menu { gap: 1rem; }
             .player-options {
                 grid-template-columns: 1fr;
+            }
+            .player-controls {
+                padding: 5px;
+            }
+            .control-btn {
+                font-size: 1rem;
+            }
+            .time-display {
+                min-width: 80px;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -796,7 +955,7 @@
                             <div class="player-option" data-player="mixdrop">
                                 <i class="fas fa-cloud"></i>
                                 <h4>MixDrop</h4>
-                                <p>Clean Interface</p>
+                                <p>Custom Player with Subtitles</p>
                             </div>
                             <div class="player-option" data-player="streamtape">
                                 <i class="fas fa-tape"></i>
@@ -848,18 +1007,40 @@
                                     title="Dead Poets Society - FileMoon">
                                 </iframe>
 
-                                <!-- MixDrop (Using iframe for better compatibility) -->
-                                <iframe 
-                                    class="video-frame" 
-                                    id="mixdropPlayer"
-                                    src="//mxdrop.to/e/vkqqjd1qs0433p" 
-                                    width="640" 
-                                    height="480" 
-                                    scrolling="no" 
-                                    frameborder="0" 
-                                    allowfullscreen="true"
-                                    title="Dead Poets Society - MixDrop">
-                                </iframe>
+                                <!-- Custom MixDrop Player -->
+                                <div class="custom-video-player" id="mixdropPlayer">
+                                    <video id="customVideo">
+                                        <source src="https://mixdrop-url-here/video.mp4" type="video/mp4">
+                                        <track id="subtitleTrack" kind="subtitles" src="https://raw.githubusercontent.com/itsthecloudyy/cdn/refs/heads/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.vtt" srclang="tr" label="Turkish" default>
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="subtitle-display" id="subtitleDisplay"></div>
+                                    <div class="player-controls">
+                                        <button class="control-btn play-pause-btn">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <div class="progress-container">
+                                            <div class="progress-bar"></div>
+                                        </div>
+                                        <div class="time-display">
+                                            <span class="current-time">0:00</span> / <span class="duration">0:00</span>
+                                        </div>
+                                        <div class="volume-control">
+                                            <button class="control-btn volume-btn">
+                                                <i class="fas fa-volume-up"></i>
+                                            </button>
+                                            <div class="volume-slider">
+                                                <div class="volume-level"></div>
+                                            </div>
+                                        </div>
+                                        <button class="subtitle-toggle active">
+                                            <i class="fas fa-closed-captioning"></i>
+                                        </button>
+                                        <button class="fullscreen-btn">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
                                 <!-- StreamTape -->
                                 <iframe 
@@ -897,7 +1078,7 @@
                             </h4>
                             <p style="color: #aaa; margin: 0;">
                                 All players include Turkish subtitles. If one player doesn't work, try another option above.
-                                DoodStream is recommended for the best performance.
+                                MixDrop player features custom controls and automatic subtitle loading.
                             </p>
                         </div>
                     </div>
@@ -929,12 +1110,263 @@
     </footer>
 
     <script>
+        // Custom Video Player Class
+        class CustomVideoPlayer {
+            constructor() {
+                this.video = document.getElementById('customVideo');
+                this.playPauseBtn = document.querySelector('.play-pause-btn');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.progressContainer = document.querySelector('.progress-container');
+                this.currentTimeEl = document.querySelector('.current-time');
+                this.durationEl = document.querySelector('.duration');
+                this.volumeBtn = document.querySelector('.volume-btn');
+                this.volumeSlider = document.querySelector('.volume-slider');
+                this.volumeLevel = document.querySelector('.volume-level');
+                this.subtitleToggle = document.querySelector('.subtitle-toggle');
+                this.subtitleDisplay = document.getElementById('subtitleDisplay');
+                this.fullscreenBtn = document.querySelector('.fullscreen-btn');
+                this.subtitleTrack = document.getElementById('subtitleTrack');
+                this.subtitles = [];
+                this.currentSubtitle = null;
+                
+                this.init();
+            }
+            
+            init() {
+                // Load subtitles
+                this.loadSubtitles();
+                
+                // Event listeners
+                this.playPauseBtn.addEventListener('click', () => this.togglePlay());
+                this.video.addEventListener('click', () => this.togglePlay());
+                this.video.addEventListener('timeupdate', () => this.updateProgress());
+                this.video.addEventListener('loadedmetadata', () => this.setDuration());
+                this.progressContainer.addEventListener('click', (e) => this.setProgress(e));
+                this.volumeBtn.addEventListener('click', () => this.toggleMute());
+                this.volumeSlider.addEventListener('click', (e) => this.setVolume(e));
+                this.subtitleToggle.addEventListener('click', () => this.toggleSubtitles());
+                this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+                this.video.addEventListener('ended', () => this.videoEnded());
+                
+                // Keyboard controls
+                document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+            }
+            
+            loadSubtitles() {
+                // Fetch and parse VTT file
+                fetch('https://raw.githubusercontent.com/itsthecloudyy/cdn/refs/heads/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.vtt')
+                    .then(response => response.text())
+                    .then(data => {
+                        this.parseVTT(data);
+                        this.video.textTracks[0].mode = 'hidden';
+                        this.video.addEventListener('timeupdate', () => this.updateSubtitles());
+                    })
+                    .catch(error => {
+                        console.error('Error loading subtitles:', error);
+                    });
+            }
+            
+            parseVTT(vttText) {
+                const lines = vttText.split('\n');
+                let currentSubtitle = null;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    if (line.includes('-->')) {
+                        if (currentSubtitle) {
+                            this.subtitles.push(currentSubtitle);
+                        }
+                        
+                        const times = line.split(' --> ');
+                        const startTime = this.parseTime(times[0]);
+                        const endTime = this.parseTime(times[1]);
+                        
+                        currentSubtitle = {
+                            start: startTime,
+                            end: endTime,
+                            text: ''
+                        };
+                    } else if (currentSubtitle && line && !line.startsWith('WEBVTT') && !line.startsWith('NOTE') && !line.match(/^\d+$/)) {
+                        currentSubtitle.text += (currentSubtitle.text ? '\n' : '') + line;
+                    }
+                }
+                
+                if (currentSubtitle) {
+                    this.subtitles.push(currentSubtitle);
+                }
+                
+                this.subtitles.sort((a, b) => a.start - b.start);
+            }
+            
+            parseTime(timeString) {
+                const parts = timeString.split(':');
+                let seconds = 0;
+                
+                if (parts.length === 3) {
+                    // HH:MM:SS.mmm
+                    seconds += parseInt(parts[0]) * 3600;
+                    seconds += parseInt(parts[1]) * 60;
+                    seconds += parseFloat(parts[2].replace(',', '.'));
+                } else if (parts.length === 2) {
+                    // MM:SS.mmm
+                    seconds += parseInt(parts[0]) * 60;
+                    seconds += parseFloat(parts[1].replace(',', '.'));
+                }
+                
+                return seconds;
+            }
+            
+            updateSubtitles() {
+                const currentTime = this.video.currentTime;
+                let subtitle = null;
+                
+                for (let i = 0; i < this.subtitles.length; i++) {
+                    if (currentTime >= this.subtitles[i].start && currentTime <= this.subtitles[i].end) {
+                        subtitle = this.subtitles[i];
+                        break;
+                    }
+                }
+                
+                if (subtitle && subtitle !== this.currentSubtitle) {
+                    this.currentSubtitle = subtitle;
+                    this.subtitleDisplay.textContent = subtitle.text;
+                    this.subtitleDisplay.classList.add('active');
+                } else if (!subtitle && this.currentSubtitle) {
+                    this.currentSubtitle = null;
+                    this.subtitleDisplay.classList.remove('active');
+                }
+            }
+            
+            togglePlay() {
+                if (this.video.paused) {
+                    this.video.play();
+                    this.playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    this.video.pause();
+                    this.playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            }
+            
+            updateProgress() {
+                const progress = (this.video.currentTime / this.video.duration) * 100;
+                this.progressBar.style.width = `${progress}%`;
+                this.currentTimeEl.textContent = this.formatTime(this.video.currentTime);
+            }
+            
+            setDuration() {
+                this.durationEl.textContent = this.formatTime(this.video.duration);
+            }
+            
+            setProgress(e) {
+                const rect = this.progressContainer.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                this.video.currentTime = percent * this.video.duration;
+            }
+            
+            toggleMute() {
+                this.video.muted = !this.video.muted;
+                this.volumeBtn.innerHTML = this.video.muted ? 
+                    '<i class="fas fa-volume-mute"></i>' : 
+                    '<i class="fas fa-volume-up"></i>';
+                this.volumeLevel.style.width = this.video.muted ? '0%' : `${this.video.volume * 100}%`;
+            }
+            
+            setVolume(e) {
+                const rect = this.volumeSlider.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                this.video.volume = Math.max(0, Math.min(1, percent));
+                this.volumeLevel.style.width = `${this.video.volume * 100}%`;
+                this.video.muted = this.video.volume === 0;
+                this.volumeBtn.innerHTML = this.video.muted ? 
+                    '<i class="fas fa-volume-mute"></i>' : 
+                    '<i class="fas fa-volume-up"></i>';
+            }
+            
+            toggleSubtitles() {
+                const isActive = this.subtitleToggle.classList.contains('active');
+                if (isActive) {
+                    this.subtitleToggle.classList.remove('active');
+                    this.subtitleDisplay.classList.remove('active');
+                } else {
+                    this.subtitleToggle.classList.add('active');
+                    if (this.currentSubtitle) {
+                        this.subtitleDisplay.classList.add('active');
+                    }
+                }
+            }
+            
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    this.video.parentElement.requestFullscreen().catch(err => {
+                        console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                    });
+                    this.fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                } else {
+                    document.exitFullscreen();
+                    this.fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            }
+            
+            videoEnded() {
+                this.playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+            
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+            
+            handleKeyPress(e) {
+                switch(e.key) {
+                    case ' ':
+                    case 'k':
+                        e.preventDefault();
+                        this.togglePlay();
+                        break;
+                    case 'm':
+                        e.preventDefault();
+                        this.toggleMute();
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        this.toggleFullscreen();
+                        break;
+                    case 'c':
+                        e.preventDefault();
+                        this.toggleSubtitles();
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        this.video.currentTime = Math.max(0, this.video.currentTime - 10);
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        this.video.currentTime = Math.min(this.video.duration, this.video.currentTime + 10);
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        this.video.volume = Math.min(1, this.video.volume + 0.1);
+                        this.volumeLevel.style.width = `${this.video.volume * 100}%`;
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        this.video.volume = Math.max(0, this.video.volume - 0.1);
+                        this.volumeLevel.style.width = `${this.video.volume * 100}%`;
+                        break;
+                }
+            }
+        }
+
         // Multi-Player Selector
         class MultiPlayerSelector {
             constructor() {
                 this.playerOptions = document.querySelectorAll('.player-option');
                 this.videoFrames = document.querySelectorAll('.video-frame');
+                this.customPlayer = document.getElementById('mixdropPlayer');
                 this.playerStatus = document.querySelector('.player-status');
+                this.customVideoPlayer = null;
                 
                 this.init();
             }
@@ -963,9 +1395,21 @@
                     frame.classList.remove('active');
                 });
                 
-                const activeFrame = document.getElementById(playerId + 'Player');
-                if (activeFrame) {
-                    activeFrame.classList.add('active');
+                // Hide custom player
+                this.customPlayer.classList.remove('active');
+                
+                // Show selected player
+                if (playerId === 'mixdrop') {
+                    this.customPlayer.classList.add('active');
+                    // Initialize custom video player if not already done
+                    if (!this.customVideoPlayer) {
+                        this.customVideoPlayer = new CustomVideoPlayer();
+                    }
+                } else {
+                    const activeFrame = document.getElementById(playerId + 'Player');
+                    if (activeFrame) {
+                        activeFrame.classList.add('active');
+                    }
                 }
                 
                 // Update status message
@@ -977,7 +1421,7 @@
                     'doodstream': 'DoodStream - Fast streaming with Turkish subtitles',
                     'vidoza': 'Vidoza - HD quality with Turkish subtitles', 
                     'filemoon': 'FileMoon - Modern player with Turkish subtitles',
-                    'mixdrop': 'MixDrop - Clean interface with Turkish subtitles',
+                    'mixdrop': 'MixDrop - Custom player with automatic Turkish subtitles',
                     'streamtape': 'StreamTape - Stable streaming with Turkish subtitles'
                 };
                 
