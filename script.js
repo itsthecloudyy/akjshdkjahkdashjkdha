@@ -85,15 +85,6 @@ class LoadingScreen {
     }
 }
 
-// Global variables
-let currentSubtitles = [];
-let subtitleInterval = null;
-let isFullscreen = false;
-let subtitlesEnabled = true;
-let videoTime = 0;
-let isVideoPlaying = true;
-let videoStartTime = 0;
-
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded - initializing app');
@@ -162,10 +153,8 @@ function initNavigation() {
             
             if (targetPage === 'video') {
                 setTimeout(() => {
-                    lazyLoadMainVideo();
+                    loadDirectVideoPlayer();
                 }, 100);
-            } else {
-                stopSubtitleSystem();
             }
         }
         
@@ -197,9 +186,9 @@ function initNavigation() {
     console.log('Navigation initialized');
 }
 
-// SIMPLE WORKING VIDEO SYSTEM
-function lazyLoadMainVideo() {
-    console.log('Loading Google Drive video - CONTROLS AT TOP');
+// DIRECT VIDEO PLAYER - NO CUSTOM UI
+function loadDirectVideoPlayer() {
+    console.log('Loading direct video player - NO CUSTOM UI');
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
     if (!videoWrapper) {
         console.error('Video wrapper not found');
@@ -214,7 +203,7 @@ function lazyLoadMainVideo() {
     videoWrapper.style.background = '#000';
     
     const videoContainer = document.createElement('div');
-    videoContainer.className = 'video-with-subtitles';
+    videoContainer.className = 'video-container-simple';
     videoContainer.style.position = 'absolute';
     videoContainer.style.top = '0';
     videoContainer.style.left = '0';
@@ -240,424 +229,71 @@ function lazyLoadMainVideo() {
     loadingDiv.style.zIndex = '10';
     loadingDiv.innerHTML = `
         <div class="loading-spinner"></div>
-        <p>Loading Google Drive player...</p>
-        <small>Subtitles will start automatically</small>
+        <p>Loading video with Turkish subtitles...</p>
+        <small>Subtitles are burned into the video</small>
     `;
     
     videoContainer.appendChild(loadingDiv);
     
-    // CONTROLS AT TOP
-    const videoControls = document.createElement('div');
-    videoControls.className = 'video-controls-overlay top-controls';
-    videoControls.innerHTML = `
-        <div class="control-group">
-            <div class="time-input-group">
-                <input type="text" id="timeInput" placeholder="MM:SS" class="time-input">
-                <button id="setTimeBtn" class="control-btn">
-                    <i class="fas fa-play"></i> Set Time
-                </button>
-            </div>
-            <button id="subtitleToggle" class="control-btn">
-                <i class="fas fa-closed-captioning"></i> <span id="subtitleStatus">ON</span>
-            </button>
-            <button id="fullscreenBtn" class="control-btn">
-                <i class="fas fa-expand"></i> Fullscreen
-            </button>
-        </div>
-        <div class="time-display">
-            <span id="currentTimeDisplay">0:00</span> / <span id="totalTimeDisplay">2:10:08</span>
-            <div id="syncStatus" style="font-size:10px;color:#00ff88;margin-top:5px;">Enter time when you seek</div>
-        </div>
-    `;
+    // HTML5 Video Player - SIMPLE
+    const video = document.createElement('video');
+    video.className = 'direct-video-player';
+    video.id = 'directVideoPlayer';
+    video.controls = true;
+    video.autoplay = false;
+    video.preload = 'auto';
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.objectFit = 'contain';
+    video.style.background = '#000';
     
-    // Google Drive iframe
-    const iframe = document.createElement('iframe');
-    iframe.className = 'video-frame';
-    iframe.id = 'videoPlayer';
-    iframe.src = 'https://drive.google.com/file/d/1kujv8Jnj76rzEWVNsaJwcLSqN7o4nriq/preview';
-    iframe.allow = 'autoplay; encrypted-media; fullscreen';
-    iframe.allowFullscreen = true;
-    iframe.frameBorder = '0';
-    iframe.scrolling = 'no';
-    iframe.width = '100%';
-    iframe.height = '100%';
-    iframe.title = 'Dead Poets Society - Google Drive';
-    iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-forms";
-    iframe.referrerPolicy = 'no-referrer';
-    iframe.style.position = 'absolute';
-    iframe.style.top = '0';
-    iframe.style.left = '0';
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = 'none';
-    iframe.style.background = '#000';
-    iframe.style.zIndex = '1';
-    iframe.style.display = 'block';
-    iframe.style.visibility = 'visible';
-    iframe.style.opacity = '0.9';
+    // Video source - REPLACE THIS WITH YOUR ACTUAL VIDEO URL
+    const source = document.createElement('source');
+    source.src = 'YOUR_VIDEO_URL_HERE.mp4'; // Replace with your video URL
+    source.type = 'video/mp4';
     
-    // Subtitle overlay
-    const subtitleOverlay = document.createElement('div');
-    subtitleOverlay.id = 'subtitleOverlay';
-    subtitleOverlay.className = 'subtitle-overlay';
-    subtitleOverlay.innerHTML = '<div class="subtitle-text"></div>';
+    video.appendChild(source);
     
-    // Append elements in correct order - CONTROLS FIRST (TOP)
-    videoContainer.appendChild(videoControls);
-    videoContainer.appendChild(iframe);
-    videoContainer.appendChild(subtitleOverlay);
+    // Fallback message
+    const fallbackText = document.createElement('p');
+    fallbackText.textContent = 'Your browser does not support the video tag.';
+    fallbackText.style.color = '#fff';
+    fallbackText.style.textAlign = 'center';
+    fallbackText.style.padding = '2rem';
+    
+    video.appendChild(fallbackText);
+    
+    // Append only the video (NO CUSTOM CONTROLS)
+    videoContainer.appendChild(video);
     videoWrapper.appendChild(videoContainer);
     
-    console.log('Video elements created - controls at top');
+    console.log('Direct video player created - no custom UI');
     
-    iframe.addEventListener('load', () => {
-        console.log('Google Drive player loaded successfully');
+    // Remove loading when video can play
+    video.addEventListener('canplay', () => {
+        console.log('Video can play');
         loadingDiv.style.display = 'none';
-        
-        setTimeout(() => {
-            loadExternalSubtitles();
-        }, 1000);
     });
     
-    iframe.addEventListener('error', (e) => {
-        console.error('Google Drive player failed to load:', e);
+    video.addEventListener('error', (e) => {
+        console.error('Video failed to load:', e);
         loadingDiv.innerHTML = `
             <div class="video-error">
                 <i class="fas fa-exclamation-triangle"></i>
-                <h3>Google Drive Player Failed to Load</h3>
-                <p>Please try refreshing the page or check your internet connection.</p>
-                <button onclick="lazyLoadMainVideo()" class="retry-btn">Retry</button>
+                <h3>Video Failed to Load</h3>
+                <p>Please check the video URL or try a different browser.</p>
+                <p><strong>Current URL:</strong> ${source.src}</p>
+                <button onclick="loadDirectVideoPlayer()" class="retry-btn">Retry</button>
             </div>
         `;
     });
     
+    // Remove loading after timeout
     setTimeout(() => {
         if (loadingDiv.parentNode && loadingDiv.style.display !== 'none') {
             loadingDiv.style.display = 'none';
         }
-    }, 10000);
-}
-
-// External subtitle loader
-function loadExternalSubtitles() {
-    console.log('Loading external subtitles...');
-    const subtitleUrl = 'https://raw.githubusercontent.com/itsthecloudyy/cdn/refs/heads/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.srt';
-    
-    fetch(subtitleUrl)
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return response.text();
-        })
-        .then(srtData => {
-            console.log('Subtitle file loaded successfully');
-            currentSubtitles = parseSRT(srtData);
-            console.log(`Parsed ${currentSubtitles.length} subtitle entries`);
-            setupSimpleSyncSystem();
-        })
-        .catch(error => {
-            console.error('Could not load external subtitles:', error);
-            showSubtitleError();
-        });
-}
-
-// SRT Parser
-function parseSRT(srtText) {
-    const subtitles = [];
-    const blocks = srtText.trim().split(/\r?\n\r?\n/);
-    
-    console.log(`Found ${blocks.length} subtitle blocks`);
-    
-    blocks.forEach((block, index) => {
-        const lines = block.split(/\r?\n/).filter(line => line.trim() !== '');
-        
-        if (lines.length >= 3) {
-            const timecode = lines[1];
-            const text = lines.slice(2).join(' ').replace(/<[^>]*>/g, '');
-            
-            const times = timecode.split(' --> ');
-            if (times.length === 2) {
-                const startTime = parseTime(times[0]);
-                const endTime = parseTime(times[1]);
-                
-                if (!isNaN(startTime) && !isNaN(endTime)) {
-                    subtitles.push({
-                        id: index + 1,
-                        start: startTime,
-                        end: endTime,
-                        text: text.trim()
-                    });
-                }
-            }
-        }
-    });
-    
-    subtitles.sort((a, b) => a.start - b.start);
-    return subtitles;
-}
-
-// Time parser (HH:MM:SS,mmm -> seconds)
-function parseTime(timeString) {
-    try {
-        const normalizedTime = timeString.replace(',', '.');
-        const parts = normalizedTime.split(':');
-        
-        if (parts.length !== 3) return 0;
-        
-        const hours = parseInt(parts[0]);
-        const minutes = parseInt(parts[1]);
-        const secondsParts = parts[2].split('.');
-        const seconds = parseInt(secondsParts[0]);
-        const milliseconds = parseInt(secondsParts[1]) || 0;
-        
-        return hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
-    } catch (error) {
-        console.error('Error parsing time:', timeString, error);
-        return 0;
-    }
-}
-
-// SIMPLE WORKING SYNC SYSTEM
-function setupSimpleSyncSystem() {
-    console.log('Setting up SIMPLE sync system');
-    
-    const timeInput = document.getElementById('timeInput');
-    const setTimeBtn = document.getElementById('setTimeBtn');
-    const subtitleToggle = document.getElementById('subtitleToggle');
-    const subtitleStatus = document.getElementById('subtitleStatus');
-    const syncStatus = document.getElementById('syncStatus');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    
-    if (!timeInput || !setTimeBtn) {
-        console.error('Time input elements not found');
-        return;
-    }
-    
-    // Manual time set button
-    setTimeBtn.addEventListener('click', () => {
-        const timeValue = timeInput.value.trim();
-        
-        if (timeValue) {
-            const newTime = parseManualTime(timeValue);
-            if (newTime !== null) {
-                videoTime = newTime;
-                videoStartTime = Date.now() - (videoTime * 1000);
-                syncStatus.textContent = `Time set to ${formatTime(videoTime)}`;
-                syncStatus.style.color = '#00ff88';
-                timeInput.value = '';
-                
-                console.log('Manual time set to:', videoTime);
-            } else {
-                syncStatus.textContent = 'Invalid time format (use MM:SS)';
-                syncStatus.style.color = '#ff4444';
-            }
-        }
-    });
-    
-    // Enter key support for time input
-    timeInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            setTimeBtn.click();
-        }
-    });
-    
-    // Subtitle toggle
-    subtitlesEnabled = true;
-    subtitleStatus.textContent = 'ON';
-    subtitleToggle.style.background = '#00ff88';
-    
-    subtitleToggle.addEventListener('click', () => {
-        subtitlesEnabled = !subtitlesEnabled;
-        
-        if (subtitlesEnabled) {
-            subtitleStatus.textContent = 'ON';
-            subtitleToggle.style.background = '#00ff88';
-            updateSubtitles(videoTime);
-        } else {
-            subtitleStatus.textContent = 'OFF';
-            subtitleToggle.style.background = '#ff4444';
-            const subtitleOverlay = document.getElementById('subtitleOverlay');
-            if (subtitleOverlay) subtitleOverlay.style.opacity = '0';
-        }
-    });
-    
-    // Fullscreen
-    fullscreenBtn.addEventListener('click', toggleFullscreen);
-    
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-    
-    // Start subtitle tracking
-    startSubtitleTracking();
-}
-
-// Parse manual time input (MM:SS or HH:MM:SS)
-function parseManualTime(timeString) {
-    const parts = timeString.split(':');
-    
-    if (parts.length === 2) {
-        // MM:SS format
-        const minutes = parseInt(parts[0]);
-        const seconds = parseInt(parts[1]);
-        
-        if (!isNaN(minutes) && !isNaN(seconds)) {
-            return (minutes * 60) + seconds;
-        }
-    } else if (parts.length === 3) {
-        // HH:MM:SS format
-        const hours = parseInt(parts[0]);
-        const minutes = parseInt(parts[1]);
-        const seconds = parseInt(parts[2]);
-        
-        if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds)) {
-            return (hours * 3600) + (minutes * 60) + seconds;
-        }
-    }
-    
-    return null;
-}
-
-// Format time for display
-function formatTime(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-    
-    if (hours > 0) {
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    } else {
-        return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    }
-}
-
-function startSubtitleTracking() {
-    console.log('Starting subtitle tracking');
-    stopSubtitleTracking();
-    
-    isVideoPlaying = true;
-    videoStartTime = Date.now() - (videoTime * 1000);
-    
-    subtitleInterval = setInterval(() => {
-        if (isVideoPlaying) {
-            const currentTime = Date.now();
-            const elapsed = (currentTime - videoStartTime) / 1000;
-            videoTime = Math.min(7808, elapsed);
-            updateSubtitles(videoTime);
-            updateTimeDisplay(videoTime);
-        }
-    }, 100);
-}
-
-function stopSubtitleTracking() {
-    if (subtitleInterval) {
-        clearInterval(subtitleInterval);
-        subtitleInterval = null;
-    }
-}
-
-function stopSubtitleSystem() {
-    stopSubtitleTracking();
-    isVideoPlaying = false;
-    
-    const subtitleOverlay = document.getElementById('subtitleOverlay');
-    if (subtitleOverlay) {
-        subtitleOverlay.style.opacity = '0';
-    }
-}
-
-function updateSubtitles(currentTime) {
-    const subtitleOverlay = document.getElementById('subtitleOverlay');
-    const subtitleText = subtitleOverlay?.querySelector('.subtitle-text');
-    
-    if (!subtitleOverlay || !subtitleText || !subtitlesEnabled) return;
-    
-    const currentSubtitle = currentSubtitles.find(sub => 
-        currentTime >= sub.start && currentTime <= sub.end
-    );
-    
-    if (currentSubtitle) {
-        subtitleText.textContent = currentSubtitle.text;
-        subtitleOverlay.style.opacity = '1';
-    } else {
-        subtitleOverlay.style.opacity = '0';
-    }
-}
-
-function updateTimeDisplay(currentTime) {
-    const timeDisplay = document.getElementById('currentTimeDisplay');
-    if (timeDisplay) {
-        timeDisplay.textContent = formatTime(currentTime);
-    }
-}
-
-// Fullscreen functionality
-function toggleFullscreen() {
-    const videoContainer = document.getElementById('videoContainer');
-    
-    if (!document.fullscreenElement) {
-        if (videoContainer.requestFullscreen) {
-            videoContainer.requestFullscreen();
-        } else if (videoContainer.webkitRequestFullscreen) {
-            videoContainer.webkitRequestFullscreen();
-        } else if (videoContainer.mozRequestFullScreen) {
-            videoContainer.mozRequestFullScreen();
-        } else if (videoContainer.msRequestFullscreen) {
-            videoContainer.msRequestFullscreen();
-        }
-        isFullscreen = true;
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
-        isFullscreen = false;
-    }
-}
-
-function handleFullscreenChange() {
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const subtitleOverlay = document.getElementById('subtitleOverlay');
-    
-    if (document.fullscreenElement || 
-        document.webkitFullscreenElement || 
-        document.mozFullScreenElement ||
-        document.msFullscreenElement) {
-        isFullscreen = true;
-        fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
-        fullscreenBtn.style.background = '#ff4444';
-        
-        if (subtitleOverlay) {
-            subtitleOverlay.classList.add('fullscreen');
-        }
-    } else {
-        isFullscreen = false;
-        fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> Fullscreen';
-        fullscreenBtn.style.background = '#00ccff';
-        
-        if (subtitleOverlay) {
-            subtitleOverlay.classList.remove('fullscreen');
-        }
-    }
-}
-
-function showSubtitleError() {
-    const videoControls = document.querySelector('.video-controls-overlay');
-    if (videoControls) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'subtitle-error';
-        errorDiv.innerHTML = `
-            <div style="margin-top: 10px; color: #ff4444; font-size: 12px;">
-                <i class="fas fa-exclamation-triangle"></i> Subtitles failed to load
-            </div>
-        `;
-        videoControls.appendChild(errorDiv);
-    }
+    }, 8000);
 }
 
 // Documentation system
@@ -687,36 +323,30 @@ function loadDocsContent(subpage) {
     const content = {
         'about': `
             <h2>About CyberStream</h2>
-            <p>CyberStream is a next-generation video streaming platform with manual time synchronization for Google Drive videos.</p>
-            
-            <h3>How to Use</h3>
-            <p>When you seek in Google Drive video, simply enter the new time in MM:SS format and click "Set Time" to synchronize subtitles.</p>
+            <p>CyberStream is a next-generation video streaming platform with direct video playback.</p>
             
             <h3>Features</h3>
             <ul>
-                <li><strong>Manual Time Sync:</strong> Enter time when you seek in Google Drive</li>
-                <li><strong>Turkish Subtitles:</strong> Automatic subtitle loading</li>
-                <li><strong>Top Controls:</strong> Easy-to-access interface at the top</li>
+                <li><strong>Direct Video Playback:</strong> Native HTML5 video player</li>
+                <li><strong>Burned-in Subtitles:</strong> Turkish subtitles embedded in video</li>
+                <li><strong>Clean Interface:</strong> No custom UI - just the video</li>
             </ul>
         `,
         'support': `
             <h2>Support & Help</h2>
             
-            <h3>Using Time Sync</h3>
-            <ol>
-                <li>Play your Google Drive video normally</li>
-                <li>When you seek to a new position, note the time</li>
-                <li>Enter the time in MM:SS format (e.g., 45:30 for 45 minutes 30 seconds)</li>
-                <li>Click "Set Time" or press Enter</li>
-                <li>Subtitles will instantly sync to the new time</li>
-            </ol>
-            
-            <h3>Time Format Examples</h3>
+            <h3>Video Player</h3>
+            <p>The video player uses your browser's native HTML5 video controls. All standard video controls are available:</p>
             <ul>
-                <li><strong>15:30</strong> = 15 minutes, 30 seconds</li>
-                <li><strong>1:05:20</strong> = 1 hour, 5 minutes, 20 seconds</li>
-                <li><strong>2:00</strong> = 2 minutes, 0 seconds</li>
+                <li>Play/Pause</li>
+                <li>Volume control</li>
+                <li>Fullscreen</li>
+                <li>Seeking</li>
+                <li>Playback speed</li>
             </ul>
+            
+            <h3>Subtitles</h3>
+            <p>Turkish subtitles are burned directly into the video stream and cannot be turned off.</p>
         `
     };
 
