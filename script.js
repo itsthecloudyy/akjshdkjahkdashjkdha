@@ -242,7 +242,7 @@ function loadGoogleDrivePlayer() {
     const iframe = document.createElement('iframe');
     iframe.className = 'drive-iframe';
     iframe.id = 'drivePlayer';
-    iframe.src = 'https://drive.google.com/file/d/1kujv8Jnj76rzEWVNsaJwcLSqN7o4nriq/preview';
+    iframe.src = 'https://drive.google.com/file/d/1yrROYsYQ4kWG4HFCVwXjwHtnQwAmmK5l/preview';
     iframe.allow = 'autoplay; encrypted-media; fullscreen';
     iframe.allowFullscreen = true;
     iframe.frameBorder = '0';
