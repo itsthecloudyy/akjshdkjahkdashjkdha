@@ -81,8 +81,10 @@ class LoadingScreen {
         intro.classList.add('hidden');
         
         // Show main content immediately
-        document.querySelector('.main-content').style.opacity = '1';
-        document.querySelector('.main-content').style.display = 'block';
+        const mainContent = document.querySelector('.main-content');
+        mainContent.style.opacity = '1';
+        mainContent.style.display = 'block';
+        mainContent.style.visibility = 'visible';
     }
 }
 
@@ -112,8 +114,10 @@ function initializeApp() {
     console.log('Initializing application');
     
     // Show main content
-    document.querySelector('.main-content').style.opacity = '1';
-    document.querySelector('.main-content').style.display = 'block';
+    const mainContent = document.querySelector('.main-content');
+    mainContent.style.opacity = '1';
+    mainContent.style.display = 'block';
+    mainContent.style.visibility = 'visible';
     
     // Initialize navigation FIRST
     initNavigation();
@@ -139,8 +143,10 @@ function initNavigation() {
     const pageContents = document.querySelectorAll('.page-content');
     
     // Make sure home page is visible initially
-    document.getElementById('homePage').style.display = 'block';
-    document.getElementById('homePage').classList.add('active');
+    const homePage = document.getElementById('homePage');
+    homePage.style.display = 'block';
+    homePage.classList.add('active');
+    homePage.style.visibility = 'visible';
     
     // Function to switch pages
     function switchPage(targetPage) {
@@ -150,6 +156,7 @@ function initNavigation() {
         pageContents.forEach(page => {
             page.style.display = 'none';
             page.classList.remove('active');
+            page.style.visibility = 'hidden';
         });
         
         // Show target page
@@ -157,10 +164,13 @@ function initNavigation() {
         if (targetPageElement) {
             targetPageElement.style.display = 'block';
             targetPageElement.classList.add('active');
+            targetPageElement.style.visibility = 'visible';
             
             // Initialize specific page content
             if (targetPage === 'video') {
-                lazyLoadMainVideo();
+                setTimeout(() => {
+                    lazyLoadMainVideo();
+                }, 100);
             }
         }
         
@@ -202,132 +212,169 @@ function initNavigation() {
 function lazyLoadMainVideo() {
     console.log('Loading main video');
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
-    if (!videoWrapper) return;
+    if (!videoWrapper) {
+        console.error('Video wrapper not found');
+        return;
+    }
     
-    const existingFrame = videoWrapper.querySelector('.video-frame');
+    console.log('Video wrapper found, clearing content');
     
-    // Only load if not already loaded
-    if (!existingFrame || !existingFrame.src) {
-        // Clear existing content
-        videoWrapper.innerHTML = '';
+    // Clear existing content completely
+    videoWrapper.innerHTML = '';
+    videoWrapper.style.position = 'relative';
+    videoWrapper.style.width = '100%';
+    videoWrapper.style.height = '100%';
+    videoWrapper.style.minHeight = '500px';
+    videoWrapper.style.background = '#000';
+    
+    // Create video container with subtitle support
+    const videoContainer = document.createElement('div');
+    videoContainer.className = 'video-with-subtitles';
+    videoContainer.style.position = 'absolute';
+    videoContainer.style.top = '0';
+    videoContainer.style.left = '0';
+    videoContainer.style.width = '100%';
+    videoContainer.style.height = '100%';
+    videoContainer.style.background = '#000';
+    
+    // Add loading indicator first
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'video-loading';
+    loadingDiv.style.position = 'absolute';
+    loadingDiv.style.top = '0';
+    loadingDiv.style.left = '0';
+    loadingDiv.style.width = '100%';
+    loadingDiv.style.height = '100%';
+    loadingDiv.style.display = 'flex';
+    loadingDiv.style.flexDirection = 'column';
+    loadingDiv.style.alignItems = 'center';
+    loadingDiv.style.justifyContent = 'center';
+    loadingDiv.style.background = '#000';
+    loadingDiv.style.color = '#00ff88';
+    loadingDiv.style.zIndex = '10';
+    loadingDiv.innerHTML = `
+        <div class="loading-spinner" style="width: 50px; height: 50px; border: 4px solid rgba(0, 255, 136, 0.3); border-top: 4px solid #00ff88; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+        <p style="color: #00ff88; font-size: 1.1rem; margin-bottom: 0.5rem;">Loading Google Drive player...</p>
+        <small style="color: #888; font-size: 0.9rem;">This may take a few moments</small>
+    `;
+    
+    videoContainer.appendChild(loadingDiv);
+    
+    // Google Drive iframe - FIXED URL
+    const iframe = document.createElement('iframe');
+    iframe.className = 'video-frame';
+    iframe.src = 'https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview';
+    iframe.allow = 'autoplay; encrypted-media; fullscreen';
+    iframe.allowFullscreen = true;
+    iframe.frameBorder = '0';
+    iframe.scrolling = 'no';
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.title = 'Dead Poets Society - Google Drive';
+    iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-forms";
+    iframe.referrerPolicy = 'no-referrer';
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.background = '#000';
+    iframe.style.zIndex = '1';
+    iframe.style.display = 'block';
+    iframe.style.visibility = 'visible';
+    
+    // External subtitle overlay
+    const subtitleOverlay = document.createElement('div');
+    subtitleOverlay.id = 'subtitleOverlay';
+    subtitleOverlay.style.position = 'absolute';
+    subtitleOverlay.style.bottom = '80px';
+    subtitleOverlay.style.left = '0';
+    subtitleOverlay.style.width = '100%';
+    subtitleOverlay.style.textAlign = 'center';
+    subtitleOverlay.style.zIndex = '2';
+    subtitleOverlay.style.pointerEvents = 'none';
+    subtitleOverlay.style.color = '#ffffff';
+    subtitleOverlay.style.fontSize = '24px';
+    subtitleOverlay.style.fontWeight = 'bold';
+    subtitleOverlay.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
+    subtitleOverlay.style.fontFamily = 'Arial, sans-serif';
+    subtitleOverlay.style.padding = '10px 20px';
+    subtitleOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    subtitleOverlay.style.borderRadius = '5px';
+    subtitleOverlay.style.display = 'none';
+    subtitleOverlay.style.maxWidth = '80%';
+    subtitleOverlay.style.margin = '0 auto';
+    subtitleOverlay.style.lineHeight = '1.4';
+    
+    // Subtitle controls
+    const subtitleControls = document.createElement('div');
+    subtitleControls.className = 'subtitle-controls';
+    subtitleControls.style.position = 'absolute';
+    subtitleControls.style.bottom = '20px';
+    subtitleControls.style.left = '20px';
+    subtitleControls.style.zIndex = '3';
+    subtitleControls.style.background = 'rgba(0,0,0,0.8)';
+    subtitleControls.style.padding = '10px';
+    subtitleControls.style.borderRadius = '5px';
+    subtitleControls.style.color = 'white';
+    subtitleControls.style.fontSize = '14px';
+    
+    subtitleControls.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="toggleSubtitles" style="padding: 8px 16px; background: #00ff88; color: black; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">
+                <i class="fas fa-closed-captioning"></i> Turn On Subtitles
+            </button>
+            <span id="subtitleStatus" style="font-size: 12px; color: #aaa;">Off</span>
+        </div>
+    `;
+    
+    // Append elements in correct order
+    videoContainer.appendChild(iframe);
+    videoContainer.appendChild(subtitleOverlay);
+    videoContainer.appendChild(subtitleControls);
+    videoWrapper.appendChild(videoContainer);
+    
+    console.log('Video elements created, setting up event listeners');
+    
+    // Remove loading indicator when iframe loads
+    iframe.addEventListener('load', () => {
+        console.log('Google Drive player loaded successfully');
+        loadingDiv.style.display = 'none';
+        iframe.style.display = 'block';
+        iframe.style.visibility = 'visible';
         
-        // Create video container with subtitle support
-        const videoContainer = document.createElement('div');
-        videoContainer.className = 'video-with-subtitles';
-        videoContainer.style.position = 'relative';
-        videoContainer.style.width = '100%';
-        videoContainer.style.height = '100%';
-        
-        // Google Drive iframe
-        const iframe = document.createElement('iframe');
-        iframe.className = 'video-frame';
-        iframe.src = 'https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview';
-        iframe.allow = 'autoplay; encrypted-media; fullscreen';
-        iframe.allowFullscreen = true;
-        iframe.frameBorder = '0';
-        iframe.scrolling = 'no';
-        iframe.width = '100%';
-        iframe.height = '100%';
-        iframe.title = 'Dead Poets Society - Google Drive';
-        iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-forms";
-        iframe.referrerPolicy = 'no-referrer';
-        iframe.style.position = 'absolute';
-        iframe.style.top = '0';
-        iframe.style.left = '0';
-        iframe.style.zIndex = '1';
-        
-        // External subtitle overlay
-        const subtitleOverlay = document.createElement('div');
-        subtitleOverlay.id = 'subtitleOverlay';
-        subtitleOverlay.style.position = 'absolute';
-        subtitleOverlay.style.bottom = '80px';
-        subtitleOverlay.style.left = '0';
-        subtitleOverlay.style.width = '100%';
-        subtitleOverlay.style.textAlign = 'center';
-        subtitleOverlay.style.zIndex = '2';
-        subtitleOverlay.style.pointerEvents = 'none';
-        subtitleOverlay.style.color = '#ffffff';
-        subtitleOverlay.style.fontSize = '24px';
-        subtitleOverlay.style.fontWeight = 'bold';
-        subtitleOverlay.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
-        subtitleOverlay.style.fontFamily = 'Arial, sans-serif';
-        subtitleOverlay.style.padding = '10px 20px';
-        subtitleOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        subtitleOverlay.style.borderRadius = '5px';
-        subtitleOverlay.style.display = 'none';
-        subtitleOverlay.style.maxWidth = '80%';
-        subtitleOverlay.style.margin = '0 auto';
-        subtitleOverlay.style.lineHeight = '1.4';
-        
-        // Subtitle controls
-        const subtitleControls = document.createElement('div');
-        subtitleControls.className = 'subtitle-controls';
-        subtitleControls.style.position = 'absolute';
-        subtitleControls.style.bottom = '20px';
-        subtitleControls.style.left = '20px';
-        subtitleControls.style.zIndex = '3';
-        subtitleControls.style.background = 'rgba(0,0,0,0.8)';
-        subtitleControls.style.padding = '10px';
-        subtitleControls.style.borderRadius = '5px';
-        subtitleControls.style.color = 'white';
-        
-        subtitleControls.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <button id="toggleSubtitles" style="padding: 5px 10px; background: #00ff88; color: black; border: none; border-radius: 3px; cursor: pointer;">
-                    <i class="fas fa-closed-captioning"></i> Turn On Subtitles
-                </button>
-                <span id="subtitleStatus" style="font-size: 12px;">Off</span>
+        // Load subtitles after video is loaded
+        setTimeout(() => {
+            loadExternalSubtitles();
+        }, 1000);
+    });
+    
+    iframe.addEventListener('error', (e) => {
+        console.error('Google Drive player failed to load:', e);
+        loadingDiv.innerHTML = `
+            <div class="video-error" style="text-align: center; color: #ff4444;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h3 style="color: #ff4444; margin-bottom: 1rem;">Google Drive Player Failed to Load</h3>
+                <p style="color: #ccc; margin-bottom: 1.5rem;">Please try refreshing the page or check your internet connection.</p>
+                <button onclick="lazyLoadMainVideo()" style="padding: 10px 20px; background: #ff4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">Retry</button>
             </div>
         `;
-        
-        videoContainer.appendChild(iframe);
-        videoContainer.appendChild(subtitleOverlay);
-        videoContainer.appendChild(subtitleControls);
-        videoWrapper.appendChild(videoContainer);
-        
-        // Load external subtitle file
-        loadExternalSubtitles();
-        
-        // Add loading indicator
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'video-loading';
-        loadingDiv.innerHTML = `
-            <div class="loading-spinner"></div>
-            <p>Loading Google Drive player and Turkish subtitles...</p>
-        `;
-        videoWrapper.appendChild(loadingDiv);
-        
-        // Remove loading indicator when iframe loads
-        iframe.addEventListener('load', () => {
-            console.log('Google Drive player loaded successfully');
-            loadingDiv.remove();
-        });
-        
-        iframe.addEventListener('error', () => {
-            console.error('Google Drive player failed to load');
-            loadingDiv.innerHTML = `
-                <div class="video-error">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Google Drive Player Failed to Load</h3>
-                    <p>Please try refreshing the page or check your internet connection.</p>
-                </div>
-            `;
-        });
-        
-        // Remove loading indicator after timeout (fallback)
-        setTimeout(() => {
-            if (loadingDiv.parentNode) {
-                loadingDiv.remove();
-            }
-        }, 8000);
-    }
+    });
+    
+    // Remove loading indicator after timeout (fallback)
+    setTimeout(() => {
+        if (loadingDiv.parentNode && loadingDiv.style.display !== 'none') {
+            console.log('Removing loading indicator by timeout');
+            loadingDiv.style.display = 'none';
+        }
+    }, 10000);
 }
 
 // External subtitle loader
 function loadExternalSubtitles() {
+    console.log('Loading external subtitles...');
     const subtitleUrl = 'https://raw.githubusercontent.com/itsthecloudyy/cdn/refs/heads/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.srt';
-    
-    console.log('Loading subtitles from:', subtitleUrl);
     
     fetch(subtitleUrl)
         .then(response => {
@@ -406,9 +453,15 @@ function parseTime(timeString) {
 
 // Subtitle player
 function setupSubtitlePlayer(subtitles) {
+    console.log('Setting up subtitle player');
     const overlay = document.getElementById('subtitleOverlay');
     const toggleBtn = document.getElementById('toggleSubtitles');
     const statusSpan = document.getElementById('subtitleStatus');
+    
+    if (!overlay || !toggleBtn || !statusSpan) {
+        console.error('Subtitle elements not found');
+        return;
+    }
     
     let currentSubtitleIndex = -1;
     let subtitlesEnabled = false;
@@ -421,12 +474,14 @@ function setupSubtitlePlayer(subtitles) {
         
         if (subtitlesEnabled) {
             statusSpan.textContent = 'On';
+            statusSpan.style.color = '#00ff88';
             toggleBtn.innerHTML = '<i class="fas fa-closed-captioning"></i> Turn Off Subtitles';
             toggleBtn.style.background = '#ff4444';
             overlay.style.display = 'block';
             startTimeSimulation();
         } else {
             statusSpan.textContent = 'Off';
+            statusSpan.style.color = '#aaa';
             toggleBtn.innerHTML = '<i class="fas fa-closed-captioning"></i> Turn On Subtitles';
             toggleBtn.style.background = '#00ff88';
             overlay.style.display = 'none';
@@ -474,42 +529,47 @@ function setupSubtitlePlayer(subtitles) {
     
     // Manual time control buttons
     const controls = document.querySelector('.subtitle-controls');
-    const timeControls = document.createElement('div');
-    timeControls.style.marginTop = '10px';
-    timeControls.style.display = 'flex';
-    timeControls.style.gap = '5px';
-    timeControls.style.alignItems = 'center';
-    
-    timeControls.innerHTML = `
-        <button id="rewindBtn" style="padding: 3px 8px; background: #00ccff; border: none; border-radius: 3px; cursor: pointer;">
-            <i class="fas fa-backward"></i> 10s
-        </button>
-        <button id="forwardBtn" style="padding: 3px 8px; background: #00ccff; border: none; border-radius: 3px; cursor: pointer;">
-            <i class="fas fa-forward"></i> 10s
-        </button>
-        <span style="font-size: 11px; color: #aaa;">Time: <span id="currentTime">0:00</span></span>
-    `;
-    
-    controls.appendChild(timeControls);
-    
-    // Time control handlers
-    document.getElementById('rewindBtn').addEventListener('click', () => {
-        currentTime = Math.max(0, currentTime - 10);
-        updateSubtitles();
-        updateTimeDisplay();
-    });
-    
-    document.getElementById('forwardBtn').addEventListener('click', () => {
-        currentTime += 10;
-        updateSubtitles();
-        updateTimeDisplay();
-    });
-    
-    function updateTimeDisplay() {
-        const minutes = Math.floor(currentTime / 60);
-        const seconds = Math.floor(currentTime % 60);
-        document.getElementById('currentTime').textContent = 
-            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    if (controls) {
+        const timeControls = document.createElement('div');
+        timeControls.style.marginTop = '10px';
+        timeControls.style.display = 'flex';
+        timeControls.style.gap = '5px';
+        timeControls.style.alignItems = 'center';
+        timeControls.style.flexWrap = 'wrap';
+        
+        timeControls.innerHTML = `
+            <button id="rewindBtn" style="padding: 5px 10px; background: #00ccff; color: black; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                <i class="fas fa-backward"></i> 10s
+            </button>
+            <button id="forwardBtn" style="padding: 5px 10px; background: #00ccff; color: black; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                <i class="fas fa-forward"></i> 10s
+            </button>
+            <span style="font-size: 11px; color: #aaa;">Time: <span id="currentTime" style="color: #00ff88;">0:00</span></span>
+        `;
+        
+        controls.appendChild(timeControls);
+        
+        // Time control handlers
+        document.getElementById('rewindBtn').addEventListener('click', () => {
+            currentTime = Math.max(0, currentTime - 10);
+            updateSubtitles();
+            updateTimeDisplay();
+        });
+        
+        document.getElementById('forwardBtn').addEventListener('click', () => {
+            currentTime += 10;
+            updateSubtitles();
+            updateTimeDisplay();
+        });
+        
+        function updateTimeDisplay() {
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = Math.floor(currentTime % 60);
+            const timeDisplay = document.getElementById('currentTime');
+            if (timeDisplay) {
+                timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
     }
     
     console.log('Subtitle player setup completed');
@@ -517,13 +577,16 @@ function setupSubtitlePlayer(subtitles) {
 
 // Manual subtitle controls as fallback
 function setupManualSubtitleControls() {
+    console.log('Setting up manual subtitle controls');
     const subtitleControls = document.querySelector('.subtitle-controls');
     
-    subtitleControls.innerHTML += `
-        <div style="margin-top: 10px; color: #ff4444; font-size: 12px;">
-            <i class="fas fa-exclamation-triangle"></i> Subtitles failed to load
-        </div>
-    `;
+    if (subtitleControls) {
+        subtitleControls.innerHTML += `
+            <div style="margin-top: 10px; color: #ff4444; font-size: 12px;">
+                <i class="fas fa-exclamation-triangle"></i> Subtitles failed to load
+            </div>
+        `;
+    }
 }
 
 // Documentation system
@@ -635,3 +698,13 @@ function monitorPerformance() {
 
 // Initialize performance monitoring
 document.addEventListener('DOMContentLoaded', monitorPerformance);
+
+// Add CSS for loading spinner animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(style);
