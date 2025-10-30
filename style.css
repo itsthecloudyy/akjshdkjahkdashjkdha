@@ -1465,3 +1465,42 @@ body {
     opacity: 1 !important;
     visibility: visible !important;
 }
+
+/* CRITICAL FIX: Ensure main content is visible */
+.main-content {
+    opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* CRITICAL FIX: Ensure pages are properly displayed */
+.page-content {
+    display: none;
+}
+
+.page-content.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* CRITICAL FIX: Make sure home page is visible initially */
+#homePage {
+    display: block !important;
+}
+
+/* Remove any conflicting transitions that might hide content */
+.main-content,
+.page-content {
+    transition: opacity 0.3s ease;
+}
+
+/* Ensure navigation works properly */
+.nav-link {
+    cursor: pointer;
+}
+
+.nav-link.active {
+    color: #00ff88 !important;
+    background: rgba(0, 255, 136, 0.1) !important;
+}
