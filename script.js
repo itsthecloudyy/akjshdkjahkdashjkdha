@@ -223,7 +223,7 @@ class MultiPlayerSelector {
                 playerTitle = 'Dead Poets Society - FileMoon';
                 break;
             case 'mixdrop':
-                playerUrl = 'https://mixdrop.co/e/vkqqjd1qs0433p';
+                playerUrl = 'https://mxdrop.to/e/vkqqjd1qs0433p';
                 playerTitle = 'Dead Poets Society - MixDrop';
                 break;
         }
