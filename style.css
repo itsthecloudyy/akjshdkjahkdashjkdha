@@ -424,7 +424,7 @@ body {
     line-height: 1.6;
 }
 
-/* Video Player Styles - CRITICAL FIXES */
+/* Video Player Styles */
 .video-container {
     background: #000;
     border-radius: 12px;
@@ -465,18 +465,18 @@ body {
     display: block;
     visibility: visible;
     z-index: 1;
-    opacity: 0.9; /* Semi-transparent effect */
+    opacity: 0.9;
     transition: opacity 0.3s ease;
 }
 
 .video-frame:hover {
-    opacity: 1; /* Full opacity on hover */
+    opacity: 1;
 }
 
-/* Video Controls */
+/* Video Controls - MOVED TO TOP */
 .video-controls-overlay {
     position: absolute;
-    bottom: 20px;
+    top: 20px;
     left: 20px;
     right: 20px;
     z-index: 3;
@@ -522,19 +522,15 @@ body {
 }
 
 .control-btn:nth-child(1) {
-    background: #00ccff; /* -10s button */
+    background: #00ccff; /* Set Time button */
 }
 
 .control-btn:nth-child(2) {
-    background: #ffaa00; /* +10s button */
+    background: #00ff88; /* Subtitles button */
 }
 
 .control-btn:nth-child(3) {
     background: #ff4444; /* Fullscreen button */
-}
-
-.control-btn:nth-child(4) {
-    background: #00ff88; /* Subtitles button */
 }
 
 .time-display {
@@ -547,10 +543,39 @@ body {
     border: 1px solid rgba(255,255,255,0.2);
 }
 
+/* Time Input Styles */
+.time-input-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.time-input {
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    color: white;
+    font-size: 12px;
+    width: 80px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+}
+
+.time-input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: #00ff88;
+    background: rgba(255,255,255,0.15);
+}
+
 /* AUTO SUBTITLE SYSTEM STYLES */
 .subtitle-overlay {
     position: absolute;
-    bottom: 100px;
+    bottom: 80px; /* Adjusted for top controls */
     left: 0;
     width: 100%;
     text-align: center;
@@ -561,7 +586,7 @@ body {
 }
 
 .subtitle-overlay.fullscreen {
-    bottom: 120px;
+    bottom: 100px;
 }
 
 .subtitle-text {
@@ -810,7 +835,7 @@ body {
 :-webkit-full-screen .subtitle-overlay,
 :-moz-full-screen .subtitle-overlay,
 :-ms-fullscreen .subtitle-overlay {
-    bottom: 150px;
+    bottom: 120px;
     z-index: 2147483647;
 }
 
@@ -828,13 +853,14 @@ body {
 :-ms-fullscreen .video-controls-overlay {
     z-index: 2147483647;
     background: rgba(0,0,0,0.8);
+    top: 20px;
 }
 
 :fullscreen .video-frame,
 :-webkit-full-screen .video-frame,
 :-moz-full-screen .video-frame,
 :-ms-fullscreen .video-frame {
-    opacity: 1; /* Full opacity in fullscreen */
+    opacity: 1;
 }
 
 /* Responsive Design */
@@ -900,11 +926,11 @@ body {
     }
     
     .subtitle-overlay {
-        bottom: 80px;
+        bottom: 60px;
     }
     
     .video-controls-overlay {
-        bottom: 10px;
+        top: 10px;
         left: 10px;
         right: 10px;
         padding: 10px;
@@ -920,6 +946,12 @@ body {
     .control-btn {
         padding: 6px 12px;
         font-size: 11px;
+    }
+    
+    .time-input {
+        width: 70px;
+        font-size: 11px;
+        padding: 6px 10px;
     }
     
     .video-container {
@@ -954,11 +986,11 @@ body {
     }
     
     .subtitle-overlay {
-        bottom: 70px;
+        bottom: 50px;
     }
     
     .video-controls-overlay {
-        bottom: 5px;
+        top: 5px;
         left: 5px;
         right: 5px;
         padding: 8px;
@@ -967,6 +999,12 @@ body {
     .control-btn {
         padding: 5px 10px;
         font-size: 10px;
+    }
+    
+    .time-input {
+        width: 60px;
+        font-size: 10px;
+        padding: 5px 8px;
     }
     
     .time-display {
@@ -1068,6 +1106,10 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+@keyframes pulse-sync {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
 
 /* SMART SYNC Button Styles */
 .sync-btn {
@@ -1075,7 +1117,7 @@ body {
 }
 
 .control-btn.sync-btn {
-    background: #ffaa00; /* Default orange - ready */
+    background: #ffaa00;
 }
 
 .control-btn.sync-btn:hover {
@@ -1087,34 +1129,4 @@ body {
 #syncStatus {
     transition: all 0.3s ease;
     font-weight: bold;
-}
-
-
-/* Time Input Styles */
-.time-input-group {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-
-.time-input {
-    padding: 8px 12px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 6px;
-    color: white;
-    font-size: 12px;
-    width: 80px;
-    text-align: center;
-    font-family: 'Courier New', monospace;
-}
-
-.time-input::placeholder {
-    color: rgba(255,255,255,0.5);
-}
-
-.time-input:focus {
-    outline: none;
-    border-color: #00ff88;
-    background: rgba(255,255,255,0.15);
 }
