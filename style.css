@@ -912,3 +912,406 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+
+
+
+/* Video Container Fixes */
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 2rem;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(0, 255, 136, 0.3);
+    display: none;
+}
+
+.video-container.active {
+    display: block;
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background: #000;
+}
+
+.video-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #000;
+    display: block;
+}
+
+/* Video Loading States */
+.video-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    color: #00ff88;
+    text-align: center;
+    padding: 2rem;
+}
+
+.video-loading .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(0, 255, 136, 0.3);
+    border-top: 4px solid #00ff88;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.video-loading p {
+    color: #00ff88;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.video-loading small {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Video Error States */
+.video-error {
+    text-align: center;
+    color: #ff4444;
+}
+
+.video-error i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #ff4444;
+}
+
+.video-error h3 {
+    color: #ff4444;
+    margin-bottom: 1rem;
+}
+
+.video-error p {
+    color: #ccc;
+    margin-bottom: 1.5rem;
+}
+
+.retry-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+    background: #ff6666;
+    transform: translateY(-2px);
+}
+
+/* Player Selector Improvements */
+.player-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.player-option {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.player-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.player-option:hover::before {
+    left: 100%;
+}
+
+.player-option:hover {
+    background: rgba(0, 255, 136, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 255, 136, 0.2);
+}
+
+.player-option.active {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.15);
+    transform: translateY(-2px);
+}
+
+.player-option i {
+    font-size: 2.5rem;
+    color: #00ff88;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.player-option h4 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.player-option p {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Player Status */
+.player-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 255, 136, 0.1);
+    border-radius: 8px;
+    margin: 1rem 0;
+    color: #00ff88;
+    border-left: 4px solid #00ff88;
+}
+
+.player-status i {
+    font-size: 1.2rem;
+}
+
+/* Player Warning */
+.player-warning {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 68, 68, 0.1);
+    border-radius: 8px;
+    margin: 1rem 0;
+    color: #ff4444;
+    border-left: 4px solid #ff4444;
+}
+
+.player-warning.active {
+    display: flex;
+}
+
+.player-warning i {
+    font-size: 1.2rem;
+}
+
+/* Direct Links Improvements */
+.direct-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.direct-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(255, 170, 0, 0.1);
+    color: #ffaa00;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    font-weight: 500;
+}
+
+.direct-link:hover {
+    background: rgba(255, 170, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 170, 0, 0.2);
+}
+
+/* Player Info Note */
+.player-info-note {
+    background: rgba(0, 255, 136, 0.1);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #00ff88;
+    margin-top: 1.5rem;
+}
+
+.player-info-note h4 {
+    color: #00ff88;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-info-note p {
+    color: #aaa;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Fallback Player Styles */
+.player-fallback {
+    background: rgba(255, 170, 0, 0.1);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    border-left: 4px solid #ffaa00;
+}
+
+.player-fallback h4 {
+    color: #ffaa00;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-fallback p {
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+/* Responsive Video Improvements */
+@media (max-width: 768px) {
+    .video-container {
+        margin: 0 auto 1.5rem;
+        border-radius: 8px;
+    }
+    
+    .player-options {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    
+    .player-option {
+        padding: 1.2rem;
+    }
+    
+    .direct-links {
+        grid-template-columns: 1fr;
+    }
+    
+    .video-loading {
+        padding: 1rem;
+    }
+    
+    .video-loading p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .video-wrapper {
+        padding-bottom: 60%; /* Slightly taller on mobile */
+    }
+    
+    .player-option {
+        padding: 1rem;
+    }
+    
+    .player-option i {
+        font-size: 2rem;
+    }
+    
+    .player-status,
+    .player-warning {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Ensure iframe visibility */
+.video-frame {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix for iframe loading issues */
+.video-container.active .video-frame {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Loading state for main video */
+#videoPage .video-wrapper,
+#backupPage .video-wrapper {
+    min-height: 400px;
+}
+
+/* Error boundary styling */
+.video-error-boundary {
+    background: rgba(255, 68, 68, 0.1);
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    margin: 1rem 0;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.video-error-boundary h4 {
+    color: #ff4444;
+    margin-bottom: 1rem;
+}
+
+.video-error-boundary p {
+    color: #ccc;
+    margin-bottom: 1.5rem;
+}
