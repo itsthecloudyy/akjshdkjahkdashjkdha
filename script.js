@@ -146,6 +146,8 @@ class MultiPlayerSelector {
     }
     
     setActivePlayer(playerId) {
+        console.log('Switching to player:', playerId);
+        
         // Stop current player first
         this.stopCurrentPlayer();
         
@@ -160,25 +162,30 @@ class MultiPlayerSelector {
         // Hide all video containers first
         document.querySelectorAll('.video-container').forEach(container => {
             container.classList.remove('active');
+            container.style.display = 'none';
         });
         
         // Show active video container
         const activeContainer = document.getElementById(playerId + 'Container');
         if (activeContainer) {
             activeContainer.classList.add('active');
+            activeContainer.style.display = 'block';
             
             // Lazy load the player if not already loaded
             if (!this.loadedPlayers.has(playerId)) {
                 this.lazyLoadPlayer(playerId);
                 this.loadedPlayers.add(playerId);
+            } else {
+                // If already loaded, just ensure the iframe is visible
+                this.ensurePlayerVisible(playerId);
             }
         }
         
         // Show/hide MixDrop warning
         if (playerId === 'mixdrop') {
-            this.mixdropWarning.classList.add('active');
+            this.mixdropWarning.style.display = 'flex';
         } else {
-            this.mixdropWarning.classList.remove('active');
+            this.mixdropWarning.style.display = 'none';
         }
         
         // Update status message
@@ -201,29 +208,49 @@ class MultiPlayerSelector {
         iframe.allowFullscreen = true;
         iframe.frameBorder = '0';
         iframe.scrolling = 'no';
+        iframe.sandbox = "allow-scripts allow-same-origin allow-presentation allow-popups allow-forms";
+        
+        let playerUrl = '';
+        let playerTitle = '';
         
         switch(playerId) {
             case 'doodstream':
-                iframe.src = 'https://doodstream.com/e/t2gc0n61c3iv';
-                iframe.title = 'Dead Poets Society - DoodStream';
+                playerUrl = 'https://doodstream.com/e/t2gc0n61c3iv';
+                playerTitle = 'Dead Poets Society - DoodStream';
                 break;
             case 'filemoon':
-                iframe.src = 'https://filemoon.sx/e/ra1uugjc5f0v';
-                iframe.title = 'Dead Poets Society - FileMoon';
+                playerUrl = 'https://filemoon.sx/e/ra1uugjc5f0v';
+                playerTitle = 'Dead Poets Society - FileMoon';
                 break;
             case 'mixdrop':
-                iframe.src = 'https://mixdrop.co/e/vkqqjd1qs0433p';
-                iframe.title = 'Dead Poets Society - MixDrop';
+                playerUrl = 'https://mixdrop.co/e/vkqqjd1qs0433p';
+                playerTitle = 'Dead Poets Society - MixDrop';
                 break;
         }
         
+        iframe.src = playerUrl;
+        iframe.title = playerTitle;
         iframe.width = '100%';
         iframe.height = '100%';
+        iframe.style.border = 'none';
+        iframe.style.display = 'block';
         
         videoWrapper.appendChild(iframe);
         
+        console.log('Loading player:', playerId, playerUrl);
+        
         // Add loading indicator
         this.addLoadingIndicator(videoWrapper, playerId);
+    }
+    
+    ensurePlayerVisible(playerId) {
+        const container = document.getElementById(playerId + 'Container');
+        if (!container) return;
+        
+        const iframe = container.querySelector('iframe');
+        if (iframe) {
+            iframe.style.display = 'block';
+        }
     }
     
     addLoadingIndicator(wrapper, playerId) {
@@ -232,30 +259,49 @@ class MultiPlayerSelector {
         loadingDiv.innerHTML = `
             <div class="loading-spinner"></div>
             <p>Loading ${playerId} player...</p>
+            <small>If the player doesn't load, try the direct links below</small>
         `;
         wrapper.appendChild(loadingDiv);
         
         // Remove loading indicator when iframe loads
         const iframe = wrapper.querySelector('iframe');
         iframe.addEventListener('load', () => {
+            console.log('Player loaded:', playerId);
             loadingDiv.remove();
+        });
+        
+        iframe.addEventListener('error', (e) => {
+            console.error('Error loading player:', playerId, e);
+            loadingDiv.innerHTML = `
+                <div class="video-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Player Failed to Load</h3>
+                    <p>The ${playerId} player could not be loaded. Please try another player or use the direct links below.</p>
+                    <button class="retry-btn" onclick="window.multiPlayer.retryPlayer('${playerId}')">Retry</button>
+                </div>
+            `;
         });
         
         // Remove loading indicator after timeout (fallback)
         setTimeout(() => {
-            loadingDiv.remove();
-        }, 5000);
+            if (loadingDiv.parentNode) {
+                loadingDiv.remove();
+            }
+        }, 10000);
+    }
+    
+    retryPlayer(playerId) {
+        console.log('Retrying player:', playerId);
+        this.loadedPlayers.delete(playerId);
+        this.setActivePlayer(playerId);
     }
     
     stopCurrentPlayer() {
         const currentFrame = document.querySelector(`#${this.currentPlayer}Container iframe`);
         if (currentFrame) {
-            // For iframes, we need to reload them to stop playback
-            const src = currentFrame.src;
-            currentFrame.src = '';
-            setTimeout(() => {
-                currentFrame.src = src;
-            }, 100);
+            // For iframes, we can't actually stop video playback due to cross-origin restrictions
+            // But we can hide it and show a message
+            currentFrame.style.display = 'none';
         }
     }
     
@@ -266,32 +312,34 @@ class MultiPlayerSelector {
             'mixdrop': 'MixDrop - Clean interface (manual subtitle upload required)'
         };
         
-        this.playerStatus.innerHTML = `
-            <i class="fas fa-info-circle"></i>
-            <span>Current: ${statusMessages[playerId]}</span>
-        `;
+        if (this.playerStatus) {
+            this.playerStatus.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <span>Current: ${statusMessages[playerId]}</span>
+            `;
+        }
     }
 }
+
+// Global reference for retry functionality
+window.multiPlayer = null;
 
 // Navigation system with page management
 function initNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     const pageContents = document.querySelectorAll('.page-content');
-    let multiPlayer = null;
     let currentPage = 'home';
     
     // Function to stop all videos when leaving backup page
     function stopAllVideos() {
-        if (multiPlayer) {
-            multiPlayer.stopCurrentPlayer();
+        if (window.multiPlayer) {
+            window.multiPlayer.stopCurrentPlayer();
         }
         
         // Also stop the main video on video page
         const mainVideo = document.querySelector('#videoPage .video-frame');
-        if (mainVideo && mainVideo.src) {
-            const src = mainVideo.src;
-            mainVideo.src = '';
-            mainVideo.src = src;
+        if (mainVideo) {
+            mainVideo.style.display = 'none';
         }
     }
     
@@ -331,17 +379,19 @@ function initNavigation() {
             // Show target page, hide others
             pageContents.forEach(page => {
                 page.classList.remove('active');
+                page.style.display = 'none';
             });
             
             const targetPageElement = document.getElementById(targetPage + 'Page');
             if (targetPageElement) {
                 targetPageElement.classList.add('active');
+                targetPageElement.style.display = 'block';
             }
             
             // Initialize multi-player when backup page is loaded
-            if (targetPage === 'backup' && !multiPlayer) {
+            if (targetPage === 'backup' && !window.multiPlayer) {
                 setTimeout(() => {
-                    multiPlayer = new MultiPlayerSelector();
+                    window.multiPlayer = new MultiPlayerSelector();
                 }, 100);
             }
             
@@ -378,6 +428,7 @@ function lazyLoadMainVideo() {
         iframe.width = '100%';
         iframe.height = '100%';
         iframe.title = 'Dead Poets Society - Google Drive';
+        iframe.sandbox = "allow-scripts allow-same-origin allow-presentation allow-popups allow-forms";
         
         videoWrapper.appendChild(iframe);
         
@@ -395,10 +446,25 @@ function lazyLoadMainVideo() {
             loadingDiv.remove();
         });
         
+        iframe.addEventListener('error', () => {
+            loadingDiv.innerHTML = `
+                <div class="video-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Google Drive Player Failed to Load</h3>
+                    <p>Please try the direct links below.</p>
+                </div>
+            `;
+        });
+        
         // Remove loading indicator after timeout (fallback)
         setTimeout(() => {
-            loadingDiv.remove();
-        }, 5000);
+            if (loadingDiv.parentNode) {
+                loadingDiv.remove();
+            }
+        }, 8000);
+    } else {
+        // If already exists, make sure it's visible
+        existingFrame.style.display = 'block';
     }
 }
 
