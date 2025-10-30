@@ -131,214 +131,6 @@ function initializeApp() {
     console.log('Application initialized successfully');
 }
 
-// Multi-Player Selector with Lazy Loading
-class MultiPlayerSelector {
-    constructor() {
-        this.playerOptions = document.querySelectorAll('.player-option');
-        this.playerStatus = document.querySelector('.player-status');
-        this.mixdropWarning = document.getElementById('mixdropWarning');
-        this.currentPlayer = 'doodstream';
-        this.loadedPlayers = new Set(['doodstream']);
-        
-        this.init();
-    }
-    
-    init() {
-        console.log('Initializing MultiPlayerSelector');
-        // Set initial active player
-        this.setActivePlayer('doodstream');
-        
-        // Add event listeners to player options
-        this.playerOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const player = option.dataset.player;
-                this.setActivePlayer(player);
-            });
-        });
-    }
-    
-    setActivePlayer(playerId) {
-        console.log('Switching to player:', playerId);
-        
-        // Stop current player first
-        this.stopCurrentPlayer();
-        
-        // Update current player
-        this.currentPlayer = playerId;
-        
-        // Update player options
-        this.playerOptions.forEach(option => {
-            option.classList.toggle('active', option.dataset.player === playerId);
-        });
-        
-        // Hide all video containers first
-        document.querySelectorAll('.video-container').forEach(container => {
-            container.classList.remove('active');
-            container.style.display = 'none';
-        });
-        
-        // Show active video container
-        const activeContainer = document.getElementById(playerId + 'Container');
-        if (activeContainer) {
-            activeContainer.classList.add('active');
-            activeContainer.style.display = 'block';
-            
-            // Lazy load the player if not already loaded
-            if (!this.loadedPlayers.has(playerId)) {
-                this.lazyLoadPlayer(playerId);
-                this.loadedPlayers.add(playerId);
-            } else {
-                // If already loaded, just ensure the iframe is visible
-                this.ensurePlayerVisible(playerId);
-            }
-        }
-        
-        // Show/hide MixDrop warning
-        if (playerId === 'mixdrop') {
-            this.mixdropWarning.style.display = 'flex';
-        } else {
-            this.mixdropWarning.style.display = 'none';
-        }
-        
-        // Update status message
-        this.updatePlayerStatus(playerId);
-    }
-    
-    lazyLoadPlayer(playerId) {
-        const container = document.getElementById(playerId + 'Container');
-        if (!container) return;
-        
-        const videoWrapper = container.querySelector('.video-wrapper');
-        
-        // Clear existing content
-        videoWrapper.innerHTML = '';
-        
-        // Create and append the iframe only when needed
-        const iframe = document.createElement('iframe');
-        iframe.className = 'video-frame';
-        iframe.allow = 'autoplay; encrypted-media; fullscreen';
-        iframe.allowFullscreen = true;
-        iframe.frameBorder = '0';
-        iframe.scrolling = 'no';
-        
-        let playerUrl = '';
-        let playerTitle = '';
-        let sandboxPermissions = 'allow-scripts allow-same-origin allow-popups allow-forms';
-        
-        switch(playerId) {
-            case 'doodstream':
-                playerUrl = 'https://doodstream.com/e/t2gc0n61c3iv';
-                playerTitle = 'Dead Poets Society - DoodStream';
-                sandboxPermissions = 'allow-scripts allow-same-origin allow-popups allow-forms';
-                break;
-            case 'filemoon':
-                playerUrl = 'https://filemoon.sx/e/ra1uugjc5f0v';
-                playerTitle = 'Dead Poets Society - FileMoon';
-                sandboxPermissions = 'allow-scripts allow-same-origin allow-popups allow-forms allow-presentation';
-                break;
-            case 'mixdrop':
-                playerUrl = 'https://mxdrop.to/e/vkqqjd1qs0433p';
-                playerTitle = 'Dead Poets Society - MixDrop';
-                sandboxPermissions = 'allow-scripts allow-same-origin allow-popups allow-forms';
-                break;
-        }
-        
-        iframe.sandbox = sandboxPermissions;
-        iframe.src = playerUrl;
-        iframe.title = playerTitle;
-        iframe.width = '100%';
-        iframe.height = '100%';
-        iframe.style.border = 'none';
-        iframe.style.display = 'block';
-        iframe.referrerPolicy = 'no-referrer';
-        
-        videoWrapper.appendChild(iframe);
-        
-        console.log('Loading player:', playerId, playerUrl);
-        
-        // Add loading indicator
-        this.addLoadingIndicator(videoWrapper, playerId);
-    }
-    
-    ensurePlayerVisible(playerId) {
-        const container = document.getElementById(playerId + 'Container');
-        if (!container) return;
-        
-        const iframe = container.querySelector('iframe');
-        if (iframe) {
-            iframe.style.display = 'block';
-        }
-    }
-    
-    addLoadingIndicator(wrapper, playerId) {
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'video-loading';
-        loadingDiv.innerHTML = `
-            <div class="loading-spinner"></div>
-            <p>Loading ${playerId} player...</p>
-            <small>If the player doesn't load, try the direct links below</small>
-        `;
-        wrapper.appendChild(loadingDiv);
-        
-        // Remove loading indicator when iframe loads
-        const iframe = wrapper.querySelector('iframe');
-        iframe.addEventListener('load', () => {
-            console.log('Player loaded:', playerId);
-            loadingDiv.remove();
-        });
-        
-        iframe.addEventListener('error', (e) => {
-            console.error('Error loading player:', playerId, e);
-            loadingDiv.innerHTML = `
-                <div class="video-error">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Player Failed to Load</h3>
-                    <p>The ${playerId} player could not be loaded. Please try another player or use the direct links below.</p>
-                    <button class="retry-btn" onclick="window.multiPlayer.retryPlayer('${playerId}')">Retry</button>
-                </div>
-            `;
-        });
-        
-        // Remove loading indicator after timeout (fallback)
-        setTimeout(() => {
-            if (loadingDiv.parentNode) {
-                loadingDiv.remove();
-            }
-        }, 10000);
-    }
-    
-    retryPlayer(playerId) {
-        console.log('Retrying player:', playerId);
-        this.loadedPlayers.delete(playerId);
-        this.setActivePlayer(playerId);
-    }
-    
-    stopCurrentPlayer() {
-        const currentFrame = document.querySelector(`#${this.currentPlayer}Container iframe`);
-        if (currentFrame) {
-            currentFrame.style.display = 'none';
-        }
-    }
-    
-    updatePlayerStatus(playerId) {
-        const statusMessages = {
-            'doodstream': 'DoodStream - Fast streaming with Turkish subtitles',
-            'filemoon': 'FileMoon - Modern player with Turkish subtitles',
-            'mixdrop': 'MixDrop - Clean interface (manual subtitle upload required)'
-        };
-        
-        if (this.playerStatus) {
-            this.playerStatus.innerHTML = `
-                <i class="fas fa-info-circle"></i>
-                <span>Current: ${statusMessages[playerId]}</span>
-            `;
-        }
-    }
-}
-
-// Global reference for retry functionality
-window.multiPlayer = null;
-
 // Navigation system with page management - FIXED
 function initNavigation() {
     console.log('Initializing navigation');
@@ -367,15 +159,16 @@ function initNavigation() {
             targetPageElement.classList.add('active');
             
             // Initialize specific page content
-            if (targetPage === 'backup' && !window.multiPlayer) {
-                setTimeout(() => {
-                    window.multiPlayer = new MultiPlayerSelector();
-                }, 100);
-            }
-            
             if (targetPage === 'video') {
                 lazyLoadMainVideo();
             }
+        }
+        
+        // Update active nav link
+        navLinks.forEach(nav => nav.classList.remove('active'));
+        const activeLink = document.querySelector(`[data-page="${targetPage}"]`);
+        if (activeLink) {
+            activeLink.classList.add('active');
         }
         
         // Scroll to top
@@ -388,11 +181,16 @@ function initNavigation() {
             e.preventDefault();
             const targetPage = this.getAttribute('data-page');
             
-            // Update active nav link
-            navLinks.forEach(nav => nav.classList.remove('active'));
-            this.classList.add('active');
-            
             // Switch page
+            switchPage(targetPage);
+        });
+    });
+    
+    // Add event listeners to buttons with data-page attribute
+    document.querySelectorAll('.btn[data-page]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetPage = this.getAttribute('data-page');
             switchPage(targetPage);
         });
     });
@@ -439,15 +237,17 @@ function lazyLoadMainVideo() {
         
         // Remove loading indicator when iframe loads
         iframe.addEventListener('load', () => {
+            console.log('Google Drive player loaded successfully');
             loadingDiv.remove();
         });
         
         iframe.addEventListener('error', () => {
+            console.error('Google Drive player failed to load');
             loadingDiv.innerHTML = `
                 <div class="video-error">
                     <i class="fas fa-exclamation-triangle"></i>
                     <h3>Google Drive Player Failed to Load</h3>
-                    <p>Please try the direct links below.</p>
+                    <p>Please try refreshing the page or check your internet connection.</p>
                 </div>
             `;
         });
@@ -522,8 +322,8 @@ function loadDocsContent(subpage) {
             <h2>Platform Features</h2>
             <p>CyberStream offers a comprehensive set of features designed to enhance your streaming experience.</p>
             
-            <h3>Multi-Player Support</h3>
-            <p>Choose from multiple video players to find the one that works best for your connection and device.</p>
+            <h3>Single Player Experience</h3>
+            <p>We provide a unified, high-quality streaming experience through Google Drive integration for reliable playback.</p>
             
             <h3>Subtitle Management</h3>
             <p>Download and use subtitle files with your favorite media players for an enhanced viewing experience.</p>
@@ -542,10 +342,10 @@ function loadDocsContent(subpage) {
             <p>Simply navigate to the video page and start streaming. No account creation or login required.</p>
             
             <h3>Player Issues</h3>
-            <p>If you encounter issues with one player, try switching to another option from the backup video page.</p>
+            <p>If you encounter issues with the video player, try refreshing the page or check your internet connection.</p>
             
             <h3>Subtitle Support</h3>
-            <p>Most players support automatic subtitle loading. For players that don't, download the subtitle file and load it manually in your preferred media player.</p>
+            <p>Download the subtitle file and load it manually in your preferred media player for the best experience.</p>
             
             <div class="note">
                 <p><strong>Note:</strong> CyberStream is a demonstration platform. Some features may be limited in functionality.</p>
