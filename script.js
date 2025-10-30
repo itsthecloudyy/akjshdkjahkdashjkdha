@@ -199,7 +199,7 @@ function initNavigation() {
 
 // SIMPLE WORKING VIDEO SYSTEM
 function lazyLoadMainVideo() {
-    console.log('Loading Google Drive video - SIMPLE WORKING VERSION');
+    console.log('Loading Google Drive video - CONTROLS AT TOP');
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
     if (!videoWrapper) {
         console.error('Video wrapper not found');
@@ -246,6 +246,30 @@ function lazyLoadMainVideo() {
     
     videoContainer.appendChild(loadingDiv);
     
+    // CONTROLS AT TOP
+    const videoControls = document.createElement('div');
+    videoControls.className = 'video-controls-overlay top-controls';
+    videoControls.innerHTML = `
+        <div class="control-group">
+            <div class="time-input-group">
+                <input type="text" id="timeInput" placeholder="MM:SS" class="time-input">
+                <button id="setTimeBtn" class="control-btn">
+                    <i class="fas fa-play"></i> Set Time
+                </button>
+            </div>
+            <button id="subtitleToggle" class="control-btn">
+                <i class="fas fa-closed-captioning"></i> <span id="subtitleStatus">ON</span>
+            </button>
+            <button id="fullscreenBtn" class="control-btn">
+                <i class="fas fa-expand"></i> Fullscreen
+            </button>
+        </div>
+        <div class="time-display">
+            <span id="currentTimeDisplay">0:00</span> / <span id="totalTimeDisplay">2:10:08</span>
+            <div id="syncStatus" style="font-size:10px;color:#00ff88;margin-top:5px;">Enter time when you seek</div>
+        </div>
+    `;
+    
     // Google Drive iframe
     const iframe = document.createElement('iframe');
     iframe.className = 'video-frame';
@@ -278,36 +302,13 @@ function lazyLoadMainVideo() {
     subtitleOverlay.className = 'subtitle-overlay';
     subtitleOverlay.innerHTML = '<div class="subtitle-text"></div>';
     
-    // SIMPLE CONTROLS - Manual time input
-    const videoControls = document.createElement('div');
-    videoControls.className = 'video-controls-overlay';
-    videoControls.innerHTML = `
-        <div class="control-group">
-            <div class="time-input-group">
-                <input type="text" id="timeInput" placeholder="MM:SS" class="time-input">
-                <button id="setTimeBtn" class="control-btn">
-                    <i class="fas fa-play"></i> Set Time
-                </button>
-            </div>
-            <button id="subtitleToggle" class="control-btn">
-                <i class="fas fa-closed-captioning"></i> <span id="subtitleStatus">ON</span>
-            </button>
-            <button id="fullscreenBtn" class="control-btn">
-                <i class="fas fa-expand"></i> Fullscreen
-            </button>
-        </div>
-        <div class="time-display">
-            <span id="currentTimeDisplay">0:00</span> / <span id="totalTimeDisplay">2:10:08</span>
-            <div id="syncStatus" style="font-size:10px;color:#00ff88;margin-top:5px;">Enter time when you seek</div>
-        </div>
-    `;
-    
+    // Append elements in correct order - CONTROLS FIRST (TOP)
+    videoContainer.appendChild(videoControls);
     videoContainer.appendChild(iframe);
     videoContainer.appendChild(subtitleOverlay);
-    videoContainer.appendChild(videoControls);
     videoWrapper.appendChild(videoContainer);
     
-    console.log('Video elements created');
+    console.log('Video elements created - controls at top');
     
     iframe.addEventListener('load', () => {
         console.log('Google Drive player loaded successfully');
@@ -695,7 +696,7 @@ function loadDocsContent(subpage) {
             <ul>
                 <li><strong>Manual Time Sync:</strong> Enter time when you seek in Google Drive</li>
                 <li><strong>Turkish Subtitles:</strong> Automatic subtitle loading</li>
-                <li><strong>Simple Controls:</strong> Easy-to-use interface</li>
+                <li><strong>Top Controls:</strong> Easy-to-access interface at the top</li>
             </ul>
         `,
         'support': `
