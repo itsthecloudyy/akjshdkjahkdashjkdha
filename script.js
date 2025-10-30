@@ -120,7 +120,7 @@ function initializeApp() {
     }, 100);
 }
 
-// Multi-Player Selector with Lazy Loading
+// Multi-Player Selector with Lazy Loading - FIXED SANDBOX ISSUES
 class MultiPlayerSelector {
     constructor() {
         this.playerOptions = document.querySelectorAll('.player-option');
@@ -208,32 +208,37 @@ class MultiPlayerSelector {
         iframe.allowFullscreen = true;
         iframe.frameBorder = '0';
         iframe.scrolling = 'no';
-        iframe.sandbox = "allow-scripts allow-same-origin allow-presentation allow-popups allow-forms";
         
         let playerUrl = '';
         let playerTitle = '';
+        let sandboxPermissions = 'allow-scripts allow-same-origin allow-popups allow-forms';
         
         switch(playerId) {
             case 'doodstream':
                 playerUrl = 'https://doodstream.com/e/t2gc0n61c3iv';
                 playerTitle = 'Dead Poets Society - DoodStream';
+                sandboxPermissions = 'allow-scripts allow-same-origin allow-popups allow-forms';
                 break;
             case 'filemoon':
                 playerUrl = 'https://filemoon.sx/e/ra1uugjc5f0v';
                 playerTitle = 'Dead Poets Society - FileMoon';
+                sandboxPermissions = 'allow-scripts allow-same-origin allow-popups allow-forms allow-presentation';
                 break;
             case 'mixdrop':
                 playerUrl = 'https://mxdrop.to/e/vkqqjd1qs0433p';
                 playerTitle = 'Dead Poets Society - MixDrop';
+                sandboxPermissions = 'allow-scripts allow-same-origin allow-popups allow-forms';
                 break;
         }
         
+        iframe.sandbox = sandboxPermissions;
         iframe.src = playerUrl;
         iframe.title = playerTitle;
         iframe.width = '100%';
         iframe.height = '100%';
         iframe.style.border = 'none';
         iframe.style.display = 'block';
+        iframe.referrerPolicy = 'no-referrer';
         
         videoWrapper.appendChild(iframe);
         
@@ -299,8 +304,6 @@ class MultiPlayerSelector {
     stopCurrentPlayer() {
         const currentFrame = document.querySelector(`#${this.currentPlayer}Container iframe`);
         if (currentFrame) {
-            // For iframes, we can't actually stop video playback due to cross-origin restrictions
-            // But we can hide it and show a message
             currentFrame.style.display = 'none';
         }
     }
@@ -428,7 +431,8 @@ function lazyLoadMainVideo() {
         iframe.width = '100%';
         iframe.height = '100%';
         iframe.title = 'Dead Poets Society - Google Drive';
-        iframe.sandbox = "allow-scripts allow-same-origin allow-presentation allow-popups allow-forms";
+        iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-forms";
+        iframe.referrerPolicy = 'no-referrer';
         
         videoWrapper.appendChild(iframe);
         
