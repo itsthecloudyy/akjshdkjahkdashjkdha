@@ -14,7 +14,7 @@ class LoadingScreen {
         this.steps = [
             { text: 'Initializing platform...', duration: 800 },
             { text: 'Loading core modules...', duration: 600 },
-            { text: 'Setting up video players...', duration: 700 },
+            { text: 'Setting up video player...', duration: 700 },
             { text: 'Preparing user interface...', duration: 500 },
             { text: 'Almost ready...', duration: 400 }
         ];
@@ -325,8 +325,8 @@ function loadDocsContent(subpage) {
             <h3>Single Player Experience</h3>
             <p>We provide a unified, high-quality streaming experience through Google Drive integration for reliable playback.</p>
             
-            <h3>Subtitle Management</h3>
-            <p>Download and use subtitle files with your favorite media players for an enhanced viewing experience.</p>
+            <h3>Cyberpunk Design</h3>
+            <p>Immersive interface with futuristic aesthetics and smooth animations that enhance your viewing experience.</p>
             
             <h3>Responsive Design</h3>
             <p>Our platform works seamlessly across all devices, from desktop computers to mobile phones.</p>
@@ -344,11 +344,11 @@ function loadDocsContent(subpage) {
             <h3>Player Issues</h3>
             <p>If you encounter issues with the video player, try refreshing the page or check your internet connection.</p>
             
-            <h3>Subtitle Support</h3>
-            <p>Download the subtitle file and load it manually in your preferred media player for the best experience.</p>
+            <h3>Browser Compatibility</h3>
+            <p>CyberStream works best with modern browsers like Chrome, Firefox, Safari, and Edge.</p>
             
             <div class="note">
-                <p><strong>Note:</strong> CyberStream is a demonstration platform. Some features may be limited in functionality.</p>
+                <p><strong>Note:</strong> CyberStream is a demonstration platform showcasing modern web technologies and cyberpunk design aesthetics.</p>
             </div>
         `
     };
