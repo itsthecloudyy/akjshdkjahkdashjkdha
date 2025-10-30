@@ -186,33 +186,65 @@ class MultiPlayerSelector {
         const container = document.getElementById(playerId + 'Container');
         if (!container) return;
         
+        const videoWrapper = container.querySelector('.video-wrapper');
+        
+        // Clear existing content
+        videoWrapper.innerHTML = '';
+        
         // Create and append the iframe only when needed
         const iframe = document.createElement('iframe');
         iframe.className = 'video-frame active';
-        iframe.allow = 'autoplay; encrypted-media';
+        iframe.allow = 'autoplay; encrypted-media; fullscreen';
         iframe.allowFullscreen = true;
+        iframe.frameBorder = '0';
+        iframe.scrolling = 'no';
         
         switch(playerId) {
             case 'doodstream':
-                iframe.src = 'https://dsvplay.com/e/t2gc0n61c3iv';
+                iframe.src = 'https://doodstream.com/e/t2gc0n61c3iv';
                 iframe.title = 'Dead Poets Society - DoodStream';
+                iframe.width = '100%';
+                iframe.height = '100%';
                 break;
             case 'filemoon':
-                iframe.src = 'https://filemoon.to/e/ra1uugjc5f0v';
+                iframe.src = 'https://filemoon.sx/e/ra1uugjc5f0v';
                 iframe.title = 'Dead Poets Society - FileMoon';
+                iframe.width = '100%';
+                iframe.height = '100%';
                 break;
             case 'mixdrop':
-                iframe.src = '//mxdrop.to/e/vkqqjd1qs0433p';
-                iframe.width = '640';
-                iframe.height = '480';
-                iframe.scrolling = 'no';
-                iframe.frameBorder = '0';
-                iframe.allowFullscreen = true;
+                iframe.src = 'https://mixdrop.co/e/vkqqjd1qs0433p';
                 iframe.title = 'Dead Poets Society - MixDrop';
+                iframe.width = '100%';
+                iframe.height = '100%';
                 break;
         }
         
-        container.querySelector('.video-wrapper').appendChild(iframe);
+        videoWrapper.appendChild(iframe);
+        
+        // Add loading indicator
+        this.addLoadingIndicator(videoWrapper, playerId);
+    }
+    
+    addLoadingIndicator(wrapper, playerId) {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'video-loading';
+        loadingDiv.innerHTML = `
+            <div class="loading-spinner"></div>
+            <p>Loading ${playerId} player...</p>
+        `;
+        wrapper.appendChild(loadingDiv);
+        
+        // Remove loading indicator when iframe loads
+        const iframe = wrapper.querySelector('iframe');
+        iframe.addEventListener('load', () => {
+            loadingDiv.remove();
+        });
+        
+        // Remove loading indicator after timeout (fallback)
+        setTimeout(() => {
+            loadingDiv.remove();
+        }, 5000);
     }
     
     stopCurrentPlayer() {
@@ -328,14 +360,40 @@ function lazyLoadMainVideo() {
     
     // Only load if not already loaded
     if (!existingFrame || !existingFrame.src) {
+        // Clear existing content
+        videoWrapper.innerHTML = '';
+        
         const iframe = document.createElement('iframe');
         iframe.className = 'video-frame active';
         iframe.src = 'https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview';
-        iframe.allow = 'autoplay; encrypted-media';
+        iframe.allow = 'autoplay; encrypted-media; fullscreen';
         iframe.allowFullscreen = true;
-        iframe.title = 'Dead Poets Society';
+        iframe.frameBorder = '0';
+        iframe.scrolling = 'no';
+        iframe.width = '100%';
+        iframe.height = '100%';
+        iframe.title = 'Dead Poets Society - Google Drive';
         
         videoWrapper.appendChild(iframe);
+        
+        // Add loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'video-loading';
+        loadingDiv.innerHTML = `
+            <div class="loading-spinner"></div>
+            <p>Loading Google Drive player...</p>
+        `;
+        videoWrapper.appendChild(loadingDiv);
+        
+        // Remove loading indicator when iframe loads
+        iframe.addEventListener('load', () => {
+            loadingDiv.remove();
+        });
+        
+        // Remove loading indicator after timeout (fallback)
+        setTimeout(() => {
+            loadingDiv.remove();
+        }, 5000);
     }
 }
 
