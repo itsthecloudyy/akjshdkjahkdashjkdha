@@ -88,6 +88,12 @@ class LoadingScreen {
     }
 }
 
+// Global variables for video and subtitle management
+let videoPlayer = null;
+let currentSubtitles = [];
+let subtitleInterval = null;
+let isFullscreen = false;
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded - initializing app');
@@ -171,6 +177,9 @@ function initNavigation() {
                 setTimeout(() => {
                     lazyLoadMainVideo();
                 }, 100);
+            } else {
+                // Stop subtitle tracking when leaving video page
+                stopSubtitleTracking();
             }
         }
         
@@ -208,9 +217,9 @@ function initNavigation() {
     console.log('Navigation initialized');
 }
 
-// Lazy load main video with subtitle support
+// Lazy load main video with AUTO subtitle support
 function lazyLoadMainVideo() {
-    console.log('Loading main video');
+    console.log('Loading main video with auto subtitles');
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
     if (!videoWrapper) {
         console.error('Video wrapper not found');
@@ -236,6 +245,7 @@ function lazyLoadMainVideo() {
     videoContainer.style.width = '100%';
     videoContainer.style.height = '100%';
     videoContainer.style.background = '#000';
+    videoContainer.id = 'videoContainer';
     
     // Add loading indicator first
     const loadingDiv = document.createElement('div');
@@ -253,16 +263,17 @@ function lazyLoadMainVideo() {
     loadingDiv.style.color = '#00ff88';
     loadingDiv.style.zIndex = '10';
     loadingDiv.innerHTML = `
-        <div class="loading-spinner" style="width: 50px; height: 50px; border: 4px solid rgba(0, 255, 136, 0.3); border-top: 4px solid #00ff88; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
-        <p style="color: #00ff88; font-size: 1.1rem; margin-bottom: 0.5rem;">Loading Google Drive player...</p>
-        <small style="color: #888; font-size: 0.9rem;">This may take a few moments</small>
+        <div class="loading-spinner"></div>
+        <p>Loading Google Drive player and Turkish subtitles...</p>
+        <small>Subtitles will start automatically</small>
     `;
     
     videoContainer.appendChild(loadingDiv);
     
-    // Google Drive iframe - FIXED URL
+    // Google Drive iframe
     const iframe = document.createElement('iframe');
     iframe.className = 'video-frame';
+    iframe.id = 'videoPlayer';
     iframe.src = 'https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview';
     iframe.allow = 'autoplay; encrypted-media; fullscreen';
     iframe.allowFullscreen = true;
@@ -284,48 +295,26 @@ function lazyLoadMainVideo() {
     iframe.style.display = 'block';
     iframe.style.visibility = 'visible';
     
-    // External subtitle overlay
+    // External subtitle overlay - FULLSCREEN COMPATIBLE
     const subtitleOverlay = document.createElement('div');
     subtitleOverlay.id = 'subtitleOverlay';
-    subtitleOverlay.style.position = 'absolute';
-    subtitleOverlay.style.bottom = '80px';
-    subtitleOverlay.style.left = '0';
-    subtitleOverlay.style.width = '100%';
-    subtitleOverlay.style.textAlign = 'center';
-    subtitleOverlay.style.zIndex = '2';
-    subtitleOverlay.style.pointerEvents = 'none';
-    subtitleOverlay.style.color = '#ffffff';
-    subtitleOverlay.style.fontSize = '24px';
-    subtitleOverlay.style.fontWeight = 'bold';
-    subtitleOverlay.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
-    subtitleOverlay.style.fontFamily = 'Arial, sans-serif';
-    subtitleOverlay.style.padding = '10px 20px';
-    subtitleOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-    subtitleOverlay.style.borderRadius = '5px';
-    subtitleOverlay.style.display = 'none';
-    subtitleOverlay.style.maxWidth = '80%';
-    subtitleOverlay.style.margin = '0 auto';
-    subtitleOverlay.style.lineHeight = '1.4';
+    subtitleOverlay.className = 'subtitle-overlay';
+    subtitleOverlay.innerHTML = '<div class="subtitle-text"></div>';
     
     // Subtitle controls
     const subtitleControls = document.createElement('div');
     subtitleControls.className = 'subtitle-controls';
-    subtitleControls.style.position = 'absolute';
-    subtitleControls.style.bottom = '20px';
-    subtitleControls.style.left = '20px';
-    subtitleControls.style.zIndex = '3';
-    subtitleControls.style.background = 'rgba(0,0,0,0.8)';
-    subtitleControls.style.padding = '10px';
-    subtitleControls.style.borderRadius = '5px';
-    subtitleControls.style.color = 'white';
-    subtitleControls.style.fontSize = '14px';
-    
     subtitleControls.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <button id="toggleSubtitles" style="padding: 8px 16px; background: #00ff88; color: black; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">
-                <i class="fas fa-closed-captioning"></i> Turn On Subtitles
+        <div class="control-group">
+            <button id="fullscreenBtn" class="control-btn">
+                <i class="fas fa-expand"></i> Fullscreen
             </button>
-            <span id="subtitleStatus" style="font-size: 12px; color: #aaa;">Off</span>
+            <button id="subtitleToggle" class="control-btn">
+                <i class="fas fa-closed-captioning"></i> <span id="subtitleStatus">Subtitles: ON</span>
+            </button>
+        </div>
+        <div class="time-display">
+            <span id="currentTimeDisplay">0:00</span> / <span id="totalTimeDisplay">2:10:08</span>
         </div>
     `;
     
@@ -334,6 +323,9 @@ function lazyLoadMainVideo() {
     videoContainer.appendChild(subtitleOverlay);
     videoContainer.appendChild(subtitleControls);
     videoWrapper.appendChild(videoContainer);
+    
+    // Store video player reference
+    videoPlayer = iframe;
     
     console.log('Video elements created, setting up event listeners');
     
@@ -347,17 +339,17 @@ function lazyLoadMainVideo() {
         // Load subtitles after video is loaded
         setTimeout(() => {
             loadExternalSubtitles();
-        }, 1000);
+        }, 2000);
     });
     
     iframe.addEventListener('error', (e) => {
         console.error('Google Drive player failed to load:', e);
         loadingDiv.innerHTML = `
-            <div class="video-error" style="text-align: center; color: #ff4444;">
-                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                <h3 style="color: #ff4444; margin-bottom: 1rem;">Google Drive Player Failed to Load</h3>
-                <p style="color: #ccc; margin-bottom: 1.5rem;">Please try refreshing the page or check your internet connection.</p>
-                <button onclick="lazyLoadMainVideo()" style="padding: 10px 20px; background: #ff4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">Retry</button>
+            <div class="video-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Google Drive Player Failed to Load</h3>
+                <p>Please try refreshing the page or check your internet connection.</p>
+                <button onclick="lazyLoadMainVideo()" class="retry-btn">Retry</button>
             </div>
         `;
     });
@@ -383,13 +375,13 @@ function loadExternalSubtitles() {
         })
         .then(srtData => {
             console.log('Subtitle file loaded successfully');
-            const subtitles = parseSRT(srtData);
-            console.log(`Parsed ${subtitles.length} subtitle entries`);
-            setupSubtitlePlayer(subtitles);
+            currentSubtitles = parseSRT(srtData);
+            console.log(`Parsed ${currentSubtitles.length} subtitle entries`);
+            setupAutoSubtitleSystem();
         })
         .catch(error => {
             console.error('Could not load external subtitles:', error);
-            setupManualSubtitleControls();
+            showSubtitleError();
         });
 }
 
@@ -451,141 +443,186 @@ function parseTime(timeString) {
     }
 }
 
-// Subtitle player
-function setupSubtitlePlayer(subtitles) {
-    console.log('Setting up subtitle player');
-    const overlay = document.getElementById('subtitleOverlay');
-    const toggleBtn = document.getElementById('toggleSubtitles');
-    const statusSpan = document.getElementById('subtitleStatus');
+// AUTO SUBTITLE SYSTEM - Video time tracking
+function setupAutoSubtitleSystem() {
+    console.log('Setting up auto subtitle system');
     
-    if (!overlay || !toggleBtn || !statusSpan) {
+    const subtitleOverlay = document.getElementById('subtitleOverlay');
+    const subtitleToggle = document.getElementById('subtitleToggle');
+    const subtitleStatus = document.getElementById('subtitleStatus');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    
+    if (!subtitleOverlay || !subtitleToggle) {
         console.error('Subtitle elements not found');
         return;
     }
     
-    let currentSubtitleIndex = -1;
-    let subtitlesEnabled = false;
+    let subtitlesEnabled = true;
     let currentTime = 0;
-    let timeInterval;
+    
+    // Auto start subtitle tracking
+    startSubtitleTracking();
     
     // Toggle subtitle visibility
-    toggleBtn.addEventListener('click', () => {
+    subtitleToggle.addEventListener('click', () => {
         subtitlesEnabled = !subtitlesEnabled;
         
         if (subtitlesEnabled) {
-            statusSpan.textContent = 'On';
-            statusSpan.style.color = '#00ff88';
-            toggleBtn.innerHTML = '<i class="fas fa-closed-captioning"></i> Turn Off Subtitles';
-            toggleBtn.style.background = '#ff4444';
-            overlay.style.display = 'block';
-            startTimeSimulation();
+            subtitleStatus.textContent = 'Subtitles: ON';
+            subtitleToggle.style.background = '#00ff88';
+            startSubtitleTracking();
         } else {
-            statusSpan.textContent = 'Off';
-            statusSpan.style.color = '#aaa';
-            toggleBtn.innerHTML = '<i class="fas fa-closed-captioning"></i> Turn On Subtitles';
-            toggleBtn.style.background = '#00ff88';
-            overlay.style.display = 'none';
-            stopTimeSimulation();
+            subtitleStatus.textContent = 'Subtitles: OFF';
+            subtitleToggle.style.background = '#ff4444';
+            subtitleOverlay.style.opacity = '0';
+            stopSubtitleTracking();
         }
     });
     
-    function startTimeSimulation() {
-        currentTime = 0;
-        clearInterval(timeInterval);
-        
-        timeInterval = setInterval(() => {
-            if (subtitlesEnabled) {
-                currentTime += 0.1;
-                updateSubtitles();
-            }
-        }, 100);
-    }
+    // Fullscreen functionality
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
     
-    function stopTimeSimulation() {
-        clearInterval(timeInterval);
-        overlay.style.display = 'none';
-        currentSubtitleIndex = -1;
-    }
-    
-    function updateSubtitles() {
-        if (!subtitlesEnabled) return;
-        
-        // Find current subtitle
-        const newSubtitleIndex = subtitles.findIndex(sub => 
-            currentTime >= sub.start && currentTime <= sub.end
-        );
-        
-        if (newSubtitleIndex !== currentSubtitleIndex) {
-            currentSubtitleIndex = newSubtitleIndex;
-            
-            if (currentSubtitleIndex !== -1) {
-                overlay.textContent = subtitles[currentSubtitleIndex].text;
-                overlay.style.display = 'block';
-            } else {
-                overlay.style.display = 'none';
-            }
-        }
-    }
-    
-    // Manual time control buttons
-    const controls = document.querySelector('.subtitle-controls');
-    if (controls) {
-        const timeControls = document.createElement('div');
-        timeControls.style.marginTop = '10px';
-        timeControls.style.display = 'flex';
-        timeControls.style.gap = '5px';
-        timeControls.style.alignItems = 'center';
-        timeControls.style.flexWrap = 'wrap';
-        
-        timeControls.innerHTML = `
-            <button id="rewindBtn" style="padding: 5px 10px; background: #00ccff; color: black; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
-                <i class="fas fa-backward"></i> 10s
-            </button>
-            <button id="forwardBtn" style="padding: 5px 10px; background: #00ccff; color: black; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
-                <i class="fas fa-forward"></i> 10s
-            </button>
-            <span style="font-size: 11px; color: #aaa;">Time: <span id="currentTime" style="color: #00ff88;">0:00</span></span>
-        `;
-        
-        controls.appendChild(timeControls);
-        
-        // Time control handlers
-        document.getElementById('rewindBtn').addEventListener('click', () => {
-            currentTime = Math.max(0, currentTime - 10);
-            updateSubtitles();
-            updateTimeDisplay();
-        });
-        
-        document.getElementById('forwardBtn').addEventListener('click', () => {
-            currentTime += 10;
-            updateSubtitles();
-            updateTimeDisplay();
-        });
-        
-        function updateTimeDisplay() {
-            const minutes = Math.floor(currentTime / 60);
-            const seconds = Math.floor(currentTime % 60);
-            const timeDisplay = document.getElementById('currentTime');
-            if (timeDisplay) {
-                timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            }
-        }
-    }
-    
-    console.log('Subtitle player setup completed');
+    // Listen for fullscreen changes
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 }
 
-// Manual subtitle controls as fallback
-function setupManualSubtitleControls() {
-    console.log('Setting up manual subtitle controls');
-    const subtitleControls = document.querySelector('.subtitle-controls');
+function startSubtitleTracking() {
+    console.log('Starting auto subtitle tracking');
+    stopSubtitleTracking(); // Clear any existing interval
     
+    let simulatedTime = 0;
+    const startTime = Date.now();
+    
+    subtitleInterval = setInterval(() => {
+        // Simulate video time progression (you can replace this with actual video time if available)
+        simulatedTime = (Date.now() - startTime) / 1000;
+        updateSubtitles(simulatedTime);
+        updateTimeDisplay(simulatedTime);
+    }, 100); // Update 10 times per second for smooth subtitles
+}
+
+function stopSubtitleTracking() {
+    if (subtitleInterval) {
+        clearInterval(subtitleInterval);
+        subtitleInterval = null;
+    }
+    const subtitleOverlay = document.getElementById('subtitleOverlay');
+    if (subtitleOverlay) {
+        subtitleOverlay.style.opacity = '0';
+    }
+}
+
+function updateSubtitles(currentTime) {
+    const subtitleOverlay = document.getElementById('subtitleOverlay');
+    const subtitleText = subtitleOverlay.querySelector('.subtitle-text');
+    
+    if (!subtitleOverlay || !subtitleText) return;
+    
+    // Find current subtitle
+    const currentSubtitle = currentSubtitles.find(sub => 
+        currentTime >= sub.start && currentTime <= sub.end
+    );
+    
+    if (currentSubtitle) {
+        subtitleText.textContent = currentSubtitle.text;
+        subtitleOverlay.style.opacity = '1';
+    } else {
+        subtitleOverlay.style.opacity = '0';
+    }
+}
+
+function updateTimeDisplay(currentTime) {
+    const timeDisplay = document.getElementById('currentTimeDisplay');
+    if (timeDisplay) {
+        const minutes = Math.floor(currentTime / 60);
+        const seconds = Math.floor(currentTime % 60);
+        timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+}
+
+// Fullscreen functionality
+function toggleFullscreen() {
+    const videoContainer = document.getElementById('videoContainer');
+    
+    if (!document.fullscreenElement) {
+        // Enter fullscreen
+        if (videoContainer.requestFullscreen) {
+            videoContainer.requestFullscreen();
+        } else if (videoContainer.webkitRequestFullscreen) {
+            videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) {
+            videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.msRequestFullscreen) {
+            videoContainer.msRequestFullscreen();
+        }
+        isFullscreen = true;
+    } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+        isFullscreen = false;
+    }
+}
+
+function handleFullscreenChange() {
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const subtitleOverlay = document.getElementById('subtitleOverlay');
+    
+    if (document.fullscreenElement || 
+        document.webkitFullscreenElement || 
+        document.mozFullScreenElement ||
+        document.msFullscreenElement) {
+        // Fullscreen mode
+        isFullscreen = true;
+        fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
+        fullscreenBtn.style.background = '#ff4444';
+        
+        // Adjust subtitle overlay for fullscreen
+        if (subtitleOverlay) {
+            subtitleOverlay.classList.add('fullscreen');
+        }
+    } else {
+        // Normal mode
+        isFullscreen = false;
+        fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> Fullscreen';
+        fullscreenBtn.style.background = '#00ccff';
+        
+        // Reset subtitle overlay
+        if (subtitleOverlay) {
+            subtitleOverlay.classList.remove('fullscreen');
+        }
+    }
+}
+
+function showSubtitleError() {
+    const subtitleControls = document.querySelector('.subtitle-controls');
     if (subtitleControls) {
-        subtitleControls.innerHTML += `
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'subtitle-error';
+        errorDiv.innerHTML = `
             <div style="margin-top: 10px; color: #ff4444; font-size: 12px;">
                 <i class="fas fa-exclamation-triangle"></i> Subtitles failed to load
             </div>
         `;
+        subtitleControls.appendChild(errorDiv);
+    }
+}
+
+// Clean up when leaving page
+function stopSubtitleTracking() {
+    if (subtitleInterval) {
+        clearInterval(subtitleInterval);
+        subtitleInterval = null;
     }
 }
 
@@ -626,8 +663,8 @@ function loadDocsContent(subpage) {
             <ul>
                 <li><strong>High-Quality Streaming:</strong> Adaptive bitrate streaming for the best possible quality based on your connection</li>
                 <li><strong>Advanced Player:</strong> Custom video player with precision controls and intuitive interface</li>
-                <li><strong>Privacy Focused:</strong> We respect your privacy and don't track your viewing habits</li>
-                <li><strong>Future-Ready:</strong> Built with the latest web technologies for optimal performance</li>
+                <li><strong>Auto Subtitles:</strong> Automatic Turkish subtitle synchronization</li>
+                <li><strong>Fullscreen Support:</strong> Immersive fullscreen experience with subtitle support</li>
             </ul>
         `,
         'technology': `
@@ -637,8 +674,8 @@ function loadDocsContent(subpage) {
             <h3>Video Delivery</h3>
             <p>We use adaptive bitrate streaming to ensure smooth playback regardless of your connection speed. Our content delivery network ensures low latency and fast loading times worldwide.</p>
             
-            <h3>Player Technology</h3>
-            <p>Our custom video player is built with HTML5 and enhanced with JavaScript for advanced functionality while maintaining compatibility across all modern browsers.</p>
+            <h3>Auto Subtitle System</h3>
+            <p>Our advanced subtitle system automatically synchronizes with video playback and works seamlessly in fullscreen mode.</p>
             
             <h3>Security Features</h3>
             <p>All streams are protected with industry-standard encryption protocols to ensure your content remains secure and private.</p>
@@ -647,33 +684,33 @@ function loadDocsContent(subpage) {
             <h2>Platform Features</h2>
             <p>CyberStream offers a comprehensive set of features designed to enhance your streaming experience.</p>
             
-            <h3>Single Player Experience</h3>
-            <p>We provide a unified, high-quality streaming experience through Google Drive integration for reliable playback.</p>
+            <h3>Auto Subtitle System</h3>
+            <p>Turkish subtitles start automatically and sync perfectly with video playback. No manual setup required!</p>
             
-            <h3>Subtitle Support</h3>
-            <p>Built-in subtitle system with synchronized timing and manual controls for the best viewing experience.</p>
+            <h3>Fullscreen Experience</h3>
+            <p>Enjoy immersive fullscreen viewing with subtitle support that works perfectly in fullscreen mode.</p>
             
-            <h3>Responsive Design</h3>
-            <p>Our platform works seamlessly across all devices, from desktop computers to mobile phones.</p>
+            <h3>Smart Controls</h3>
+            <p>Easy-to-use controls for subtitles and fullscreen with real-time time display.</p>
             
-            <h3>User-Friendly Interface</h3>
-            <p>Clean, intuitive design that makes finding and watching content simple and enjoyable.</p>
+            <h3>Cyberpunk Design</h3>
+            <p>Immersive interface with futuristic aesthetics and smooth animations.</p>
         `,
         'support': `
             <h2>Support & Help</h2>
             <p>We're here to help you get the most out of CyberStream.</p>
             
             <h3>Getting Started</h3>
-            <p>Simply navigate to the video page and start streaming. No account creation or login required.</p>
+            <p>Simply navigate to the video page and start streaming. Turkish subtitles will start automatically!</p>
             
-            <h3>Player Issues</h3>
-            <p>If you encounter issues with the video player, try refreshing the page or check your internet connection.</p>
+            <h3>Subtitle Controls</h3>
+            <p>Subtitles are enabled by default. Use the "Subtitles" button to toggle them on/off.</p>
             
-            <h3>Subtitle Support</h3>
-            <p>Use the subtitle controls below the video player to enable Turkish subtitles and adjust timing if needed.</p>
+            <h3>Fullscreen Mode</h3>
+            <p>Click the "Fullscreen" button for an immersive viewing experience. Subtitles work perfectly in fullscreen.</p>
             
             <div class="note">
-                <p><strong>Note:</strong> CyberStream is a demonstration platform showcasing modern web technologies and cyberpunk design aesthetics.</p>
+                <p><strong>Note:</strong> CyberStream automatically synchronizes Turkish subtitles with video playback for the best viewing experience.</p>
             </div>
         `
     };
@@ -699,12 +736,17 @@ function monitorPerformance() {
 // Initialize performance monitoring
 document.addEventListener('DOMContentLoaded', monitorPerformance);
 
-// Add CSS for loading spinner animation
+// Add CSS for animations
 const style = document.createElement('style');
 style.textContent = `
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 `;
 document.head.appendChild(style);
