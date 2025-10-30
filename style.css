@@ -302,6 +302,7 @@ body {
     padding: 0 16px;
 }
 
+/* NAVBAR STYLES - DÜZELTİLDİ */
 .header {
     border: 1px solid hsl(0deg 0% 100% / 12%);
     border-radius: 6px;
@@ -309,14 +310,16 @@ body {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.95);
     border-radius: 50px;
-    padding: 10px 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 12px 25px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.8);
     z-index: 100;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    backdrop-filter: blur(10px);
+    opacity: 1;
+    transition: all 0.5s ease;
+    backdrop-filter: blur(15px);
+    width: auto;
+    min-width: 650px;
 }
 
 .header.active {
@@ -344,21 +347,23 @@ body {
 
 .nav-brand i {
     font-size: 1.6rem;
-    color: #cccccc;
+    color: #00ff88;
 }
 
 .nav-menu {
     display: flex;
     list-style: none;
-    gap: 2.5rem;
-    border: 1px solid hsl(0deg 0% 100% / 12%);
+    gap: 1.2rem;
+    border: 1px solid hsl(0deg 0% 100% / 15%);
     border-radius: 6px;
+    padding: 6px;
+    background: rgba(20, 20, 20, 0.9);
 }
 
 .nav-menu a {
     color: #aaaaaa;
     text-decoration: none;
-    padding: 0.6rem 1.2rem;
+    padding: 0.6rem 1rem;
     border: 1px solid transparent;
     transition: all 0.3s ease;
     font-size: 1rem;
@@ -366,12 +371,15 @@ body {
     align-items: center;
     gap: 8px;
     border-radius: 4px;
+    white-space: nowrap;
 }
 
 .nav-menu a:hover,
 .nav-menu a.active {
     color: #ffffff;
-    border: 1px solid #ffffff;
+    border: 1px solid #00ff88;
+    background: rgba(0, 255, 136, 0.15);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .main-content {
@@ -905,21 +913,36 @@ body {
     to { transform: rotate(360deg); }
 }
 
-/* Performance optimizations for slow devices */
+/* Responsive düzenlemeler */
 @media (max-width: 768px) {
+    .header {
+        min-width: 90%;
+        padding: 10px 15px;
+        top: 10px;
+    }
+    
+    .nav-menu {
+        gap: 0.8rem;
+    }
+    
+    .nav-menu a {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .nav-brand {
+        margin-right: 1rem;
+        font-size: 1.1rem;
+    }
+    
     .hero { padding: 8rem 0; }
     .hero h1 { font-size: 2.5rem; }
     .loading-logo { font-size: 2.5rem; }
     .loading-logo i { font-size: 3rem; }
     .docs-layout { flex-direction: column; gap: 1.5rem; }
     .docs-sidebar { min-width: 0; }
-    .nav-menu { gap: 1rem; }
     .player-options {
         grid-template-columns: 1fr;
-    }
-    .nav-brand {
-        margin-right: 1rem;
-        font-size: 1.2rem;
     }
     .video-meta {
         flex-direction: column;
@@ -949,14 +972,15 @@ body {
 @media (max-width: 480px) {
     .header {
         width: 95%;
-        padding: 8px 16px;
+        padding: 8px 12px;
+        min-width: unset;
     }
     .nav-menu {
         gap: 0.5rem;
     }
     .nav-menu a {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
     }
     .nav-brand {
         font-size: 1rem;
