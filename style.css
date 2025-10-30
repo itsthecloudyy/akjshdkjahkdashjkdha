@@ -1088,3 +1088,33 @@ body {
     transition: all 0.3s ease;
     font-weight: bold;
 }
+
+
+/* Time Input Styles */
+.time-input-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.time-input {
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    color: white;
+    font-size: 12px;
+    width: 80px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+}
+
+.time-input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: #00ff88;
+    background: rgba(255,255,255,0.15);
+}
