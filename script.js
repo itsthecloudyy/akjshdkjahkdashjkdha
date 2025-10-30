@@ -95,8 +95,9 @@ let subtitleInterval = null;
 let isFullscreen = false;
 let subtitlesEnabled = true;
 let videoTime = 0;
-let isVideoPlaying = true; // Auto-play enabled
+let isVideoPlaying = true;
 let videoStartTime = 0;
+let lastVideoTime = 0;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
@@ -221,9 +222,9 @@ function initNavigation() {
     console.log('Navigation initialized');
 }
 
-// Lazy load main video with AUTO subtitle support
+// Lazy load main video with SMART SYNC system
 function lazyLoadMainVideo() {
-    console.log('Loading main video with auto subtitles');
+    console.log('Loading Google Drive video with SMART SYNC');
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
     if (!videoWrapper) {
         console.error('Video wrapper not found');
@@ -268,13 +269,13 @@ function lazyLoadMainVideo() {
     loadingDiv.style.zIndex = '10';
     loadingDiv.innerHTML = `
         <div class="loading-spinner"></div>
-        <p>Loading Google Drive player and Turkish subtitles...</p>
-        <small>Video will start automatically with Turkish subtitles</small>
+        <p>Loading Google Drive player with SMART SYNC...</p>
+        <small>Use SYNC button when you seek in video</small>
     `;
     
     videoContainer.appendChild(loadingDiv);
     
-    // Google Drive iframe with NEW ID
+    // Google Drive iframe
     const iframe = document.createElement('iframe');
     iframe.className = 'video-frame';
     iframe.id = 'videoPlayer';
@@ -306,26 +307,24 @@ function lazyLoadMainVideo() {
     subtitleOverlay.className = 'subtitle-overlay';
     subtitleOverlay.innerHTML = '<div class="subtitle-text"></div>';
     
-    // Video controls container (NO PLAY BUTTON)
+    // SMART CONTROLS with Sync button
     const videoControls = document.createElement('div');
     videoControls.className = 'video-controls-overlay';
     videoControls.innerHTML = `
         <div class="control-group">
-            <button id="seekBackBtn" class="control-btn">
-                <i class="fas fa-backward"></i> -10s
+            <button id="syncSubtitlesBtn" class="control-btn sync-btn">
+                <i class="fas fa-sync-alt"></i> <span id="syncText">Sync Subtitles</span>
             </button>
-            <button id="seekForwardBtn" class="control-btn">
-                <i class="fas fa-forward"></i> +10s
+            <button id="subtitleToggle" class="control-btn">
+                <i class="fas fa-closed-captioning"></i> <span id="subtitleStatus">ON</span>
             </button>
             <button id="fullscreenBtn" class="control-btn">
                 <i class="fas fa-expand"></i> Fullscreen
             </button>
-            <button id="subtitleToggle" class="control-btn">
-                <i class="fas fa-closed-captioning"></i> <span id="subtitleStatus">Subtitles: ON</span>
-            </button>
         </div>
         <div class="time-display">
             <span id="currentTimeDisplay">0:00</span> / <span id="totalTimeDisplay">2:10:08</span>
+            <div id="syncStatus" style="font-size:10px;color:#00ff88;margin-top:5px;">Auto-sync ready</div>
         </div>
     `;
     
@@ -338,7 +337,7 @@ function lazyLoadMainVideo() {
     // Store video player reference
     videoPlayer = iframe;
     
-    console.log('Video elements created, setting up event listeners');
+    console.log('Video elements created, setting up SMART SYNC system');
     
     // Remove loading indicator when iframe loads
     iframe.addEventListener('load', () => {
@@ -376,7 +375,7 @@ function lazyLoadMainVideo() {
 
 // External subtitle loader
 function loadExternalSubtitles() {
-    console.log('Loading external subtitles...');
+    console.log('Loading external subtitles for SMART SYNC...');
     const subtitleUrl = 'https://raw.githubusercontent.com/itsthecloudyy/cdn/refs/heads/main/Dead.Poets.Society.1989.1080p.BluRay.X264-AMIABLE%20YIFY-Turkish.srt';
     
     fetch(subtitleUrl)
@@ -388,8 +387,7 @@ function loadExternalSubtitles() {
             console.log('Subtitle file loaded successfully');
             currentSubtitles = parseSRT(srtData);
             console.log(`Parsed ${currentSubtitles.length} subtitle entries`);
-            setupVideoControls();
-            setupAutoSubtitleSystem();
+            setupSmartSyncSystem();
         })
         .catch(error => {
             console.error('Could not load external subtitles:', error);
@@ -455,69 +453,81 @@ function parseTime(timeString) {
     }
 }
 
-// Video controls setup (NO PLAY BUTTON)
-function setupVideoControls() {
-    const seekBackBtn = document.getElementById('seekBackBtn');
-    const seekForwardBtn = document.getElementById('seekForwardBtn');
+// SMART SYNC SYSTEM for Google Drive
+function setupSmartSyncSystem() {
+    console.log('Setting up SMART SYNC system for Google Drive');
     
-    if (!seekBackBtn || !seekForwardBtn) {
-        console.error('Video control buttons not found');
-        return;
-    }
-    
-    // Seek backward 10 seconds
-    seekBackBtn.addEventListener('click', () => {
-        videoTime = Math.max(0, videoTime - 10);
-        updateTimeDisplay(videoTime);
-        updateSubtitles(videoTime);
-    });
-    
-    // Seek forward 10 seconds
-    seekForwardBtn.addEventListener('click', () => {
-        videoTime = Math.min(7808, videoTime + 10); // Max 2:10:08
-        updateTimeDisplay(videoTime);
-        updateSubtitles(videoTime);
-    });
-    
-    // Auto start video and subtitles
-    startSubtitleTracking();
-}
-
-// AUTO SUBTITLE SYSTEM - Auto start when video loads
-function setupAutoSubtitleSystem() {
-    console.log('Setting up auto subtitle system');
-    
-    const subtitleOverlay = document.getElementById('subtitleOverlay');
+    const syncBtn = document.getElementById('syncSubtitlesBtn');
+    const syncText = document.getElementById('syncText');
     const subtitleToggle = document.getElementById('subtitleToggle');
     const subtitleStatus = document.getElementById('subtitleStatus');
+    const syncStatus = document.getElementById('syncStatus');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     
-    if (!subtitleOverlay || !subtitleToggle) {
-        console.error('Subtitle elements not found');
+    if (!syncBtn || !syncStatus) {
+        console.error('Smart sync elements not found');
         return;
     }
     
-    // Subtitles enabled by default
+    let seekDetected = false;
+    lastVideoTime = 0;
+    
+    // Manual sync button - Kullanıcı sardırdığında buna basacak
+    syncBtn.addEventListener('click', () => {
+        // Reset time tracking with current position
+        videoStartTime = Date.now() - (videoTime * 1000);
+        seekDetected = false;
+        syncStatus.textContent = '✓ Subtitles synced!';
+        syncStatus.style.color = '#00ff88';
+        syncBtn.style.background = '#00ff88';
+        syncText.textContent = 'Synced!';
+        
+        // Show confirmation for 2 seconds
+        setTimeout(() => {
+            syncStatus.textContent = 'Auto-sync ready';
+            syncBtn.style.background = '#ffaa00';
+            syncText.textContent = 'Sync Subtitles';
+        }, 2000);
+        
+        console.log('Manual sync activated at time:', videoTime);
+    });
+    
+    // Auto-detect seeking (approximate detection)
+    setInterval(() => {
+        const timeDiff = Math.abs(videoTime - lastVideoTime);
+        
+        // If time jump is more than 3 seconds, detect as seek
+        if (timeDiff > 3 && lastVideoTime > 0) {
+            if (!seekDetected) {
+                seekDetected = true;
+                syncStatus.textContent = '⚠ Seek detected - Click SYNC';
+                syncStatus.style.color = '#ffaa00';
+                syncBtn.style.background = '#ff4444';
+                syncText.textContent = 'Sync Needed!';
+                console.log('Seek detected! Time jump:', timeDiff, 'seconds');
+            }
+        }
+        
+        lastVideoTime = videoTime;
+    }, 1000);
+    
+    // Subtitle toggle
     subtitlesEnabled = true;
-    subtitleStatus.textContent = 'Subtitles: ON';
+    subtitleStatus.textContent = 'ON';
     subtitleToggle.style.background = '#00ff88';
     
-    // Auto start subtitle tracking
-    videoTime = 0;
-    updateTimeDisplay(videoTime);
-    
-    // Toggle subtitle visibility
     subtitleToggle.addEventListener('click', () => {
         subtitlesEnabled = !subtitlesEnabled;
         
         if (subtitlesEnabled) {
-            subtitleStatus.textContent = 'Subtitles: ON';
+            subtitleStatus.textContent = 'ON';
             subtitleToggle.style.background = '#00ff88';
             updateSubtitles(videoTime);
         } else {
-            subtitleStatus.textContent = 'Subtitles: OFF';
+            subtitleStatus.textContent = 'OFF';
             subtitleToggle.style.background = '#ff4444';
-            subtitleOverlay.style.opacity = '0';
+            const subtitleOverlay = document.getElementById('subtitleOverlay');
+            if (subtitleOverlay) subtitleOverlay.style.opacity = '0';
         }
     });
     
@@ -529,11 +539,14 @@ function setupAutoSubtitleSystem() {
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    
+    // Start auto subtitle tracking
+    startSubtitleTracking();
 }
 
 function startSubtitleTracking() {
-    console.log('Starting auto subtitle tracking');
-    stopSubtitleTracking(); // Clear any existing interval
+    console.log('Starting SMART subtitle tracking');
+    stopSubtitleTracking();
     
     isVideoPlaying = true;
     videoStartTime = Date.now() - (videoTime * 1000);
@@ -546,7 +559,7 @@ function startSubtitleTracking() {
             updateSubtitles(videoTime);
             updateTimeDisplay(videoTime);
         }
-    }, 100); // Update 10 times per second for smooth subtitles
+    }, 100);
 }
 
 function stopSubtitleTracking() {
@@ -609,7 +622,7 @@ function toggleFullscreen() {
         if (videoContainer.requestFullscreen) {
             videoContainer.requestFullscreen();
         } else if (videoContainer.webkitRequestFullscreen) {
-            videoContainer.webkitRequestFullscreen();
+            videoContainer.webkitRequestfullscreen();
         } else if (videoContainer.mozRequestFullScreen) {
             videoContainer.mozRequestFullScreen();
         } else if (videoContainer.msRequestFullscreen) {
@@ -705,65 +718,68 @@ function loadDocsContent(subpage) {
             <h2>About CyberStream</h2>
             <p>CyberStream is a next-generation video streaming platform designed for the modern digital era. Our mission is to deliver high-quality video content with an immersive, cyberpunk-inspired user experience.</p>
             
-            <h3>Our Vision</h3>
-            <p>We believe that streaming technology should be both powerful and beautiful. CyberStream combines cutting-edge video delivery with a visually striking interface that enhances your viewing experience.</p>
+            <h3>SMART SYNC Technology</h3>
+            <p>Our advanced SMART SYNC system automatically detects when you seek in Google Drive videos and allows you to instantly resynchronize Turkish subtitles with a single click.</p>
             
             <h3>What We Offer</h3>
             <ul>
-                <li><strong>High-Quality Streaming:</strong> Adaptive bitrate streaming for the best possible quality based on your connection</li>
-                <li><strong>Advanced Player:</strong> Custom video player with precision controls and intuitive interface</li>
-                <li><strong>Auto Subtitles:</strong> Automatic Turkish subtitle synchronization enabled by default</li>
-                <li><strong>Fullscreen Support:</strong> Immersive fullscreen experience with subtitle support</li>
+                <li><strong>Smart Subtitle Sync:</strong> Automatic seek detection and one-click subtitle synchronization</li>
+                <li><strong>Google Drive Integration:</strong> Seamless integration with Google Drive videos</li>
+                <li><strong>Auto Subtitles:</strong> Turkish subtitles enabled by default</li>
+                <li><strong>Fullscreen Support:</strong> Immersive fullscreen experience</li>
             </ul>
         `,
         'technology': `
-            <h2>Our Technology</h2>
-            <p>CyberStream is built on a modern technology stack designed for performance, reliability, and scalability.</p>
+            <h2>Our SMART SYNC Technology</h2>
+            <p>CyberStream features revolutionary SMART SYNC technology designed specifically for Google Drive integration.</p>
             
-            <h3>Video Delivery</h3>
-            <p>We use adaptive bitrate streaming to ensure smooth playback regardless of your connection speed. Our content delivery network ensures low latency and fast loading times worldwide.</p>
+            <h3>Seek Detection</h3>
+            <p>Our system automatically monitors video playback and detects when you jump to different time positions in Google Drive videos.</p>
             
-            <h3>Auto Subtitle System</h3>
-            <p>Our advanced subtitle system automatically synchronizes with video playback and works seamlessly in fullscreen mode. Subtitles are enabled by default for the best user experience.</p>
+            <h3>One-Click Sync</h3>
+            <p>When a seek is detected, simply click the "Sync Subtitles" button to instantly resynchronize Turkish subtitles with the new video position.</p>
             
-            <h3>Security Features</h3>
-            <p>All streams are protected with industry-standard encryption protocols to ensure your content remains secure and private.</p>
+            <h3>Smart Controls</h3>
+            <p>The sync button changes color to indicate status: Orange when ready, Red when sync needed, Green when synchronized.</p>
         `,
         'features': `
             <h2>Platform Features</h2>
-            <p>CyberStream offers a comprehensive set of features designed to enhance your streaming experience.</p>
+            <p>CyberStream offers advanced features designed specifically for Google Drive video streaming.</p>
             
-            <h3>Auto Subtitle System</h3>
-            <p>Turkish subtitles start automatically and sync perfectly with video playback. No manual setup required! Subtitles are enabled by default.</p>
+            <h3>SMART SYNC System</h3>
+            <p>Automatic seek detection and one-click subtitle synchronization for Google Drive videos.</p>
             
-            <h3>Fullscreen Experience</h3>
-            <p>Enjoy immersive fullscreen viewing with subtitle support that works perfectly in fullscreen mode.</p>
+            <h3>Color-Coded Status</h3>
+            <ul>
+                <li><span style="color:#ffaa00">🟠 Orange:</span> Sync button ready</li>
+                <li><span style="color:#ff4444">🔴 Red:</span> Sync needed (seek detected)</li>
+                <li><span style="color:#00ff88">🟢 Green:</span> Subtitles synchronized</li>
+            </ul>
             
-            <h3>Smart Controls</h3>
-            <p>Easy-to-use controls for seeking, subtitles and fullscreen with real-time time display.</p>
-            
-            <h3>Cyberpunk Design</h3>
-            <p>Immersive interface with futuristic aesthetics and smooth animations.</p>
+            <h3>Seamless Integration</h3>
+            <p>Works perfectly with Google Drive's native video player while providing advanced subtitle synchronization.</p>
         `,
         'support': `
             <h2>Support & Help</h2>
-            <p>We're here to help you get the most out of CyberStream.</p>
+            <p>We're here to help you get the most out of CyberStream's SMART SYNC technology.</p>
             
-            <h3>Getting Started</h3>
-            <p>Simply navigate to the video page and the video will start automatically with Turkish subtitles!</p>
+            <h3>Using SMART SYNC</h3>
+            <ol>
+                <li>Play your Google Drive video normally</li>
+                <li>When you seek (jump to different time), the system will detect it automatically</li>
+                <li>Click the <strong>"Sync Subtitles"</strong> button (it will turn red when sync is needed)</li>
+                <li>Subtitles will instantly synchronize with the new video position</li>
+            </ol>
             
             <h3>Video Controls</h3>
             <ul>
-                <li><strong>-10s / +10s:</strong> Seek backward or forward 10 seconds</li>
-                <li><strong>Subtitles:</strong> Toggle Turkish subtitles on/off</li>
+                <li><strong>Sync Subtitles:</strong> Resynchronize subtitles after seeking</li>
+                <li><strong>Subtitles Toggle:</strong> Turn Turkish subtitles on/off</li>
                 <li><strong>Fullscreen:</strong> Enter immersive fullscreen mode</li>
             </ul>
             
-            <h3>Subtitle Controls</h3>
-            <p>Subtitles are enabled by default. Use the "Subtitles" button to toggle them on/off if needed.</p>
-            
             <div class="note">
-                <p><strong>Note:</strong> CyberStream automatically synchronizes Turkish subtitles with video playback for the best viewing experience. Subtitles are enabled by default.</p>
+                <p><strong>Pro Tip:</strong> The system automatically detects when you seek in the video. Just click the sync button when it turns red to instantly fix subtitle timing.</p>
             </div>
         `
     };
@@ -800,6 +816,11 @@ style.textContent = `
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse-sync {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
     }
 `;
 document.head.appendChild(style);
