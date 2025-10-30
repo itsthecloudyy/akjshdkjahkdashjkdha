@@ -80,13 +80,16 @@ class LoadingScreen {
         const intro = document.getElementById('introScreen');
         intro.classList.add('hidden');
         
-        // Show main content
+        // Show main content immediately
         document.querySelector('.main-content').style.opacity = '1';
+        document.querySelector('.main-content').style.display = 'block';
     }
 }
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
+    console.log('DOM loaded - initializing app');
+    
     // Check if mobile device
     if (isMobileDevice()) {
         const mobileWarning = document.getElementById('mobileWarning');
@@ -106,7 +109,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 function initializeApp() {
-    // Initialize navigation
+    console.log('Initializing application');
+    
+    // Show main content
+    document.querySelector('.main-content').style.opacity = '1';
+    document.querySelector('.main-content').style.display = 'block';
+    
+    // Initialize navigation FIRST
     initNavigation();
     
     // Initialize documentation system
@@ -118,9 +127,11 @@ function initializeApp() {
             initNetworkBackground();
         }
     }, 100);
+    
+    console.log('Application initialized successfully');
 }
 
-// Multi-Player Selector with Lazy Loading - FIXED SANDBOX ISSUES
+// Multi-Player Selector with Lazy Loading
 class MultiPlayerSelector {
     constructor() {
         this.playerOptions = document.querySelectorAll('.player-option');
@@ -133,6 +144,7 @@ class MultiPlayerSelector {
     }
     
     init() {
+        console.log('Initializing MultiPlayerSelector');
         // Set initial active player
         this.setActivePlayer('doodstream');
         
@@ -327,90 +339,70 @@ class MultiPlayerSelector {
 // Global reference for retry functionality
 window.multiPlayer = null;
 
-// Navigation system with page management
+// Navigation system with page management - FIXED
 function initNavigation() {
+    console.log('Initializing navigation');
+    
     const navLinks = document.querySelectorAll('.nav-link');
     const pageContents = document.querySelectorAll('.page-content');
-    let currentPage = 'home';
     
-    // Function to stop all videos when leaving backup page
-    function stopAllVideos() {
-        if (window.multiPlayer) {
-            window.multiPlayer.stopCurrentPlayer();
-        }
+    // Make sure home page is visible initially
+    document.getElementById('homePage').style.display = 'block';
+    document.getElementById('homePage').classList.add('active');
+    
+    // Function to switch pages
+    function switchPage(targetPage) {
+        console.log('Switching to page:', targetPage);
         
-        // Also stop the main video on video page
-        const mainVideo = document.querySelector('#videoPage .video-frame');
-        if (mainVideo) {
-            mainVideo.style.display = 'none';
-        }
-    }
-    
-    // Function to manage page resources
-    function managePageResources(targetPage) {
-        // Stop videos and animations when leaving pages
-        if (currentPage === 'backup' || currentPage === 'video') {
-            stopAllVideos();
-        }
+        // Hide all pages
+        pageContents.forEach(page => {
+            page.style.display = 'none';
+            page.classList.remove('active');
+        });
         
-        // Pause network animation on content pages to save resources
-        const background = document.getElementById('networkBackground');
-        if (background) {
-            if (targetPage !== 'home') {
-                background.style.opacity = '0.2';
-            } else {
-                background.style.opacity = '0.4';
-            }
-        }
-    }
-    
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetPage = this.getAttribute('data-page');
+        // Show target page
+        const targetPageElement = document.getElementById(targetPage + 'Page');
+        if (targetPageElement) {
+            targetPageElement.style.display = 'block';
+            targetPageElement.classList.add('active');
             
-            // Manage resources before page change
-            managePageResources(targetPage);
-            
-            // Update current page
-            currentPage = targetPage;
-            
-            // Update active nav link
-            navLinks.forEach(nav => nav.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Show target page, hide others
-            pageContents.forEach(page => {
-                page.classList.remove('active');
-                page.style.display = 'none';
-            });
-            
-            const targetPageElement = document.getElementById(targetPage + 'Page');
-            if (targetPageElement) {
-                targetPageElement.classList.add('active');
-                targetPageElement.style.display = 'block';
-            }
-            
-            // Initialize multi-player when backup page is loaded
+            // Initialize specific page content
             if (targetPage === 'backup' && !window.multiPlayer) {
                 setTimeout(() => {
                     window.multiPlayer = new MultiPlayerSelector();
                 }, 100);
             }
             
-            // Lazy load main video only when video page is accessed
             if (targetPage === 'video') {
                 lazyLoadMainVideo();
             }
+        }
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Add event listeners to navigation links
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetPage = this.getAttribute('data-page');
             
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Update active nav link
+            navLinks.forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Switch page
+            switchPage(targetPage);
         });
     });
+    
+    console.log('Navigation initialized');
 }
 
 // Lazy load main video
 function lazyLoadMainVideo() {
+    console.log('Loading main video');
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
     if (!videoWrapper) return;
     
@@ -474,6 +466,7 @@ function lazyLoadMainVideo() {
 
 // Documentation system
 function initDocumentation() {
+    console.log('Initializing documentation');
     const docsLinks = document.querySelectorAll('.docs-link');
     
     docsLinks.forEach(link => {
