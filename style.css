@@ -1034,3 +1034,137 @@ body {
         animation: none;
     }
 }
+
+/* ... önceki stiller aynı ... */
+
+/* Video Loading Indicator Styles */
+.video-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    color: #fff;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #333;
+    border-top: 4px solid #00ff88;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.video-loading p {
+    color: #ccc;
+    font-size: 1rem;
+}
+
+/* Video Container Error States */
+.video-error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    color: #ff4444;
+    text-align: center;
+    padding: 2rem;
+}
+
+.video-error i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.video-error h3 {
+    margin-bottom: 1rem;
+    color: #ff4444;
+}
+
+.video-error p {
+    color: #ccc;
+    margin-bottom: 1.5rem;
+}
+
+.retry-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+    background: #ff6666;
+    transform: translateY(-2px);
+}
+
+/* Video Frame Styling Improvements */
+.video-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #000;
+    z-index: 5;
+}
+
+/* Player Fallback Options */
+.player-fallback {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.player-fallback h4 {
+    color: #00ff88;
+    margin-bottom: 1rem;
+}
+
+.direct-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.direct-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #333;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.direct-link:hover {
+    background: #00ff88;
+    color: #000;
+    transform: translateY(-2px);
+}
