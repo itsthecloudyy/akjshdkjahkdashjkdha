@@ -186,9 +186,9 @@ function initNavigation() {
     console.log('Navigation initialized');
 }
 
-// DIRECT VIDEO PLAYER - NO CUSTOM UI
+// DIRECT VIDEO PLAYER using direct Google Drive video file
 function loadDirectVideoPlayer() {
-    console.log('Loading direct video player - NO CUSTOM UI');
+    console.log('Loading direct Google Drive video file');
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
     if (!videoWrapper) {
         console.error('Video wrapper not found');
@@ -230,12 +230,12 @@ function loadDirectVideoPlayer() {
     loadingDiv.innerHTML = `
         <div class="loading-spinner"></div>
         <p>Loading video with Turkish subtitles...</p>
-        <small>Subtitles are burned into the video</small>
+        <small>Using direct Google Drive video file</small>
     `;
     
     videoContainer.appendChild(loadingDiv);
     
-    // HTML5 Video Player - SIMPLE
+    // HTML5 Video Player - DIRECT GOOGLE DRIVE FILE
     const video = document.createElement('video');
     video.className = 'direct-video-player';
     video.id = 'directVideoPlayer';
@@ -247,9 +247,10 @@ function loadDirectVideoPlayer() {
     video.style.objectFit = 'contain';
     video.style.background = '#000';
     
-    // Video source - REPLACE THIS WITH YOUR ACTUAL VIDEO URL
+    // DIRECT GOOGLE DRIVE VIDEO FILE URL
+    // Replace this with your actual Google Drive direct video file URL
     const source = document.createElement('source');
-    source.src = 'YOUR_VIDEO_URL_HERE.mp4'; // Replace with your video URL
+    source.src = 'https://drive.google.com/uc?export=download&id=1kujv8Jnj76rzEWVNsaJwcLSqN7o4nriq';
     source.type = 'video/mp4';
     
     video.appendChild(source);
@@ -267,7 +268,7 @@ function loadDirectVideoPlayer() {
     videoContainer.appendChild(video);
     videoWrapper.appendChild(videoContainer);
     
-    console.log('Direct video player created - no custom UI');
+    console.log('Direct Google Drive video player created');
     
     // Remove loading when video can play
     video.addEventListener('canplay', () => {
@@ -283,6 +284,14 @@ function loadDirectVideoPlayer() {
                 <h3>Video Failed to Load</h3>
                 <p>Please check the video URL or try a different browser.</p>
                 <p><strong>Current URL:</strong> ${source.src}</p>
+                <div class="error-solutions">
+                    <h4>Possible Solutions:</h4>
+                    <ul>
+                        <li>Make sure the Google Drive file is publicly accessible</li>
+                        <li>Try using a direct download link instead</li>
+                        <li>Check if the video file is in MP4 format</li>
+                    </ul>
+                </div>
                 <button onclick="loadDirectVideoPlayer()" class="retry-btn">Retry</button>
             </div>
         `;
@@ -323,11 +332,11 @@ function loadDocsContent(subpage) {
     const content = {
         'about': `
             <h2>About CyberStream</h2>
-            <p>CyberStream is a next-generation video streaming platform with direct video playback.</p>
+            <p>CyberStream is a next-generation video streaming platform with direct video playback from Google Drive.</p>
             
             <h3>Features</h3>
             <ul>
-                <li><strong>Direct Video Playback:</strong> Native HTML5 video player</li>
+                <li><strong>Direct Video Playback:</strong> Native HTML5 video player with Google Drive files</li>
                 <li><strong>Burned-in Subtitles:</strong> Turkish subtitles embedded in video</li>
                 <li><strong>Clean Interface:</strong> No custom UI - just the video</li>
             </ul>
@@ -345,8 +354,8 @@ function loadDocsContent(subpage) {
                 <li>Playback speed</li>
             </ul>
             
-            <h3>Subtitles</h3>
-            <p>Turkish subtitles are burned directly into the video stream and cannot be turned off.</p>
+            <h3>Google Drive Integration</h3>
+            <p>Videos are loaded directly from Google Drive files for optimal streaming performance.</p>
         `
     };
 
