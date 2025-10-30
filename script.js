@@ -95,9 +95,8 @@ let subtitleInterval = null;
 let isFullscreen = false;
 let subtitlesEnabled = true;
 let videoTime = 0;
-let isVideoPlaying = false;
+let isVideoPlaying = true; // Auto-play enabled
 let videoStartTime = 0;
-let lastUpdateTime = 0;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
@@ -270,12 +269,12 @@ function lazyLoadMainVideo() {
     loadingDiv.innerHTML = `
         <div class="loading-spinner"></div>
         <p>Loading Google Drive player and Turkish subtitles...</p>
-        <small>Subtitles will start automatically</small>
+        <small>Video will start automatically with Turkish subtitles</small>
     `;
     
     videoContainer.appendChild(loadingDiv);
     
-    // Google Drive iframe with NEW ID and semi-transparent effect
+    // Google Drive iframe with NEW ID
     const iframe = document.createElement('iframe');
     iframe.className = 'video-frame';
     iframe.id = 'videoPlayer';
@@ -299,7 +298,7 @@ function lazyLoadMainVideo() {
     iframe.style.zIndex = '1';
     iframe.style.display = 'block';
     iframe.style.visibility = 'visible';
-    iframe.style.opacity = '0.7'; // Semi-transparent effect
+    iframe.style.opacity = '0.9';
     
     // External subtitle overlay - FULLSCREEN COMPATIBLE
     const subtitleOverlay = document.createElement('div');
@@ -307,14 +306,11 @@ function lazyLoadMainVideo() {
     subtitleOverlay.className = 'subtitle-overlay';
     subtitleOverlay.innerHTML = '<div class="subtitle-text"></div>';
     
-    // Video controls container
+    // Video controls container (NO PLAY BUTTON)
     const videoControls = document.createElement('div');
     videoControls.className = 'video-controls-overlay';
     videoControls.innerHTML = `
         <div class="control-group">
-            <button id="playPauseBtn" class="control-btn">
-                <i class="fas fa-play"></i> Play
-            </button>
             <button id="seekBackBtn" class="control-btn">
                 <i class="fas fa-backward"></i> -10s
             </button>
@@ -354,7 +350,7 @@ function lazyLoadMainVideo() {
         // Load subtitles after video is loaded
         setTimeout(() => {
             loadExternalSubtitles();
-        }, 2000);
+        }, 1000);
     });
     
     iframe.addEventListener('error', (e) => {
@@ -459,30 +455,15 @@ function parseTime(timeString) {
     }
 }
 
-// Video controls setup
+// Video controls setup (NO PLAY BUTTON)
 function setupVideoControls() {
-    const playPauseBtn = document.getElementById('playPauseBtn');
     const seekBackBtn = document.getElementById('seekBackBtn');
     const seekForwardBtn = document.getElementById('seekForwardBtn');
     
-    if (!playPauseBtn || !seekBackBtn || !seekForwardBtn) {
+    if (!seekBackBtn || !seekForwardBtn) {
         console.error('Video control buttons not found');
         return;
     }
-    
-    // Play/Pause functionality
-    playPauseBtn.addEventListener('click', () => {
-        isVideoPlaying = !isVideoPlaying;
-        if (isVideoPlaying) {
-            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-            playPauseBtn.style.background = '#ff4444';
-            startSubtitleTracking();
-        } else {
-            playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
-            playPauseBtn.style.background = '#00ff88';
-            stopSubtitleTracking();
-        }
-    });
     
     // Seek backward 10 seconds
     seekBackBtn.addEventListener('click', () => {
@@ -498,13 +479,11 @@ function setupVideoControls() {
         updateSubtitles(videoTime);
     });
     
-    // Start with video paused
-    isVideoPlaying = false;
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
-    playPauseBtn.style.background = '#00ff88';
+    // Auto start video and subtitles
+    startSubtitleTracking();
 }
 
-// AUTO SUBTITLE SYSTEM - Video time tracking
+// AUTO SUBTITLE SYSTEM - Auto start when video loads
 function setupAutoSubtitleSystem() {
     console.log('Setting up auto subtitle system');
     
@@ -523,7 +502,7 @@ function setupAutoSubtitleSystem() {
     subtitleStatus.textContent = 'Subtitles: ON';
     subtitleToggle.style.background = '#00ff88';
     
-    // Auto start subtitle tracking (but paused initially)
+    // Auto start subtitle tracking
     videoTime = 0;
     updateTimeDisplay(videoTime);
     
@@ -553,11 +532,11 @@ function setupAutoSubtitleSystem() {
 }
 
 function startSubtitleTracking() {
-    console.log('Starting subtitle tracking');
+    console.log('Starting auto subtitle tracking');
     stopSubtitleTracking(); // Clear any existing interval
     
+    isVideoPlaying = true;
     videoStartTime = Date.now() - (videoTime * 1000);
-    lastUpdateTime = Date.now();
     
     subtitleInterval = setInterval(() => {
         if (isVideoPlaying) {
@@ -584,12 +563,6 @@ function stopSubtitleSystem() {
     const subtitleOverlay = document.getElementById('subtitleOverlay');
     if (subtitleOverlay) {
         subtitleOverlay.style.opacity = '0';
-    }
-    
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    if (playPauseBtn) {
-        playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
-        playPauseBtn.style.background = '#00ff88';
     }
 }
 
@@ -640,7 +613,7 @@ function toggleFullscreen() {
         } else if (videoContainer.mozRequestFullScreen) {
             videoContainer.mozRequestFullScreen();
         } else if (videoContainer.msRequestFullscreen) {
-            videoContainer.msRequestfullscreen();
+            videoContainer.msRequestFullscreen();
         }
         isFullscreen = true;
     } else {
@@ -767,7 +740,7 @@ function loadDocsContent(subpage) {
             <p>Enjoy immersive fullscreen viewing with subtitle support that works perfectly in fullscreen mode.</p>
             
             <h3>Smart Controls</h3>
-            <p>Easy-to-use controls for play/pause, seeking, subtitles and fullscreen with real-time time display.</p>
+            <p>Easy-to-use controls for seeking, subtitles and fullscreen with real-time time display.</p>
             
             <h3>Cyberpunk Design</h3>
             <p>Immersive interface with futuristic aesthetics and smooth animations.</p>
@@ -777,11 +750,10 @@ function loadDocsContent(subpage) {
             <p>We're here to help you get the most out of CyberStream.</p>
             
             <h3>Getting Started</h3>
-            <p>Simply navigate to the video page and click Play to start streaming. Turkish subtitles will start automatically!</p>
+            <p>Simply navigate to the video page and the video will start automatically with Turkish subtitles!</p>
             
             <h3>Video Controls</h3>
             <ul>
-                <li><strong>Play/Pause:</strong> Start or pause the video playback</li>
                 <li><strong>-10s / +10s:</strong> Seek backward or forward 10 seconds</li>
                 <li><strong>Subtitles:</strong> Toggle Turkish subtitles on/off</li>
                 <li><strong>Fullscreen:</strong> Enter immersive fullscreen mode</li>
