@@ -56,17 +56,18 @@
                 <span>CyberStream</span>
             </div>
             <ul class="nav-menu">
-                <li><a href="#" class="nav-link active" data-page="home" aria-label="Home page"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="#" class="nav-link" data-page="video" aria-label="Watch video"><i class="fas fa-play-circle"></i> Watch</a></li>
-                <li><a href="#" class="nav-link" data-page="backup" aria-label="Backup video options"><i class="fas fa-server"></i> Backup</a></li>
-                <li><a href="#" class="nav-link" data-page="download" aria-label="Download subtitle file"><i class="fas fa-download"></i> Download</a></li>
-                <li><a href="#" class="nav-link" data-page="docs" aria-label="About CyberStream"><i class="fas fa-book"></i> About</a></li>
+                <li><a href="#" class="nav-link active" data-page="home"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" class="nav-link" data-page="video"><i class="fas fa-play-circle"></i> Watch</a></li>
+                <li><a href="#" class="nav-link" data-page="backup"><i class="fas fa-server"></i> Backup</a></li>
+                <li><a href="#" class="nav-link" data-page="download"><i class="fas fa-download"></i> Download</a></li>
+                <li><a href="#" class="nav-link" data-page="docs"><i class="fas fa-book"></i> About</a></li>
             </ul>
         </div>
     </header>
 
     <main class="main-content">
         <div class="container">
+            <!-- Home Page -->
             <div class="page-content active" id="homePage">
                 <section class="hero section">
                     <h1>Next-Gen Video Streaming</h1>
@@ -104,6 +105,7 @@
                 </section>
             </div>
 
+            <!-- Video Page -->
             <div class="page-content" id="videoPage">
                 <section class="hero-video">
                     <h1>Featured Content</h1>
@@ -112,11 +114,10 @@
                 <section class="section">
                     <div class="video-container">
                         <div class="video-wrapper">
-                            <!-- Main Video will be loaded dynamically -->
+                            <!-- Video will be loaded dynamically -->
                         </div>
                     </div>
                     
-                    <!-- Fallback Options -->
                     <div class="player-fallback">
                         <h4><i class="fas fa-exclamation-triangle"></i> Having issues with the player?</h4>
                         <p>Try these direct links:</p>
@@ -146,6 +147,7 @@
                 </section>
             </div>
 
+            <!-- Backup Page -->
             <div class="page-content" id="backupPage">
                 <section class="hero-video">
                     <h1>Backup Video with Subtitles</h1>
@@ -179,35 +181,31 @@
                             <span>Current: DoodStream - Fast streaming with Turkish subtitles</span>
                         </div>
 
-                        <!-- MixDrop Warning -->
                         <div class="player-warning" id="mixdropWarning">
                             <i class="fas fa-exclamation-triangle"></i>
                             <span><strong>MixDrop Player:</strong> To see subtitles, you need to manually load the subtitle file. Please download the subtitle file from the Download page.</span>
                         </div>
                     </div>
 
-                    <!-- DoodStream Container (Initially loaded) -->
-                    <div class="video-container" id="doodstreamContainer" style="display: block;">
+                    <!-- Video Containers -->
+                    <div class="video-container active" id="doodstreamContainer">
                         <div class="video-wrapper">
-                            <!-- Content will be loaded dynamically -->
+                            <!-- Content loaded dynamically -->
                         </div>
                     </div>
 
-                    <!-- FileMoon Container (Hidden until needed) -->
-                    <div class="video-container" id="filemoonContainer" style="display: none;">
+                    <div class="video-container" id="filemoonContainer">
                         <div class="video-wrapper">
-                            <!-- Content will be loaded dynamically -->
+                            <!-- Content loaded dynamically -->
                         </div>
                     </div>
 
-                    <!-- MixDrop Container (Hidden until needed) -->
-                    <div class="video-container" id="mixdropContainer" style="display: none;">
+                    <div class="video-container" id="mixdropContainer">
                         <div class="video-wrapper">
-                            <!-- Content will be loaded dynamically -->
+                            <!-- Content loaded dynamically -->
                         </div>
                     </div>
 
-                    <!-- Fallback Options -->
                     <div class="player-fallback">
                         <h4><i class="fas fa-exclamation-triangle"></i> Players not working?</h4>
                         <p>Try these direct links:</p>
@@ -240,19 +238,16 @@
                             A moving story about mentorship, friendship, and the transformative power of education.
                         </p>
                         
-                        <div style="margin-top: 1.5rem; padding: 1rem; background: #1a1a1a; border-radius: 6px;">
-                            <h4 style="color: #00ff88; margin-bottom: 0.5rem;">
-                                <i class="fas fa-info-circle"></i> Player Information
-                            </h4>
-                            <p style="color: #aaa; margin: 0;">
-                                All players include Turkish subtitles. If one player doesn't work, try another option above.
-                                DoodStream is recommended for the best performance.
-                            </p>
+                        <div class="player-info-note">
+                            <h4><i class="fas fa-info-circle"></i> Player Information</h4>
+                            <p>All players include Turkish subtitles. If one player doesn't work, try another option above.
+                            DoodStream is recommended for the best performance.</p>
                         </div>
                     </div>
                 </section>
             </div>
 
+            <!-- Download Page -->
             <div class="page-content" id="downloadPage">
                 <section class="hero-video">
                     <h1>Download Subtitle File</h1>
@@ -284,6 +279,7 @@
                 </section>
             </div>
 
+            <!-- Docs Page -->
             <div class="page-content" id="docsPage">
                 <section class="hero-docs">
                     <h1>About CyberStream</h1>
