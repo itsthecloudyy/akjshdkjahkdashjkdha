@@ -1067,3 +1067,24 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+/* SMART SYNC Button Styles */
+.sync-btn {
+    animation: pulse-sync 2s infinite;
+}
+
+.control-btn.sync-btn {
+    background: #ffaa00; /* Default orange - ready */
+}
+
+.control-btn.sync-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 170, 0, 0.3);
+}
+
+/* Sync status colors */
+#syncStatus {
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
