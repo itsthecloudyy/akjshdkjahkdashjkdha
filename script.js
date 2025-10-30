@@ -85,6 +85,9 @@ class LoadingScreen {
     }
 }
 
+// Global variables
+let videoPlayer = null;
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded - initializing app');
@@ -153,7 +156,7 @@ function initNavigation() {
             
             if (targetPage === 'video') {
                 setTimeout(() => {
-                    loadDirectVideoPlayer();
+                    loadGoogleDrivePlayer();
                 }, 100);
             }
         }
@@ -186,9 +189,9 @@ function initNavigation() {
     console.log('Navigation initialized');
 }
 
-// DIRECT VIDEO PLAYER using direct Google Drive video file
-function loadDirectVideoPlayer() {
-    console.log('Loading direct Google Drive video file');
+// GOOGLE DRIVE PLAYER with their interface
+function loadGoogleDrivePlayer() {
+    console.log('Loading Google Drive player with their interface');
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
     if (!videoWrapper) {
         console.error('Video wrapper not found');
@@ -203,7 +206,7 @@ function loadDirectVideoPlayer() {
     videoWrapper.style.background = '#000';
     
     const videoContainer = document.createElement('div');
-    videoContainer.className = 'video-container-simple';
+    videoContainer.className = 'video-container-drive';
     videoContainer.style.position = 'absolute';
     videoContainer.style.top = '0';
     videoContainer.style.left = '0';
@@ -229,70 +232,60 @@ function loadDirectVideoPlayer() {
     loadingDiv.style.zIndex = '10';
     loadingDiv.innerHTML = `
         <div class="loading-spinner"></div>
-        <p>Loading video with Turkish subtitles...</p>
-        <small>Using direct Google Drive video file</small>
+        <p>Loading Google Drive player...</p>
+        <small>Using Google Drive's native interface</small>
     `;
     
     videoContainer.appendChild(loadingDiv);
     
-    // HTML5 Video Player - DIRECT GOOGLE DRIVE FILE
-    const video = document.createElement('video');
-    video.className = 'direct-video-player';
-    video.id = 'directVideoPlayer';
-    video.controls = true;
-    video.autoplay = false;
-    video.preload = 'auto';
-    video.style.width = '100%';
-    video.style.height = '100%';
-    video.style.objectFit = 'contain';
-    video.style.background = '#000';
+    // Google Drive iframe with THEIR interface
+    const iframe = document.createElement('iframe');
+    iframe.className = 'drive-iframe';
+    iframe.id = 'drivePlayer';
+    iframe.src = 'https://drive.google.com/file/d/1kujv8Jnj76rzEWVNsaJwcLSqN7o4nriq/preview';
+    iframe.allow = 'autoplay; encrypted-media; fullscreen';
+    iframe.allowFullscreen = true;
+    iframe.frameBorder = '0';
+    iframe.scrolling = 'no';
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.title = 'Dead Poets Society - Google Drive';
+    iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-forms";
+    iframe.referrerPolicy = 'no-referrer';
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.background = '#000';
+    iframe.style.zIndex = '1';
+    iframe.style.display = 'block';
+    iframe.style.visibility = 'visible';
     
-    // DIRECT GOOGLE DRIVE VIDEO FILE URL
-    // Replace this with your actual Google Drive direct video file URL
-    const source = document.createElement('source');
-    source.src = 'https://drive.google.com/uc?export=download&id=1kujv8Jnj76rzEWVNsaJwcLSqN7o4nriq';
-    source.type = 'video/mp4';
-    
-    video.appendChild(source);
-    
-    // Fallback message
-    const fallbackText = document.createElement('p');
-    fallbackText.textContent = 'Your browser does not support the video tag.';
-    fallbackText.style.color = '#fff';
-    fallbackText.style.textAlign = 'center';
-    fallbackText.style.padding = '2rem';
-    
-    video.appendChild(fallbackText);
-    
-    // Append only the video (NO CUSTOM CONTROLS)
-    videoContainer.appendChild(video);
+    // Append iframe
+    videoContainer.appendChild(iframe);
     videoWrapper.appendChild(videoContainer);
     
-    console.log('Direct Google Drive video player created');
+    // Store video player reference
+    videoPlayer = iframe;
     
-    // Remove loading when video can play
-    video.addEventListener('canplay', () => {
-        console.log('Video can play');
+    console.log('Google Drive player created with native interface');
+    
+    // Remove loading when iframe loads
+    iframe.addEventListener('load', () => {
+        console.log('Google Drive player loaded successfully');
         loadingDiv.style.display = 'none';
     });
     
-    video.addEventListener('error', (e) => {
-        console.error('Video failed to load:', e);
+    iframe.addEventListener('error', (e) => {
+        console.error('Google Drive player failed to load:', e);
         loadingDiv.innerHTML = `
             <div class="video-error">
                 <i class="fas fa-exclamation-triangle"></i>
-                <h3>Video Failed to Load</h3>
-                <p>Please check the video URL or try a different browser.</p>
-                <p><strong>Current URL:</strong> ${source.src}</p>
-                <div class="error-solutions">
-                    <h4>Possible Solutions:</h4>
-                    <ul>
-                        <li>Make sure the Google Drive file is publicly accessible</li>
-                        <li>Try using a direct download link instead</li>
-                        <li>Check if the video file is in MP4 format</li>
-                    </ul>
-                </div>
-                <button onclick="loadDirectVideoPlayer()" class="retry-btn">Retry</button>
+                <h3>Google Drive Player Failed to Load</h3>
+                <p>Please try refreshing the page or check your internet connection.</p>
+                <button onclick="loadGoogleDrivePlayer()" class="retry-btn">Retry</button>
             </div>
         `;
     });
@@ -302,7 +295,7 @@ function loadDirectVideoPlayer() {
         if (loadingDiv.parentNode && loadingDiv.style.display !== 'none') {
             loadingDiv.style.display = 'none';
         }
-    }, 8000);
+    }, 10000);
 }
 
 // Documentation system
@@ -332,30 +325,48 @@ function loadDocsContent(subpage) {
     const content = {
         'about': `
             <h2>About CyberStream</h2>
-            <p>CyberStream is a next-generation video streaming platform with direct video playback from Google Drive.</p>
+            <p>CyberStream is a next-generation video streaming platform integrated with Google Drive.</p>
             
             <h3>Features</h3>
             <ul>
-                <li><strong>Direct Video Playback:</strong> Native HTML5 video player with Google Drive files</li>
-                <li><strong>Burned-in Subtitles:</strong> Turkish subtitles embedded in video</li>
-                <li><strong>Clean Interface:</strong> No custom UI - just the video</li>
+                <li><strong>Google Drive Integration:</strong> Seamless playback using Google Drive's native player</li>
+                <li><strong>Native Controls:</strong> Full access to Google Drive's video player interface</li>
+                <li><strong>Turkish Subtitles:</strong> Subtitles burned into the video stream</li>
+                <li><strong>Fullscreen Support:</strong> Complete fullscreen functionality</li>
+            </ul>
+        `,
+        'technology': `
+            <h2>Google Drive Integration</h2>
+            <p>CyberStream leverages Google Drive's powerful video streaming infrastructure for reliable playback.</p>
+            
+            <h3>Google Drive Player Features</h3>
+            <ul>
+                <li>Adaptive bitrate streaming</li>
+                <li>Built-in subtitle support (if available)</li>
+                <li>Quality selection</li>
+                <li>Playback speed control</li>
+                <li>Fullscreen mode</li>
             </ul>
         `,
         'support': `
             <h2>Support & Help</h2>
             
-            <h3>Video Player</h3>
-            <p>The video player uses your browser's native HTML5 video controls. All standard video controls are available:</p>
+            <h3>Using the Google Drive Player</h3>
+            <p>The video player uses Google Drive's native interface with all standard controls:</p>
             <ul>
-                <li>Play/Pause</li>
-                <li>Volume control</li>
-                <li>Fullscreen</li>
-                <li>Seeking</li>
-                <li>Playback speed</li>
+                <li><strong>Play/Pause:</strong> Standard video controls</li>
+                <li><strong>Volume:</strong> Built-in volume control</li>
+                <li><strong>Fullscreen:</strong> Google Drive's fullscreen button</li>
+                <li><strong>Seeking:</strong> Click anywhere on the progress bar</li>
+                <li><strong>Settings:</strong> Quality and playback speed options</li>
             </ul>
             
-            <h3>Google Drive Integration</h3>
-            <p>Videos are loaded directly from Google Drive files for optimal streaming performance.</p>
+            <h3>Subtitles</h3>
+            <p>Turkish subtitles are burned directly into the video and cannot be turned off.</p>
+            
+            <div class="note">
+                <p><strong>Note:</strong> This platform uses Google Drive's official video player interface for the best streaming experience.</p>
+            </div>
         `
     };
 
