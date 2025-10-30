@@ -93,6 +93,8 @@ let videoPlayer = null;
 let currentSubtitles = [];
 let subtitleInterval = null;
 let isFullscreen = false;
+let subtitlesEnabled = true;
+let videoTime = 0;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
@@ -270,7 +272,7 @@ function lazyLoadMainVideo() {
     
     videoContainer.appendChild(loadingDiv);
     
-    // Google Drive iframe
+    // Google Drive iframe with semi-transparent effect
     const iframe = document.createElement('iframe');
     iframe.className = 'video-frame';
     iframe.id = 'videoPlayer';
@@ -294,6 +296,7 @@ function lazyLoadMainVideo() {
     iframe.style.zIndex = '1';
     iframe.style.display = 'block';
     iframe.style.visibility = 'visible';
+    iframe.style.opacity = '0.95'; // Semi-transparent effect
     
     // External subtitle overlay - FULLSCREEN COMPATIBLE
     const subtitleOverlay = document.createElement('div');
@@ -457,8 +460,10 @@ function setupAutoSubtitleSystem() {
         return;
     }
     
-    let subtitlesEnabled = true;
-    let currentTime = 0;
+    // Subtitles enabled by default
+    subtitlesEnabled = true;
+    subtitleStatus.textContent = 'Subtitles: ON';
+    subtitleToggle.style.background = '#00ff88';
     
     // Auto start subtitle tracking
     startSubtitleTracking();
@@ -493,14 +498,15 @@ function startSubtitleTracking() {
     console.log('Starting auto subtitle tracking');
     stopSubtitleTracking(); // Clear any existing interval
     
-    let simulatedTime = 0;
+    // Start from 0 time
+    videoTime = 0;
     const startTime = Date.now();
     
     subtitleInterval = setInterval(() => {
-        // Simulate video time progression (you can replace this with actual video time if available)
-        simulatedTime = (Date.now() - startTime) / 1000;
-        updateSubtitles(simulatedTime);
-        updateTimeDisplay(simulatedTime);
+        // Calculate video time based on elapsed time
+        videoTime = (Date.now() - startTime) / 1000;
+        updateSubtitles(videoTime);
+        updateTimeDisplay(videoTime);
     }, 100); // Update 10 times per second for smooth subtitles
 }
 
@@ -526,7 +532,7 @@ function updateSubtitles(currentTime) {
         currentTime >= sub.start && currentTime <= sub.end
     );
     
-    if (currentSubtitle) {
+    if (currentSubtitle && subtitlesEnabled) {
         subtitleText.textContent = currentSubtitle.text;
         subtitleOverlay.style.opacity = '1';
     } else {
@@ -663,7 +669,7 @@ function loadDocsContent(subpage) {
             <ul>
                 <li><strong>High-Quality Streaming:</strong> Adaptive bitrate streaming for the best possible quality based on your connection</li>
                 <li><strong>Advanced Player:</strong> Custom video player with precision controls and intuitive interface</li>
-                <li><strong>Auto Subtitles:</strong> Automatic Turkish subtitle synchronization</li>
+                <li><strong>Auto Subtitles:</strong> Automatic Turkish subtitle synchronization enabled by default</li>
                 <li><strong>Fullscreen Support:</strong> Immersive fullscreen experience with subtitle support</li>
             </ul>
         `,
@@ -675,7 +681,7 @@ function loadDocsContent(subpage) {
             <p>We use adaptive bitrate streaming to ensure smooth playback regardless of your connection speed. Our content delivery network ensures low latency and fast loading times worldwide.</p>
             
             <h3>Auto Subtitle System</h3>
-            <p>Our advanced subtitle system automatically synchronizes with video playback and works seamlessly in fullscreen mode.</p>
+            <p>Our advanced subtitle system automatically synchronizes with video playback and works seamlessly in fullscreen mode. Subtitles are enabled by default for the best user experience.</p>
             
             <h3>Security Features</h3>
             <p>All streams are protected with industry-standard encryption protocols to ensure your content remains secure and private.</p>
@@ -685,7 +691,7 @@ function loadDocsContent(subpage) {
             <p>CyberStream offers a comprehensive set of features designed to enhance your streaming experience.</p>
             
             <h3>Auto Subtitle System</h3>
-            <p>Turkish subtitles start automatically and sync perfectly with video playback. No manual setup required!</p>
+            <p>Turkish subtitles start automatically and sync perfectly with video playback. No manual setup required! Subtitles are enabled by default.</p>
             
             <h3>Fullscreen Experience</h3>
             <p>Enjoy immersive fullscreen viewing with subtitle support that works perfectly in fullscreen mode.</p>
@@ -704,13 +710,13 @@ function loadDocsContent(subpage) {
             <p>Simply navigate to the video page and start streaming. Turkish subtitles will start automatically!</p>
             
             <h3>Subtitle Controls</h3>
-            <p>Subtitles are enabled by default. Use the "Subtitles" button to toggle them on/off.</p>
+            <p>Subtitles are enabled by default. Use the "Subtitles" button to toggle them on/off if needed.</p>
             
             <h3>Fullscreen Mode</h3>
             <p>Click the "Fullscreen" button for an immersive viewing experience. Subtitles work perfectly in fullscreen.</p>
             
             <div class="note">
-                <p><strong>Note:</strong> CyberStream automatically synchronizes Turkish subtitles with video playback for the best viewing experience.</p>
+                <p><strong>Note:</strong> CyberStream automatically synchronizes Turkish subtitles with video playback for the best viewing experience. Subtitles are enabled by default.</p>
             </div>
         `
     };
