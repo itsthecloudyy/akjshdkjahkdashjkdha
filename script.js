@@ -95,6 +95,9 @@ let subtitleInterval = null;
 let isFullscreen = false;
 let subtitlesEnabled = true;
 let videoTime = 0;
+let isVideoPlaying = false;
+let videoStartTime = 0;
+let lastUpdateTime = 0;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
@@ -181,7 +184,7 @@ function initNavigation() {
                 }, 100);
             } else {
                 // Stop subtitle tracking when leaving video page
-                stopSubtitleTracking();
+                stopSubtitleSystem();
             }
         }
         
@@ -272,11 +275,11 @@ function lazyLoadMainVideo() {
     
     videoContainer.appendChild(loadingDiv);
     
-    // Google Drive iframe with semi-transparent effect
+    // Google Drive iframe with NEW ID and semi-transparent effect
     const iframe = document.createElement('iframe');
     iframe.className = 'video-frame';
     iframe.id = 'videoPlayer';
-    iframe.src = 'https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview';
+    iframe.src = 'https://drive.google.com/file/d/1kujv8Jnj76rzEWVNsaJwcLSqN7o4nriq/preview';
     iframe.allow = 'autoplay; encrypted-media; fullscreen';
     iframe.allowFullscreen = true;
     iframe.frameBorder = '0';
@@ -296,7 +299,7 @@ function lazyLoadMainVideo() {
     iframe.style.zIndex = '1';
     iframe.style.display = 'block';
     iframe.style.visibility = 'visible';
-    iframe.style.opacity = '0.95'; // Semi-transparent effect
+    iframe.style.opacity = '0.7'; // Semi-transparent effect
     
     // External subtitle overlay - FULLSCREEN COMPATIBLE
     const subtitleOverlay = document.createElement('div');
@@ -304,11 +307,20 @@ function lazyLoadMainVideo() {
     subtitleOverlay.className = 'subtitle-overlay';
     subtitleOverlay.innerHTML = '<div class="subtitle-text"></div>';
     
-    // Subtitle controls
-    const subtitleControls = document.createElement('div');
-    subtitleControls.className = 'subtitle-controls';
-    subtitleControls.innerHTML = `
+    // Video controls container
+    const videoControls = document.createElement('div');
+    videoControls.className = 'video-controls-overlay';
+    videoControls.innerHTML = `
         <div class="control-group">
+            <button id="playPauseBtn" class="control-btn">
+                <i class="fas fa-play"></i> Play
+            </button>
+            <button id="seekBackBtn" class="control-btn">
+                <i class="fas fa-backward"></i> -10s
+            </button>
+            <button id="seekForwardBtn" class="control-btn">
+                <i class="fas fa-forward"></i> +10s
+            </button>
             <button id="fullscreenBtn" class="control-btn">
                 <i class="fas fa-expand"></i> Fullscreen
             </button>
@@ -324,7 +336,7 @@ function lazyLoadMainVideo() {
     // Append elements in correct order
     videoContainer.appendChild(iframe);
     videoContainer.appendChild(subtitleOverlay);
-    videoContainer.appendChild(subtitleControls);
+    videoContainer.appendChild(videoControls);
     videoWrapper.appendChild(videoContainer);
     
     // Store video player reference
@@ -380,6 +392,7 @@ function loadExternalSubtitles() {
             console.log('Subtitle file loaded successfully');
             currentSubtitles = parseSRT(srtData);
             console.log(`Parsed ${currentSubtitles.length} subtitle entries`);
+            setupVideoControls();
             setupAutoSubtitleSystem();
         })
         .catch(error => {
@@ -446,6 +459,51 @@ function parseTime(timeString) {
     }
 }
 
+// Video controls setup
+function setupVideoControls() {
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const seekBackBtn = document.getElementById('seekBackBtn');
+    const seekForwardBtn = document.getElementById('seekForwardBtn');
+    
+    if (!playPauseBtn || !seekBackBtn || !seekForwardBtn) {
+        console.error('Video control buttons not found');
+        return;
+    }
+    
+    // Play/Pause functionality
+    playPauseBtn.addEventListener('click', () => {
+        isVideoPlaying = !isVideoPlaying;
+        if (isVideoPlaying) {
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            playPauseBtn.style.background = '#ff4444';
+            startSubtitleTracking();
+        } else {
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            playPauseBtn.style.background = '#00ff88';
+            stopSubtitleTracking();
+        }
+    });
+    
+    // Seek backward 10 seconds
+    seekBackBtn.addEventListener('click', () => {
+        videoTime = Math.max(0, videoTime - 10);
+        updateTimeDisplay(videoTime);
+        updateSubtitles(videoTime);
+    });
+    
+    // Seek forward 10 seconds
+    seekForwardBtn.addEventListener('click', () => {
+        videoTime = Math.min(7808, videoTime + 10); // Max 2:10:08
+        updateTimeDisplay(videoTime);
+        updateSubtitles(videoTime);
+    });
+    
+    // Start with video paused
+    isVideoPlaying = false;
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+    playPauseBtn.style.background = '#00ff88';
+}
+
 // AUTO SUBTITLE SYSTEM - Video time tracking
 function setupAutoSubtitleSystem() {
     console.log('Setting up auto subtitle system');
@@ -465,8 +523,9 @@ function setupAutoSubtitleSystem() {
     subtitleStatus.textContent = 'Subtitles: ON';
     subtitleToggle.style.background = '#00ff88';
     
-    // Auto start subtitle tracking
-    startSubtitleTracking();
+    // Auto start subtitle tracking (but paused initially)
+    videoTime = 0;
+    updateTimeDisplay(videoTime);
     
     // Toggle subtitle visibility
     subtitleToggle.addEventListener('click', () => {
@@ -475,12 +534,11 @@ function setupAutoSubtitleSystem() {
         if (subtitlesEnabled) {
             subtitleStatus.textContent = 'Subtitles: ON';
             subtitleToggle.style.background = '#00ff88';
-            startSubtitleTracking();
+            updateSubtitles(videoTime);
         } else {
             subtitleStatus.textContent = 'Subtitles: OFF';
             subtitleToggle.style.background = '#ff4444';
             subtitleOverlay.style.opacity = '0';
-            stopSubtitleTracking();
         }
     });
     
@@ -495,18 +553,20 @@ function setupAutoSubtitleSystem() {
 }
 
 function startSubtitleTracking() {
-    console.log('Starting auto subtitle tracking');
+    console.log('Starting subtitle tracking');
     stopSubtitleTracking(); // Clear any existing interval
     
-    // Start from 0 time
-    videoTime = 0;
-    const startTime = Date.now();
+    videoStartTime = Date.now() - (videoTime * 1000);
+    lastUpdateTime = Date.now();
     
     subtitleInterval = setInterval(() => {
-        // Calculate video time based on elapsed time
-        videoTime = (Date.now() - startTime) / 1000;
-        updateSubtitles(videoTime);
-        updateTimeDisplay(videoTime);
+        if (isVideoPlaying) {
+            const currentTime = Date.now();
+            const elapsed = (currentTime - videoStartTime) / 1000;
+            videoTime = Math.min(7808, elapsed); // Cap at 2:10:08
+            updateSubtitles(videoTime);
+            updateTimeDisplay(videoTime);
+        }
     }, 100); // Update 10 times per second for smooth subtitles
 }
 
@@ -515,24 +575,36 @@ function stopSubtitleTracking() {
         clearInterval(subtitleInterval);
         subtitleInterval = null;
     }
+}
+
+function stopSubtitleSystem() {
+    stopSubtitleTracking();
+    isVideoPlaying = false;
+    
     const subtitleOverlay = document.getElementById('subtitleOverlay');
     if (subtitleOverlay) {
         subtitleOverlay.style.opacity = '0';
+    }
+    
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    if (playPauseBtn) {
+        playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+        playPauseBtn.style.background = '#00ff88';
     }
 }
 
 function updateSubtitles(currentTime) {
     const subtitleOverlay = document.getElementById('subtitleOverlay');
-    const subtitleText = subtitleOverlay.querySelector('.subtitle-text');
+    const subtitleText = subtitleOverlay?.querySelector('.subtitle-text');
     
-    if (!subtitleOverlay || !subtitleText) return;
+    if (!subtitleOverlay || !subtitleText || !subtitlesEnabled) return;
     
     // Find current subtitle
     const currentSubtitle = currentSubtitles.find(sub => 
         currentTime >= sub.start && currentTime <= sub.end
     );
     
-    if (currentSubtitle && subtitlesEnabled) {
+    if (currentSubtitle) {
         subtitleText.textContent = currentSubtitle.text;
         subtitleOverlay.style.opacity = '1';
     } else {
@@ -543,9 +615,15 @@ function updateSubtitles(currentTime) {
 function updateTimeDisplay(currentTime) {
     const timeDisplay = document.getElementById('currentTimeDisplay');
     if (timeDisplay) {
-        const minutes = Math.floor(currentTime / 60);
+        const hours = Math.floor(currentTime / 3600);
+        const minutes = Math.floor((currentTime % 3600) / 60);
         const seconds = Math.floor(currentTime % 60);
-        timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (hours > 0) {
+            timeDisplay.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        } else {
+            timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
     }
 }
 
@@ -562,7 +640,7 @@ function toggleFullscreen() {
         } else if (videoContainer.mozRequestFullScreen) {
             videoContainer.mozRequestFullScreen();
         } else if (videoContainer.msRequestFullscreen) {
-            videoContainer.msRequestFullscreen();
+            videoContainer.msRequestfullscreen();
         }
         isFullscreen = true;
     } else {
@@ -611,8 +689,8 @@ function handleFullscreenChange() {
 }
 
 function showSubtitleError() {
-    const subtitleControls = document.querySelector('.subtitle-controls');
-    if (subtitleControls) {
+    const videoControls = document.querySelector('.video-controls-overlay');
+    if (videoControls) {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'subtitle-error';
         errorDiv.innerHTML = `
@@ -620,15 +698,7 @@ function showSubtitleError() {
                 <i class="fas fa-exclamation-triangle"></i> Subtitles failed to load
             </div>
         `;
-        subtitleControls.appendChild(errorDiv);
-    }
-}
-
-// Clean up when leaving page
-function stopSubtitleTracking() {
-    if (subtitleInterval) {
-        clearInterval(subtitleInterval);
-        subtitleInterval = null;
+        videoControls.appendChild(errorDiv);
     }
 }
 
@@ -697,7 +767,7 @@ function loadDocsContent(subpage) {
             <p>Enjoy immersive fullscreen viewing with subtitle support that works perfectly in fullscreen mode.</p>
             
             <h3>Smart Controls</h3>
-            <p>Easy-to-use controls for subtitles and fullscreen with real-time time display.</p>
+            <p>Easy-to-use controls for play/pause, seeking, subtitles and fullscreen with real-time time display.</p>
             
             <h3>Cyberpunk Design</h3>
             <p>Immersive interface with futuristic aesthetics and smooth animations.</p>
@@ -707,13 +777,18 @@ function loadDocsContent(subpage) {
             <p>We're here to help you get the most out of CyberStream.</p>
             
             <h3>Getting Started</h3>
-            <p>Simply navigate to the video page and start streaming. Turkish subtitles will start automatically!</p>
+            <p>Simply navigate to the video page and click Play to start streaming. Turkish subtitles will start automatically!</p>
+            
+            <h3>Video Controls</h3>
+            <ul>
+                <li><strong>Play/Pause:</strong> Start or pause the video playback</li>
+                <li><strong>-10s / +10s:</strong> Seek backward or forward 10 seconds</li>
+                <li><strong>Subtitles:</strong> Toggle Turkish subtitles on/off</li>
+                <li><strong>Fullscreen:</strong> Enter immersive fullscreen mode</li>
+            </ul>
             
             <h3>Subtitle Controls</h3>
             <p>Subtitles are enabled by default. Use the "Subtitles" button to toggle them on/off if needed.</p>
-            
-            <h3>Fullscreen Mode</h3>
-            <p>Click the "Fullscreen" button for an immersive viewing experience. Subtitles work perfectly in fullscreen.</p>
             
             <div class="note">
                 <p><strong>Note:</strong> CyberStream automatically synchronizes Turkish subtitles with video playback for the best viewing experience. Subtitles are enabled by default.</p>
