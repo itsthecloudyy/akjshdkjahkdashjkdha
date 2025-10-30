@@ -424,7 +424,7 @@ body {
     line-height: 1.6;
 }
 
-/* Video Player Styles */
+/* SIMPLE VIDEO PLAYER - NO CUSTOM UI */
 .video-container {
     background: #000;
     border-radius: 12px;
@@ -444,7 +444,7 @@ body {
     background: #000;
 }
 
-.video-with-subtitles {
+.video-container-simple {
     position: absolute;
     top: 0;
     left: 0;
@@ -453,157 +453,12 @@ body {
     background: #000;
 }
 
-/* Semi-transparent video player */
-.video-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* Direct Video Player */
+.direct-video-player {
     width: 100%;
     height: 100%;
-    border: none;
+    object-fit: contain;
     background: #000;
-    display: block;
-    visibility: visible;
-    z-index: 1;
-    opacity: 0.9;
-    transition: opacity 0.3s ease;
-}
-
-.video-frame:hover {
-    opacity: 1;
-}
-
-/* Video Controls - MOVED TO TOP */
-.video-controls-overlay {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    z-index: 3;
-    background: rgba(0,0,0,0.9);
-    padding: 15px;
-    border-radius: 10px;
-    color: white;
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.control-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.control-btn {
-    padding: 8px 16px;
-    background: #00ccff;
-    color: black;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.control-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,255,136,0.3);
-}
-
-.control-btn:nth-child(1) {
-    background: #00ccff; /* Set Time button */
-}
-
-.control-btn:nth-child(2) {
-    background: #00ff88; /* Subtitles button */
-}
-
-.control-btn:nth-child(3) {
-    background: #ff4444; /* Fullscreen button */
-}
-
-.time-display {
-    color: #aaa;
-    font-size: 12px;
-    font-family: 'Courier New', monospace;
-    background: rgba(255,255,255,0.1);
-    padding: 5px 10px;
-    border-radius: 4px;
-    border: 1px solid rgba(255,255,255,0.2);
-}
-
-/* Time Input Styles */
-.time-input-group {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-
-.time-input {
-    padding: 8px 12px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 6px;
-    color: white;
-    font-size: 12px;
-    width: 80px;
-    text-align: center;
-    font-family: 'Courier New', monospace;
-}
-
-.time-input::placeholder {
-    color: rgba(255,255,255,0.5);
-}
-
-.time-input:focus {
-    outline: none;
-    border-color: #00ff88;
-    background: rgba(255,255,255,0.15);
-}
-
-/* AUTO SUBTITLE SYSTEM STYLES */
-.subtitle-overlay {
-    position: absolute;
-    bottom: 80px; /* Adjusted for top controls */
-    left: 0;
-    width: 100%;
-    text-align: center;
-    z-index: 2;
-    pointer-events: none;
-    transition: all 0.3s ease;
-    opacity: 0;
-}
-
-.subtitle-overlay.fullscreen {
-    bottom: 100px;
-}
-
-.subtitle-text {
-    display: inline-block;
-    color: #ffffff;
-    font-size: 24px;
-    font-weight: bold;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-    font-family: 'Arial', sans-serif;
-    padding: 12px 24px;
-    background: rgba(0,0,0,0.8);
-    border-radius: 8px;
-    max-width: 80%;
-    margin: 0 auto;
-    line-height: 1.4;
-    border: 1px solid rgba(255,255,255,0.2);
-    animation: fadeIn 0.3s ease;
 }
 
 /* Video Loading States */
@@ -830,39 +685,6 @@ body {
     color: #aaa;
 }
 
-/* Fullscreen Styles */
-:fullscreen .subtitle-overlay,
-:-webkit-full-screen .subtitle-overlay,
-:-moz-full-screen .subtitle-overlay,
-:-ms-fullscreen .subtitle-overlay {
-    bottom: 120px;
-    z-index: 2147483647;
-}
-
-:fullscreen .subtitle-text,
-:-webkit-full-screen .subtitle-text,
-:-moz-full-screen .subtitle-text,
-:-ms-fullscreen .subtitle-text {
-    font-size: 32px;
-    padding: 20px 30px;
-}
-
-:fullscreen .video-controls-overlay,
-:-webkit-full-screen .video-controls-overlay,
-:-moz-full-screen .video-controls-overlay,
-:-ms-fullscreen .video-controls-overlay {
-    z-index: 2147483647;
-    background: rgba(0,0,0,0.8);
-    top: 20px;
-}
-
-:fullscreen .video-frame,
-:-webkit-full-screen .video-frame,
-:-moz-full-screen .video-frame,
-:-ms-fullscreen .video-frame {
-    opacity: 1;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
@@ -919,41 +741,6 @@ body {
         font-size: 2rem;
     }
     
-    /* Responsive subtitle styles */
-    .subtitle-text {
-        font-size: 18px;
-        padding: 10px 15px;
-    }
-    
-    .subtitle-overlay {
-        bottom: 60px;
-    }
-    
-    .video-controls-overlay {
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        padding: 10px;
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    .control-group {
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .control-btn {
-        padding: 6px 12px;
-        font-size: 11px;
-    }
-    
-    .time-input {
-        width: 70px;
-        font-size: 11px;
-        padding: 6px 10px;
-    }
-    
     .video-container {
         min-height: 400px;
     }
@@ -976,40 +763,6 @@ body {
     .warning-content {
         padding: 1.5rem;
         margin: 1rem;
-    }
-    
-    /* Mobile subtitle styles */
-    .subtitle-text {
-        font-size: 16px;
-        padding: 8px 12px;
-        max-width: 90%;
-    }
-    
-    .subtitle-overlay {
-        bottom: 50px;
-    }
-    
-    .video-controls-overlay {
-        top: 5px;
-        left: 5px;
-        right: 5px;
-        padding: 8px;
-    }
-    
-    .control-btn {
-        padding: 5px 10px;
-        font-size: 10px;
-    }
-    
-    .time-input {
-        width: 60px;
-        font-size: 10px;
-        padding: 5px 8px;
-    }
-    
-    .time-display {
-        font-size: 10px;
-        padding: 4px 8px;
     }
     
     .video-container {
@@ -1104,29 +857,4 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-@keyframes pulse-sync {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-/* SMART SYNC Button Styles */
-.sync-btn {
-    animation: pulse-sync 2s infinite;
-}
-
-.control-btn.sync-btn {
-    background: #ffaa00;
-}
-
-.control-btn.sync-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 170, 0, 0.3);
-}
-
-/* Sync status colors */
-#syncStatus {
-    transition: all 0.3s ease;
-    font-weight: bold;
 }
