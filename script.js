@@ -79,6 +79,9 @@ class LoadingScreen {
     hide() {
         const intro = document.getElementById('introScreen');
         intro.classList.add('hidden');
+        
+        // Show main content
+        document.querySelector('.main-content').style.opacity = '1';
     }
 }
 
@@ -87,11 +90,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Check if mobile device
     if (isMobileDevice()) {
         const mobileWarning = document.getElementById('mobileWarning');
-        mobileWarning.classList.add('active');
+        mobileWarning.style.display = 'flex';
         
         // Proceed anyway button
         document.getElementById('proceedAnyway').addEventListener('click', function() {
-            mobileWarning.classList.remove('active');
+            mobileWarning.style.display = 'none';
             initializeApp();
         });
     } else {
@@ -124,7 +127,7 @@ class MultiPlayerSelector {
         this.playerStatus = document.querySelector('.player-status');
         this.mixdropWarning = document.getElementById('mixdropWarning');
         this.currentPlayer = 'doodstream';
-        this.loadedPlayers = new Set(['doodstream']); // Track loaded players
+        this.loadedPlayers = new Set(['doodstream']);
         
         this.init();
     }
@@ -156,13 +159,13 @@ class MultiPlayerSelector {
         
         // Hide all video containers first
         document.querySelectorAll('.video-container').forEach(container => {
-            container.style.display = 'none';
+            container.classList.remove('active');
         });
         
         // Show active video container
         const activeContainer = document.getElementById(playerId + 'Container');
         if (activeContainer) {
-            activeContainer.style.display = 'block';
+            activeContainer.classList.add('active');
             
             // Lazy load the player if not already loaded
             if (!this.loadedPlayers.has(playerId)) {
@@ -193,7 +196,7 @@ class MultiPlayerSelector {
         
         // Create and append the iframe only when needed
         const iframe = document.createElement('iframe');
-        iframe.className = 'video-frame active';
+        iframe.className = 'video-frame';
         iframe.allow = 'autoplay; encrypted-media; fullscreen';
         iframe.allowFullscreen = true;
         iframe.frameBorder = '0';
@@ -203,22 +206,19 @@ class MultiPlayerSelector {
             case 'doodstream':
                 iframe.src = 'https://doodstream.com/e/t2gc0n61c3iv';
                 iframe.title = 'Dead Poets Society - DoodStream';
-                iframe.width = '100%';
-                iframe.height = '100%';
                 break;
             case 'filemoon':
                 iframe.src = 'https://filemoon.sx/e/ra1uugjc5f0v';
                 iframe.title = 'Dead Poets Society - FileMoon';
-                iframe.width = '100%';
-                iframe.height = '100%';
                 break;
             case 'mixdrop':
                 iframe.src = 'https://mixdrop.co/e/vkqqjd1qs0433p';
                 iframe.title = 'Dead Poets Society - MixDrop';
-                iframe.width = '100%';
-                iframe.height = '100%';
                 break;
         }
+        
+        iframe.width = '100%';
+        iframe.height = '100%';
         
         videoWrapper.appendChild(iframe);
         
@@ -303,10 +303,13 @@ function initNavigation() {
         }
         
         // Pause network animation on content pages to save resources
-        if (targetPage !== 'home') {
-            document.getElementById('networkBackground').style.opacity = '0.2';
-        } else {
-            document.getElementById('networkBackground').style.opacity = '0.4';
+        const background = document.getElementById('networkBackground');
+        if (background) {
+            if (targetPage !== 'home') {
+                background.style.opacity = '0.2';
+            } else {
+                background.style.opacity = '0.4';
+            }
         }
     }
     
@@ -328,12 +331,12 @@ function initNavigation() {
             // Show target page, hide others
             pageContents.forEach(page => {
                 page.classList.remove('active');
-                page.style.display = 'none';
             });
             
             const targetPageElement = document.getElementById(targetPage + 'Page');
-            targetPageElement.classList.add('active');
-            targetPageElement.style.display = 'block';
+            if (targetPageElement) {
+                targetPageElement.classList.add('active');
+            }
             
             // Initialize multi-player when backup page is loaded
             if (targetPage === 'backup' && !multiPlayer) {
@@ -356,6 +359,8 @@ function initNavigation() {
 // Lazy load main video
 function lazyLoadMainVideo() {
     const videoWrapper = document.querySelector('#videoPage .video-wrapper');
+    if (!videoWrapper) return;
+    
     const existingFrame = videoWrapper.querySelector('.video-frame');
     
     // Only load if not already loaded
@@ -364,7 +369,7 @@ function lazyLoadMainVideo() {
         videoWrapper.innerHTML = '';
         
         const iframe = document.createElement('iframe');
-        iframe.className = 'video-frame active';
+        iframe.className = 'video-frame';
         iframe.src = 'https://drive.google.com/file/d/1LuxmLPRva19uLm4RaKsr2GDnpO6GW2Pv/preview';
         iframe.allow = 'autoplay; encrypted-media; fullscreen';
         iframe.allowFullscreen = true;
@@ -413,10 +418,14 @@ function initDocumentation() {
         });
     });
 
+    // Load initial content
     loadDocsContent('about');
 }
 
 function loadDocsContent(subpage) {
+    const docsContent = document.getElementById('docsContent');
+    if (!docsContent) return;
+    
     const content = {
         'about': `
             <h2>About CyberStream</h2>
@@ -481,7 +490,7 @@ function loadDocsContent(subpage) {
         `
     };
 
-    document.getElementById('docsContent').innerHTML = content[subpage] || content['about'];
+    docsContent.innerHTML = content[subpage] || content['about'];
 }
 
 // Performance monitoring
@@ -489,10 +498,12 @@ function monitorPerformance() {
     // Reduce network animation when page is not visible
     document.addEventListener('visibilitychange', function() {
         const background = document.getElementById('networkBackground');
-        if (document.hidden) {
-            background.style.opacity = '0.1';
-        } else {
-            background.style.opacity = '0.4';
+        if (background) {
+            if (document.hidden) {
+                background.style.opacity = '0.1';
+            } else {
+                background.style.opacity = '0.4';
+            }
         }
     });
 }
