@@ -453,6 +453,7 @@ body {
     background: #000;
 }
 
+/* Semi-transparent video player */
 .video-frame {
     position: absolute;
     top: 0;
@@ -464,6 +465,12 @@ body {
     display: block;
     visibility: visible;
     z-index: 1;
+    opacity: 0.95; /* Semi-transparent effect */
+    transition: opacity 0.3s ease;
+}
+
+.video-frame:hover {
+    opacity: 1; /* Full opacity on hover */
 }
 
 /* AUTO SUBTITLE SYSTEM STYLES */
@@ -809,6 +816,13 @@ body {
 :-ms-fullscreen .subtitle-controls {
     z-index: 2147483647;
     background: rgba(0,0,0,0.8);
+}
+
+:fullscreen .video-frame,
+:-webkit-full-screen .video-frame,
+:-moz-full-screen .video-frame,
+:-ms-fullscreen .video-frame {
+    opacity: 1; /* Full opacity in fullscreen */
 }
 
 /* Responsive Design */
