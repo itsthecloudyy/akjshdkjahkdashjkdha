@@ -100,7 +100,7 @@ function initializeApp() {
     mainContent.style.visibility = 'visible';
     
     initNavigation();
-    initDocumentation();
+    initMobileMenu();
     
     setTimeout(() => {
         if (typeof initNetworkBackground === 'function') {
@@ -109,6 +109,27 @@ function initializeApp() {
     }, 100);
     
     console.log('Application initialized successfully');
+}
+
+// Mobile menu functionality
+function initMobileMenu() {
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (toggle && navMenu) {
+        toggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            toggle.classList.toggle('active');
+        });
+        
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                toggle.classList.remove('active');
+            });
+        });
+    }
 }
 
 // Navigation system
@@ -280,165 +301,6 @@ function loadGoogleDrivePlayer() {
             loadingDiv.style.display = 'none';
         }
     }, 5000);
-}
-
-// Documentation system
-function initDocumentation() {
-    console.log('Initializing documentation system');
-    
-    const docLinks = document.querySelectorAll('.docs-link');
-    const docContent = document.getElementById('docsContent');
-    
-    const docs = {
-        about: `
-            <h2>About CyberStream</h2>
-            <p>CyberStream is a next-generation video streaming platform designed with a cyberpunk-inspired aesthetic and cutting-edge technology. Our mission is to provide a seamless, high-performance streaming experience while maintaining user privacy and data security.</p>
-            
-            <h3>Our Vision</h3>
-            <p>We believe that video streaming should be fast, reliable, and beautiful. CyberStream combines futuristic design with modern web technologies to create an immersive viewing experience that works across all devices.</p>
-            
-            <div class="note">
-                <p><strong>Note:</strong> CyberStream is built with modern web standards and requires a compatible browser for optimal performance.</p>
-            </div>
-            
-            <h3>Platform Features</h3>
-            <ul>
-                <li><strong>High Performance Streaming:</strong> Optimized video delivery with adaptive bitrate technology</li>
-                <li><strong>Privacy First:</strong> No tracking, no ads, no data collection</li>
-                <li><strong>Cross-Platform:</strong> Works on desktop, tablet, and mobile devices</li>
-                <li><strong>Modern Design:</strong> Cyberpunk-inspired interface with smooth animations</li>
-                <li><strong>Auto Subtitles:</strong> Automatic Turkish subtitle integration</li>
-            </ul>
-        `,
-        technology: `
-            <h2>Technology Stack</h2>
-            <p>CyberStream is built using modern web technologies to ensure the best possible performance and user experience.</p>
-            
-            <h3>Frontend Technologies</h3>
-            <ul>
-                <li><strong>HTML5:</strong> Semantic markup for accessibility and SEO</li>
-                <li><strong>CSS3:</strong> Advanced styling with CSS Grid, Flexbox, and custom properties</li>
-                <li><strong>JavaScript ES6+:</strong> Modern JavaScript with async/await and modules</li>
-                <li><strong>Canvas API:</strong> For dynamic background animations and effects</li>
-            </ul>
-            
-            <h3>Video Technology</h3>
-            <ul>
-                <li><strong>Google Drive Integration:</strong> Leveraging Google's infrastructure for reliable video hosting</li>
-                <li><strong>Adaptive Bitrate:</strong> Automatic quality adjustment based on network conditions</li>
-                <li><strong>HTML5 Video:</strong> Native browser video playback for maximum compatibility</li>
-            </ul>
-            
-            <h3>Performance Optimizations</h3>
-            <ul>
-                <li>Lazy loading of resources</li>
-                <li>Efficient animation using requestAnimationFrame</li>
-                <li>Minimal DOM manipulation</li>
-                <li>Optimized asset delivery</li>
-            </ul>
-        `,
-        features: `
-            <h2>Platform Features</h2>
-            <p>CyberStream offers a comprehensive set of features designed to enhance your video streaming experience.</p>
-            
-            <h3>Core Features</h3>
-            <ul>
-                <li><strong>High-Quality Streaming:</strong> Support for up to 1080p video quality with smooth playback</li>
-                <li><strong>Automatic Subtitles:</strong> Turkish subtitles that sync perfectly with video content</li>
-                <li><strong>Responsive Design:</strong> Optimized experience across all device sizes</li>
-                <li><strong>Fast Loading:</strong> Optimized loading times with progressive enhancement</li>
-                <li><strong>Privacy Protection:</strong> No user tracking or data collection</li>
-            </ul>
-            
-            <h3>User Experience</h3>
-            <ul>
-                <li><strong>Intuitive Navigation:</strong> Simple, clean interface that's easy to use</li>
-                <li><strong>Smooth Animations:</strong> Carefully crafted animations that enhance usability</li>
-                <li><strong>Accessibility:</strong> Built with accessibility best practices</li>
-                <li><strong>Mobile Optimized:</strong> Touch-friendly interface for mobile devices</li>
-            </ul>
-            
-            <h3>Video Player Features</h3>
-            <ul>
-                <li>Fullscreen support</li>
-                <li>Playback speed control</li>
-                <li>Quality selection</li>
-                <li>Subtitle toggle</li>
-                <li>Keyboard shortcuts</li>
-            </ul>
-        `,
-        support: `
-            <h2>Support & Help</h2>
-            <p>Need help with CyberStream? Here are some common solutions and support options.</p>
-            
-            <h3>Common Issues</h3>
-            
-            <h4>Video Won't Play</h4>
-            <ul>
-                <li>Check your internet connection</li>
-                <li>Ensure your browser is up to date</li>
-                <li>Try refreshing the page</li>
-                <li>Clear your browser cache</li>
-            </ul>
-            
-            <h4>Subtitles Not Showing</h4>
-            <ul>
-                <li>Make sure subtitles are enabled in the player</li>
-                <li>Check if your browser supports WebVTT format</li>
-                <li>Try switching to a different browser</li>
-            </ul>
-            
-            <h4>Performance Issues</h4>
-            <ul>
-                <li>Close other tabs and applications</li>
-                <li>Check your internet speed</li>
-                <li>Try lowering the video quality</li>
-                <li>Update your graphics drivers</li>
-            </ul>
-            
-            <h3>Browser Compatibility</h3>
-            <p>CyberStream works best with modern browsers:</p>
-            <ul>
-                <li>Chrome 90+</li>
-                <li>Firefox 88+</li>
-                <li>Safari 14+</li>
-                <li>Edge 90+</li>
-            </ul>
-            
-            <div class="note">
-                <p><strong>Tip:</strong> For the best experience, we recommend using the latest version of Chrome or Firefox.</p>
-            </div>
-        `
-    };
-    
-    function showDocContent(docId) {
-        console.log('Showing documentation:', docId);
-        if (docs[docId] && docContent) {
-            docContent.innerHTML = docs[docId];
-        }
-        
-        docLinks.forEach(link => link.classList.remove('active'));
-        const activeLink = document.querySelector(`[data-subpage="${docId}"]`);
-        if (activeLink) {
-            activeLink.classList.add('active');
-        }
-    }
-    
-    docLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const docId = this.getAttribute('data-subpage');
-            showDocContent(docId);
-        });
-    });
-    
-    // Show default content
-    if (docLinks.length > 0) {
-        const firstDoc = docLinks[0].getAttribute('data-subpage');
-        showDocContent(firstDoc);
-    }
-    
-    console.log('Documentation system initialized');
 }
 
 // Error handling
