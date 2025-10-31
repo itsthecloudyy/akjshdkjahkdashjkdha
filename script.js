@@ -1,9 +1,3 @@
-// Device detection
-function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           (window.innerWidth <= 768 && window.innerHeight <= 1024);
-}
-
 // Loading screen management
 class LoadingScreen {
     constructor() {
@@ -92,19 +86,9 @@ let videoPlayer = null;
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded - initializing app');
     
-    if (isMobileDevice()) {
-        const mobileWarning = document.getElementById('mobileWarning');
-        mobileWarning.style.display = 'flex';
-        
-        document.getElementById('proceedAnyway').addEventListener('click', function() {
-            mobileWarning.style.display = 'none';
-            initializeApp();
-        });
-    } else {
-        const loadingScreen = new LoadingScreen();
-        await loadingScreen.start();
-        initializeApp();
-    }
+    const loadingScreen = new LoadingScreen();
+    await loadingScreen.start();
+    initializeApp();
 });
 
 function initializeApp() {
@@ -295,111 +279,176 @@ function loadGoogleDrivePlayer() {
         if (loadingDiv.parentNode && loadingDiv.style.display !== 'none') {
             loadingDiv.style.display = 'none';
         }
-    }, 10000);
+    }, 5000);
 }
 
 // Documentation system
 function initDocumentation() {
-    console.log('Initializing documentation');
-    const docsLinks = document.querySelectorAll('.docs-link');
+    console.log('Initializing documentation system');
     
-    docsLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const subpage = this.getAttribute('data-subpage');
-            
-            docsLinks.forEach(doc => doc.classList.remove('active'));
-            this.classList.add('active');
-            
-            loadDocsContent(subpage);
-        });
-    });
-
-    loadDocsContent('about');
-}
-
-function loadDocsContent(subpage) {
-    const docsContent = document.getElementById('docsContent');
-    if (!docsContent) return;
+    const docLinks = document.querySelectorAll('.docs-link');
+    const docContent = document.getElementById('docsContent');
     
-    const content = {
-        'about': `
+    const docs = {
+        about: `
             <h2>About CyberStream</h2>
-            <p>CyberStream is a next-generation video streaming platform integrated with Google Drive.</p>
+            <p>CyberStream is a next-generation video streaming platform designed with a cyberpunk-inspired aesthetic and cutting-edge technology. Our mission is to provide a seamless, high-performance streaming experience while maintaining user privacy and data security.</p>
             
-            <h3>Features</h3>
-            <ul>
-                <li><strong>Google Drive Integration:</strong> Seamless playback using Google Drive's native player</li>
-                <li><strong>Native Controls:</strong> Full access to Google Drive's video player interface</li>
-                <li><strong>Turkish Subtitles:</strong> Subtitles burned into the video stream</li>
-                <li><strong>Fullscreen Support:</strong> Complete fullscreen functionality</li>
-            </ul>
-        `,
-        'technology': `
-            <h2>Google Drive Integration</h2>
-            <p>CyberStream leverages Google Drive's powerful video streaming infrastructure for reliable playback.</p>
-            
-            <h3>Google Drive Player Features</h3>
-            <ul>
-                <li>Adaptive bitrate streaming</li>
-                <li>Built-in subtitle support (if available)</li>
-                <li>Quality selection</li>
-                <li>Playback speed control</li>
-                <li>Fullscreen mode</li>
-            </ul>
-        `,
-        'support': `
-            <h2>Support & Help</h2>
-            
-            <h3>Using the Google Drive Player</h3>
-            <p>The video player uses Google Drive's native interface with all standard controls:</p>
-            <ul>
-                <li><strong>Play/Pause:</strong> Standard video controls</li>
-                <li><strong>Volume:</strong> Built-in volume control</li>
-                <li><strong>Fullscreen:</strong> Google Drive's fullscreen button</li>
-                <li><strong>Seeking:</strong> Click anywhere on the progress bar</li>
-                <li><strong>Settings:</strong> Quality and playback speed options</li>
-            </ul>
-            
-            <h3>Subtitles</h3>
-            <p>Turkish subtitles are burned directly into the video and cannot be turned off.</p>
+            <h3>Our Vision</h3>
+            <p>We believe that video streaming should be fast, reliable, and beautiful. CyberStream combines futuristic design with modern web technologies to create an immersive viewing experience that works across all devices.</p>
             
             <div class="note">
-                <p><strong>Note:</strong> This platform uses Google Drive's official video player interface for the best streaming experience.</p>
+                <p><strong>Note:</strong> CyberStream is built with modern web standards and requires a compatible browser for optimal performance.</p>
+            </div>
+            
+            <h3>Platform Features</h3>
+            <ul>
+                <li><strong>High Performance Streaming:</strong> Optimized video delivery with adaptive bitrate technology</li>
+                <li><strong>Privacy First:</strong> No tracking, no ads, no data collection</li>
+                <li><strong>Cross-Platform:</strong> Works on desktop, tablet, and mobile devices</li>
+                <li><strong>Modern Design:</strong> Cyberpunk-inspired interface with smooth animations</li>
+                <li><strong>Auto Subtitles:</strong> Automatic Turkish subtitle integration</li>
+            </ul>
+        `,
+        technology: `
+            <h2>Technology Stack</h2>
+            <p>CyberStream is built using modern web technologies to ensure the best possible performance and user experience.</p>
+            
+            <h3>Frontend Technologies</h3>
+            <ul>
+                <li><strong>HTML5:</strong> Semantic markup for accessibility and SEO</li>
+                <li><strong>CSS3:</strong> Advanced styling with CSS Grid, Flexbox, and custom properties</li>
+                <li><strong>JavaScript ES6+:</strong> Modern JavaScript with async/await and modules</li>
+                <li><strong>Canvas API:</strong> For dynamic background animations and effects</li>
+            </ul>
+            
+            <h3>Video Technology</h3>
+            <ul>
+                <li><strong>Google Drive Integration:</strong> Leveraging Google's infrastructure for reliable video hosting</li>
+                <li><strong>Adaptive Bitrate:</strong> Automatic quality adjustment based on network conditions</li>
+                <li><strong>HTML5 Video:</strong> Native browser video playback for maximum compatibility</li>
+            </ul>
+            
+            <h3>Performance Optimizations</h3>
+            <ul>
+                <li>Lazy loading of resources</li>
+                <li>Efficient animation using requestAnimationFrame</li>
+                <li>Minimal DOM manipulation</li>
+                <li>Optimized asset delivery</li>
+            </ul>
+        `,
+        features: `
+            <h2>Platform Features</h2>
+            <p>CyberStream offers a comprehensive set of features designed to enhance your video streaming experience.</p>
+            
+            <h3>Core Features</h3>
+            <ul>
+                <li><strong>High-Quality Streaming:</strong> Support for up to 1080p video quality with smooth playback</li>
+                <li><strong>Automatic Subtitles:</strong> Turkish subtitles that sync perfectly with video content</li>
+                <li><strong>Responsive Design:</strong> Optimized experience across all device sizes</li>
+                <li><strong>Fast Loading:</strong> Optimized loading times with progressive enhancement</li>
+                <li><strong>Privacy Protection:</strong> No user tracking or data collection</li>
+            </ul>
+            
+            <h3>User Experience</h3>
+            <ul>
+                <li><strong>Intuitive Navigation:</strong> Simple, clean interface that's easy to use</li>
+                <li><strong>Smooth Animations:</strong> Carefully crafted animations that enhance usability</li>
+                <li><strong>Accessibility:</strong> Built with accessibility best practices</li>
+                <li><strong>Mobile Optimized:</strong> Touch-friendly interface for mobile devices</li>
+            </ul>
+            
+            <h3>Video Player Features</h3>
+            <ul>
+                <li>Fullscreen support</li>
+                <li>Playback speed control</li>
+                <li>Quality selection</li>
+                <li>Subtitle toggle</li>
+                <li>Keyboard shortcuts</li>
+            </ul>
+        `,
+        support: `
+            <h2>Support & Help</h2>
+            <p>Need help with CyberStream? Here are some common solutions and support options.</p>
+            
+            <h3>Common Issues</h3>
+            
+            <h4>Video Won't Play</h4>
+            <ul>
+                <li>Check your internet connection</li>
+                <li>Ensure your browser is up to date</li>
+                <li>Try refreshing the page</li>
+                <li>Clear your browser cache</li>
+            </ul>
+            
+            <h4>Subtitles Not Showing</h4>
+            <ul>
+                <li>Make sure subtitles are enabled in the player</li>
+                <li>Check if your browser supports WebVTT format</li>
+                <li>Try switching to a different browser</li>
+            </ul>
+            
+            <h4>Performance Issues</h4>
+            <ul>
+                <li>Close other tabs and applications</li>
+                <li>Check your internet speed</li>
+                <li>Try lowering the video quality</li>
+                <li>Update your graphics drivers</li>
+            </ul>
+            
+            <h3>Browser Compatibility</h3>
+            <p>CyberStream works best with modern browsers:</p>
+            <ul>
+                <li>Chrome 90+</li>
+                <li>Firefox 88+</li>
+                <li>Safari 14+</li>
+                <li>Edge 90+</li>
+            </ul>
+            
+            <div class="note">
+                <p><strong>Tip:</strong> For the best experience, we recommend using the latest version of Chrome or Firefox.</p>
             </div>
         `
     };
-
-    docsContent.innerHTML = content[subpage] || content['about'];
-}
-
-// Performance monitoring
-function monitorPerformance() {
-    document.addEventListener('visibilitychange', function() {
-        const background = document.getElementById('networkBackground');
-        if (background) {
-            if (document.hidden) {
-                background.style.opacity = '0.1';
-            } else {
-                background.style.opacity = '0.4';
-            }
+    
+    function showDocContent(docId) {
+        console.log('Showing documentation:', docId);
+        if (docs[docId] && docContent) {
+            docContent.innerHTML = docs[docId];
         }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', monitorPerformance);
-
-// Add CSS for animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        
+        docLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`[data-subpage="${docId}"]`);
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
     }
     
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    docLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const docId = this.getAttribute('data-subpage');
+            showDocContent(docId);
+        });
+    });
+    
+    // Show default content
+    if (docLinks.length > 0) {
+        const firstDoc = docLinks[0].getAttribute('data-subpage');
+        showDocContent(firstDoc);
     }
-`;
-document.head.appendChild(style);
+    
+    console.log('Documentation system initialized');
+}
+
+// Error handling
+window.addEventListener('error', function(e) {
+    console.error('Global error:', e.error);
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('Unhandled promise rejection:', e.reason);
+});
+
+// Export functions for global access
+window.loadGoogleDrivePlayer = loadGoogleDrivePlayer;
