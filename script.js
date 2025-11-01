@@ -1,3 +1,58 @@
+// Device detection and mobile blocking
+class DeviceManager {
+    constructor() {
+        this.isMobile = this.checkMobileDevice();
+        this.mobileBlock = document.getElementById('mobileBlock');
+    }
+
+    checkMobileDevice() {
+        // Check screen width
+        const isSmallScreen = window.innerWidth <= 768;
+        
+        // Check user agent
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+        
+        // Check touch support
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        
+        // Check device orientation
+        const isPortrait = window.innerHeight > window.innerWidth;
+        
+        return isSmallScreen || isMobileUserAgent || isTouchDevice;
+    }
+
+    blockMobileAccess() {
+        if (this.isMobile && this.mobileBlock) {
+            console.log('Mobile device detected. Blocking access.');
+            this.mobileBlock.classList.add('active');
+            
+            // Hide all main content
+            const mainContent = document.getElementById('mainContent');
+            const header = document.getElementById('mainHeader');
+            const footer = document.getElementById('mainFooter');
+            
+            if (mainContent) mainContent.style.display = 'none';
+            if (header) header.style.display = 'none';
+            if (footer) footer.style.display = 'none';
+            
+            // Prevent any further initialization
+            return true;
+        }
+        return false;
+    }
+
+    getDeviceInfo() {
+        return {
+            isMobile: this.isMobile,
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            userAgent: navigator.userAgent,
+            touchSupport: 'ontouchstart' in window || navigator.maxTouchPoints > 0
+        };
+    }
+}
+
 // Loading screen management
 class LoadingScreen {
     constructor() {
@@ -87,10 +142,21 @@ class LoadingScreen {
 let videoPlayer = null;
 let isVideoPlayerLoaded = false;
 let currentPage = 'home';
+let deviceManager = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded - initializing app');
+    
+    // Initialize device manager first
+    deviceManager = new DeviceManager();
+    
+    // Check if mobile and block access
+    if (deviceManager.blockMobileAccess()) {
+        console.log('Access blocked for mobile device');
+        console.log('Device info:', deviceManager.getDeviceInfo());
+        return; // Stop initialization for mobile devices
+    }
     
     try {
         const loadingScreen = new LoadingScreen();
@@ -112,7 +178,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 function initializeApp() {
-    console.log('Initializing application');
+    console.log('Initializing application for desktop device');
+    console.log('Device info:', deviceManager ? deviceManager.getDeviceInfo() : 'No device info');
     
     const mainContent = document.querySelector('.main-content');
     if (mainContent) {
@@ -138,7 +205,7 @@ function initializeApp() {
     console.log('Application initialized successfully');
 }
 
-// Mobile menu functionality
+// Mobile menu functionality (for desktop with small windows)
 function initMobileMenu() {
     const toggle = document.querySelector('.mobile-menu-toggle');
     const navMenu = document.querySelector('.nav-menu');
@@ -384,6 +451,22 @@ function cleanupVideoPlayer() {
     }
 }
 
+// Handle window resize for device type changes
+function handleResize() {
+    if (deviceManager) {
+        const wasMobile = deviceManager.isMobile;
+        deviceManager.isMobile = deviceManager.checkMobileDevice();
+        
+        if (!wasMobile && deviceManager.isMobile) {
+            // Became mobile - block access
+            deviceManager.blockMobileAccess();
+        } else if (wasMobile && !deviceManager.isMobile) {
+            // Became desktop - allow access
+            location.reload();
+        }
+    }
+}
+
 // Error handling
 window.addEventListener('error', function(e) {
     console.error('Global error:', e.error);
@@ -392,6 +475,8 @@ window.addEventListener('error', function(e) {
 window.addEventListener('unhandledrejection', function(e) {
     console.error('Unhandled promise rejection:', e.reason);
 });
+
+window.addEventListener('resize', handleResize);
 
 // Export functions for global access
 window.loadGoogleDrivePlayer = loadGoogleDrivePlayer;
