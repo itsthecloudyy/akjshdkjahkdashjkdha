@@ -85,6 +85,8 @@ class LoadingScreen {
 
 // Global variables
 let videoPlayer = null;
+let isVideoPlayerLoaded = false;
+let currentPage = 'home';
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
@@ -183,6 +185,13 @@ function initNavigation() {
     function switchPage(targetPage) {
         console.log('Switching to page:', targetPage);
         
+        // Don't switch if already on the same page
+        if (currentPage === targetPage) {
+            return;
+        }
+        
+        currentPage = targetPage;
+        
         pageContents.forEach(page => {
             page.style.display = 'none';
             page.classList.remove('active');
@@ -195,7 +204,7 @@ function initNavigation() {
             targetPageElement.classList.add('active');
             targetPageElement.style.visibility = 'visible';
             
-            if (targetPage === 'video') {
+            if (targetPage === 'video' && !isVideoPlayerLoaded) {
                 setTimeout(() => {
                     loadGoogleDrivePlayer();
                 }, 300);
@@ -230,17 +239,30 @@ function initNavigation() {
     console.log('Navigation initialized');
 }
 
-// GOOGLE DRIVE PLAYER with their interface
+// GOOGLE DRIVE PLAYER with their interface - FIXED VERSION
 function loadGoogleDrivePlayer() {
     console.log('Loading Google Drive player with their interface');
-    const videoWrapper = document.querySelector('#videoPage .video-wrapper');
+    
+    // Prevent multiple loading
+    if (isVideoPlayerLoaded) {
+        console.log('Video player already loaded, skipping...');
+        return;
+    }
+    
+    const videoWrapper = document.getElementById('videoWrapper');
     if (!videoWrapper) {
         console.error('Video wrapper not found');
         return;
     }
     
-    // Clear existing content
-    videoWrapper.innerHTML = '';
+    // Clear existing content but only if not already loaded
+    if (!videoWrapper.querySelector('.drive-iframe')) {
+        videoWrapper.innerHTML = '';
+    } else {
+        console.log('Video player iframe already exists');
+        return;
+    }
+    
     videoWrapper.style.position = 'relative';
     videoWrapper.style.width = '100%';
     videoWrapper.style.height = '100%';
@@ -319,6 +341,7 @@ function loadGoogleDrivePlayer() {
     iframe.addEventListener('load', () => {
         console.log('Google Drive player loaded successfully');
         loadingDiv.style.display = 'none';
+        isVideoPlayerLoaded = true;
     });
     
     iframe.addEventListener('error', (e) => {
@@ -328,9 +351,10 @@ function loadGoogleDrivePlayer() {
                 <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
                 <h3 style="color: #ff4444; margin-bottom: 1rem;">Google Drive Player Failed to Load</h3>
                 <p style="color: #ccc; margin-bottom: 1.5rem;">Please try refreshing the page or check your internet connection.</p>
-                <button onclick="loadGoogleDrivePlayer()" class="retry-btn" style="background: #ff4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">Retry</button>
+                <button onclick="retryVideoLoad()" class="retry-btn" style="background: #ff4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">Retry</button>
             </div>
         `;
+        isVideoPlayerLoaded = false;
     });
     
     // Remove loading after timeout as fallback
@@ -339,6 +363,25 @@ function loadGoogleDrivePlayer() {
             loadingDiv.style.display = 'none';
         }
     }, 8000);
+}
+
+// Retry function for video loading
+function retryVideoLoad() {
+    console.log('Retrying video load...');
+    isVideoPlayerLoaded = false;
+    loadGoogleDrivePlayer();
+}
+
+// Cleanup function to reset video player when needed
+function cleanupVideoPlayer() {
+    if (videoPlayer) {
+        const iframe = document.getElementById('drivePlayer');
+        if (iframe && iframe.parentNode) {
+            iframe.parentNode.removeChild(iframe);
+        }
+        videoPlayer = null;
+        isVideoPlayerLoaded = false;
+    }
 }
 
 // Error handling
@@ -352,4 +395,6 @@ window.addEventListener('unhandledrejection', function(e) {
 
 // Export functions for global access
 window.loadGoogleDrivePlayer = loadGoogleDrivePlayer;
+window.retryVideoLoad = retryVideoLoad;
+window.cleanupVideoPlayer = cleanupVideoPlayer;
 window.initMobileMenu = initMobileMenu;
