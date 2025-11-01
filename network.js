@@ -10,6 +10,8 @@ function initNetworkBackground() {
         return;
     }
     
+    // Clear existing content
+    background.innerHTML = '';
     background.appendChild(canvas);
     const ctx = canvas.getContext('2d');
     
@@ -20,7 +22,6 @@ function initNetworkBackground() {
     canvas.height = height;
     
     const nodes = [];
-    const connections = [];
     const nodeCount = Math.min(50, Math.floor(width * height / 20000));
     
     // Create nodes
@@ -34,6 +35,8 @@ function initNetworkBackground() {
             color: `rgba(0, 255, 136, ${Math.random() * 0.3 + 0.1})`
         });
     }
+    
+    let animationId = null;
     
     function animate() {
         ctx.clearRect(0, 0, width, height);
@@ -77,7 +80,7 @@ function initNetworkBackground() {
             }
         }
         
-        requestAnimationFrame(animate);
+        animationId = requestAnimationFrame(animate);
     }
     
     // Handle resize
@@ -88,11 +91,29 @@ function initNetworkBackground() {
         canvas.height = height;
     }
     
-    window.addEventListener('resize', handleResize);
+    // Throttled resize handler
+    let resizeTimeout;
+    function throttledResize() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(handleResize, 250);
+    }
+    
+    window.addEventListener('resize', throttledResize);
+    
+    // Cleanup function
+    function cleanup() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        window.removeEventListener('resize', throttledResize);
+    }
     
     // Start animation
     animate();
     console.log('Network background animation started');
+    
+    // Return cleanup function
+    return cleanup;
 }
 
 // Make function globally available
