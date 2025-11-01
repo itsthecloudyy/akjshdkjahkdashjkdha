@@ -187,15 +187,22 @@ body {
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle.active {
+    color: #00ccff;
+    transform: rotate(90deg);
 }
 
 /* Main Content */
 .main-content {
-    opacity: 1;
-    display: block;
-    visibility: visible;
+    opacity: 0;
+    display: none;
+    visibility: hidden;
     min-height: 100vh;
     padding-top: 80px;
+    transition: opacity 0.5s ease;
 }
 
 .container {
@@ -208,6 +215,9 @@ body {
 .page-content {
     display: none;
     min-height: calc(100vh - 160px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
 }
 
 .page-content.active {
@@ -512,6 +522,7 @@ body {
         transform: translateY(-10px);
         opacity: 0;
         visibility: hidden;
+        z-index: 1000;
     }
     
     .nav-menu.active {
@@ -523,11 +534,29 @@ body {
     .nav-link {
         padding: 1rem 2rem;
         border-radius: 0;
-        justify-content: center;
+        justify-content: flex-start;
     }
     
     .hero h1, .hero-video h1 {
         font-size: 2.5rem;
+    }
+    
+    .tagline {
+        font-size: 1.1rem;
+    }
+    
+    .video-meta {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
     }
     
     .btn-group {
@@ -537,34 +566,8 @@ body {
     
     .btn {
         width: 100%;
-        max-width: 250px;
+        max-width: 300px;
         justify-content: center;
-    }
-    
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .video-meta {
-        flex-direction: column;
-        gap: 0.8rem;
-    }
-    
-    .loading-logo {
-        font-size: 2rem;
-    }
-    
-    .video-container {
-        min-height: 400px;
-    }
-    
-    .main-content {
-        padding-top: 100px;
-    }
-    
-    .hero, .hero-video {
-        padding: 3rem 1rem;
-        margin-bottom: 2rem;
     }
 }
 
@@ -578,65 +581,56 @@ body {
         font-size: 2rem;
     }
     
-    .feature-card, .video-info {
+    .loading-logo {
+        font-size: 2rem;
+    }
+    
+    .video-info {
         padding: 1.5rem;
     }
     
-    .video-container {
-        min-height: 300px;
-    }
-    
-    .nav-brand {
-        font-size: 1.3rem;
+    .video-title {
+        font-size: 1.5rem;
     }
 }
 
-/* Performance optimizations for animations */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-    .feature-card, .video-info {
-        border-color: #fff;
-        background: #000;
-    }
-    
-    .nav-link:hover, .nav-link.active {
-        background: #fff;
-        color: #000;
-    }
-}
-
-/* Print styles */
-@media print {
-    .background, .nav-menu, .btn, .intro {
-        display: none !important;
-    }
-    
-    body {
-        background: white !important;
-        color: black !important;
-    }
-    
-    .hero, .hero-video {
-        background: #f0f0f0 !important;
-        border: 1px solid #ccc !important;
-    }
-}
-
-/* Additional animations */
+/* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+/* Focus styles for accessibility */
+button:focus, 
+a:focus, 
+.nav-link:focus {
+    outline: 2px solid #00ff88;
+    outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 136, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 136, 0.7);
 }
