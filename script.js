@@ -70,12 +70,16 @@ class LoadingScreen {
 
     hide() {
         const intro = document.getElementById('introScreen');
-        intro.classList.add('hidden');
+        if (intro) {
+            intro.classList.add('hidden');
+        }
         
         const mainContent = document.querySelector('.main-content');
-        mainContent.style.opacity = '1';
-        mainContent.style.display = 'block';
-        mainContent.style.visibility = 'visible';
+        if (mainContent) {
+            mainContent.style.opacity = '1';
+            mainContent.style.display = 'block';
+            mainContent.style.visibility = 'visible';
+        }
     }
 }
 
@@ -86,27 +90,48 @@ let videoPlayer = null;
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded - initializing app');
     
-    const loadingScreen = new LoadingScreen();
-    await loadingScreen.start();
-    initializeApp();
+    try {
+        const loadingScreen = new LoadingScreen();
+        await loadingScreen.start();
+        initializeApp();
+    } catch (error) {
+        console.error('Failed to initialize app:', error);
+        // Fallback: hide loading screen and show main content
+        const intro = document.getElementById('introScreen');
+        if (intro) intro.classList.add('hidden');
+        
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            mainContent.style.opacity = '1';
+            mainContent.style.display = 'block';
+            mainContent.style.visibility = 'visible';
+        }
+    }
 });
 
 function initializeApp() {
     console.log('Initializing application');
     
     const mainContent = document.querySelector('.main-content');
-    mainContent.style.opacity = '1';
-    mainContent.style.display = 'block';
-    mainContent.style.visibility = 'visible';
+    if (mainContent) {
+        mainContent.style.opacity = '1';
+        mainContent.style.display = 'block';
+        mainContent.style.visibility = 'visible';
+    }
     
     initNavigation();
     initMobileMenu();
     
+    // Initialize network background with delay for better performance
     setTimeout(() => {
         if (typeof initNetworkBackground === 'function') {
-            initNetworkBackground();
+            try {
+                initNetworkBackground();
+            } catch (error) {
+                console.error('Failed to initialize network background:', error);
+            }
         }
-    }, 100);
+    }, 300);
     
     console.log('Application initialized successfully');
 }
@@ -117,7 +142,8 @@ function initMobileMenu() {
     const navMenu = document.querySelector('.nav-menu');
     
     if (toggle && navMenu) {
-        toggle.addEventListener('click', function() {
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
             navMenu.classList.toggle('active');
             toggle.classList.toggle('active');
         });
@@ -128,6 +154,14 @@ function initMobileMenu() {
                 navMenu.classList.remove('active');
                 toggle.classList.remove('active');
             });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navMenu.contains(e.target) && !toggle.contains(e.target)) {
+                navMenu.classList.remove('active');
+                toggle.classList.remove('active');
+            }
         });
     }
 }
@@ -140,9 +174,11 @@ function initNavigation() {
     const pageContents = document.querySelectorAll('.page-content');
     
     const homePage = document.getElementById('homePage');
-    homePage.style.display = 'block';
-    homePage.classList.add('active');
-    homePage.style.visibility = 'visible';
+    if (homePage) {
+        homePage.style.display = 'block';
+        homePage.classList.add('active');
+        homePage.style.visibility = 'visible';
+    }
     
     function switchPage(targetPage) {
         console.log('Switching to page:', targetPage);
@@ -162,7 +198,7 @@ function initNavigation() {
             if (targetPage === 'video') {
                 setTimeout(() => {
                     loadGoogleDrivePlayer();
-                }, 100);
+                }, 300);
             }
         }
         
@@ -203,6 +239,7 @@ function loadGoogleDrivePlayer() {
         return;
     }
     
+    // Clear existing content
     videoWrapper.innerHTML = '';
     videoWrapper.style.position = 'relative';
     videoWrapper.style.width = '100%';
@@ -210,6 +247,7 @@ function loadGoogleDrivePlayer() {
     videoWrapper.style.minHeight = '500px';
     videoWrapper.style.background = '#000';
     
+    // Create container
     const videoContainer = document.createElement('div');
     videoContainer.className = 'video-container-drive';
     videoContainer.style.position = 'absolute';
@@ -237,8 +275,8 @@ function loadGoogleDrivePlayer() {
     loadingDiv.style.zIndex = '10';
     loadingDiv.innerHTML = `
         <div class="loading-spinner"></div>
-        <p>Loading Google Drive player...</p>
-        <small>Using Google Drive's native interface</small>
+        <p style="margin: 1rem 0;">Loading Google Drive player...</p>
+        <small style="color: #aaa;">Using Google Drive's native interface</small>
     `;
     
     videoContainer.appendChild(loadingDiv);
@@ -286,21 +324,21 @@ function loadGoogleDrivePlayer() {
     iframe.addEventListener('error', (e) => {
         console.error('Google Drive player failed to load:', e);
         loadingDiv.innerHTML = `
-            <div class="video-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Google Drive Player Failed to Load</h3>
-                <p>Please try refreshing the page or check your internet connection.</p>
-                <button onclick="loadGoogleDrivePlayer()" class="retry-btn">Retry</button>
+            <div class="video-error" style="text-align: center; padding: 2rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h3 style="color: #ff4444; margin-bottom: 1rem;">Google Drive Player Failed to Load</h3>
+                <p style="color: #ccc; margin-bottom: 1.5rem;">Please try refreshing the page or check your internet connection.</p>
+                <button onclick="loadGoogleDrivePlayer()" class="retry-btn" style="background: #ff4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">Retry</button>
             </div>
         `;
     });
     
-    // Remove loading after timeout
+    // Remove loading after timeout as fallback
     setTimeout(() => {
         if (loadingDiv.parentNode && loadingDiv.style.display !== 'none') {
             loadingDiv.style.display = 'none';
         }
-    }, 5000);
+    }, 8000);
 }
 
 // Error handling
@@ -314,3 +352,4 @@ window.addEventListener('unhandledrejection', function(e) {
 
 // Export functions for global access
 window.loadGoogleDrivePlayer = loadGoogleDrivePlayer;
+window.initMobileMenu = initMobileMenu;
